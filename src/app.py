@@ -7,12 +7,11 @@ from PySide6.QtWidgets import (
     QListWidget,
     QHBoxLayout,
     QVBoxLayout,
-    QGridLayout,
     QMainWindow,
 )
 
 from src.api import DiabloAPI
-from src.event_card import EventCard
+from src.dashboard import DashboardWidget
 
 
 class MainWindow(QMainWindow):
@@ -24,21 +23,17 @@ class MainWindow(QMainWindow):
         self.resize(1200, 750)
 
         self.api = DiabloAPI()
+
         self.current_boss = None
+        self.current_legion = None
 
         central = QWidget()
         self.setCentralWidget(central)
 
-        # ==========================
-        # Main Layout
-        # ==========================
         main_layout = QHBoxLayout(central)
         main_layout.setContentsMargins(15, 15, 15, 15)
         main_layout.setSpacing(15)
 
-        # ==========================
-        # Sidebar
-        # ==========================
         menu = QListWidget()
         menu.setFixedWidth(220)
 
@@ -50,11 +45,7 @@ class MainWindow(QMainWindow):
 
         main_layout.addWidget(menu)
 
-        # ==========================
-        # Right Side
-        # ==========================
-        right_widget = QWidget()
-        right_layout = QVBoxLayout(right_widget)
+        right_layout = QVBoxLayout()
 
         title = QLabel("Diablo IV Companion")
         title.setAlignment(Qt.AlignCenter)
@@ -62,39 +53,14 @@ class MainWindow(QMainWindow):
             font-size:30px;
             font-weight:bold;
             color:#d9b36c;
-            margin-bottom:10px;
         """)
 
         right_layout.addWidget(title)
 
-        # ==========================
-        # Dashboard Grid
-        # ==========================
-        dashboard = QWidget()
-        grid = QGridLayout(dashboard)
+        self.dashboard = DashboardWidget()
+        right_layout.addWidget(self.dashboard)
 
-        grid.setSpacing(15)
-        grid.setContentsMargins(0, 0, 0, 0)
-
-        self.helltide_card = EventCard("🔥", "Helltide")
-        self.world_boss_card = EventCard("🌍", "World Boss")
-        self.legion_card = EventCard("👹", "Legion Event")
-        self.whisper_card = EventCard("🌳", "Tree of Whispers")
-
-        grid.addWidget(self.world_boss_card, 0, 0)
-        grid.addWidget(self.helltide_card, 0, 1)
-        grid.addWidget(self.legion_card, 1, 0)
-        grid.addWidget(self.whisper_card, 1, 1)
-
-        grid.setColumnStretch(0, 1)
-        grid.setColumnStretch(1, 1)
-
-        grid.setRowStretch(0, 1)
-        grid.setRowStretch(1, 1)
-
-        right_layout.addWidget(dashboard)
-
-        main_layout.addWidget(right_widget, 1)
+        main_layout.addLayout(right_layout)
 
         self.setStyleSheet("""
             QMainWindow{
@@ -123,10 +89,15 @@ class MainWindow(QMainWindow):
         """)
 
         self.load_world_boss()
+        self.load_legion()
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_countdown)
         self.timer.start(1000)
+
+    # ----------------------------------------------------
+    # WORLD BOSS
+    # ----------------------------------------------------
 
     def load_world_boss(self):
 
@@ -135,41 +106,100 @@ class MainWindow(QMainWindow):
         if not self.current_boss:
             return
 
-        self.world_boss_card.set_title(
-            f"🌍 {self.current_boss['boss']}"
-        )
+        card = self.dashboard.world_boss_card
+
+        card.set_title(f"🌍 {self.current_boss['boss']}")
+        card.set_subtitle("Next Spawn")
 
         zone = self.current_boss["zone"][0]["name"]
-        
-        self.world_boss_card.set_status(f"📍 {zone}")
-        self.world_boss_card.set_subtitle("Next Spawn")
-
-    def update_countdown(self):
-
-        if not self.current_boss:
-            return
 
         start = datetime.fromisoformat(
             self.current_boss["startTime"].replace("Z", "+00:00")
-        )
+        ).astimezone()
+
+        card.set_status(f"📍 {zone}\n🕒 {start:%H:%M}")
+
+    # ----------------------------------------------------
+    # LEGION
+    # ----------------------------------------------------
+
+    def load_legion(self):
+
+        self.current_legion = self.api.get_next_legion()
+
+        if not self.current_legion:
+            return
+
+        card = self.dashboard.legion_card
+
+        card.set_title("👹 LEGION")
+        card.set_subtitle("Next Event")
+
+        start = datetime.fromisoformat(
+            self.current_legion["startTime"].replace("Z", "+00:00")
+        ).astimezone()
+
+        card.set_status(f"🕒 {start:%H:%M}")
+
+    # ----------------------------------------------------
+    # UPDATE
+    # ----------------------------------------------------
+
+    def update_countdown(self):
 
         now = datetime.now(timezone.utc)
 
-        seconds = int((start - now).total_seconds())
+        # ---------- World Boss ----------
 
-        if seconds <= 0:
-            self.load_world_boss()
-            return
+        if self.current_boss:
 
-        hours = seconds // 3600
-        minutes = (seconds % 3600) // 60
-        secs = seconds % 60
+            start = datetime.fromisoformat(
+                self.current_boss["startTime"].replace("Z", "+00:00")
+            )
 
-        countdown = f"{hours:02}:{minutes:02}:{secs:02}"
+            seconds = int((start - now).total_seconds())
 
-        self.world_boss_card.set_timer(countdown)
+            if seconds <= 0:
+                self.load_world_boss()
 
-        progress = int((1 - seconds / 12600) * 100)
-        progress = max(0, min(progress, 100))
+            else:
 
-        self.world_boss_card.set_progress(progress)
+                hours = seconds // 3600
+                minutes = (seconds % 3600) // 60
+                secs = seconds % 60
+
+                self.dashboard.world_boss_card.set_timer(
+                    f"{hours:02}:{minutes:02}:{secs:02}"
+                )
+
+                progress = int((1 - seconds / 12600) * 100)
+                progress = max(0, min(progress, 100))
+
+                self.dashboard.world_boss_card.set_progress(progress)
+
+        # ---------- Legion ----------
+
+        if self.current_legion:
+
+            start = datetime.fromisoformat(
+                self.current_legion["startTime"].replace("Z", "+00:00")
+            )
+
+            seconds = int((start - now).total_seconds())
+
+            if seconds <= 0:
+                self.load_legion()
+
+            else:
+
+                minutes = seconds // 60
+                secs = seconds % 60
+
+                self.dashboard.legion_card.set_timer(
+                    f"{minutes:02}:{secs:02}"
+                )
+
+                progress = int((1 - seconds / 1500) * 100)
+                progress = max(0, min(progress, 100))
+
+                self.dashboard.legion_card.set_progress(progress)

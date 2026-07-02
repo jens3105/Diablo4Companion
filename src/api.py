@@ -21,3 +21,14 @@ class DiabloAPI:
                 return boss
 
         return None
+
+    def get_next_legion(self):
+        data = self.get_schedule()
+
+        now = datetime.now(timezone.utc).timestamp()
+
+        for legion in data["legion"]:
+            if legion["timestamp"] > now:
+                return legion
+
+        return None
