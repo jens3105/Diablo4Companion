@@ -5,65 +5,104 @@ from src.event_card import EventCard
 
 
 class DashboardWidget(QWidget):
-    """Responsive dashboard."""
+    """Dashboard v3"""
 
     def __init__(self):
         super().__init__()
 
-        self.layout = QGridLayout(self)
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.layout.setSpacing(15)
+        self.grid = QGridLayout(self)
 
+        self.grid.setContentsMargins(0, 0, 0, 0)
+        self.grid.setHorizontalSpacing(20)
+        self.grid.setVerticalSpacing(20)
+
+        # Cards
         self.world_boss_card = EventCard("🌍", "World Boss")
         self.helltide_card = EventCard("🔥", "Helltide")
-        self.legion_card = EventCard("👹", "Legion Event")
-        self.whisper_card = EventCard("🌳", "Tree of Whispers")
+        self.legion_card = EventCard("👹", "Legion")
 
         self.cards = [
             self.world_boss_card,
             self.helltide_card,
             self.legion_card,
-            self.whisper_card,
         ]
-
-        self._current_columns = None
 
         self.installEventFilter(self)
 
-        self.update_layout()
+        self.current_mode = None
+
+        self.rebuild()
 
     def eventFilter(self, obj, event):
+
         if obj == self and event.type() == QEvent.Resize:
-            self.update_layout()
+            self.rebuild()
 
         return super().eventFilter(obj, event)
 
-    def update_layout(self):
+    def rebuild(self):
+
         width = self.width()
 
-        columns = 2 if width >= 900 else 1
+        # 3 kolonner på stor skærm
+        if width >= 1700:
+            mode = 3
 
-        if columns == self._current_columns:
+        # 2 kolonner
+        elif width >= 900:
+            mode = 2
+
+        # Mobil / smalle vinduer
+        else:
+            mode = 1
+
+        if mode == self.current_mode:
             return
 
-        self._current_columns = columns
+        self.current_mode = mode
 
-        while self.layout.count():
-            item = self.layout.takeAt(0)
+        while self.grid.count():
+            item = self.grid.takeAt(0)
+
             if item.widget():
                 item.widget().setParent(None)
 
-        if columns == 2:
-            self.layout.addWidget(self.world_boss_card, 0, 0)
-            self.layout.addWidget(self.helltide_card, 0, 1)
-            self.layout.addWidget(self.legion_card, 1, 0)
-            self.layout.addWidget(self.whisper_card, 1, 1)
+        # ---------------------------------
+        # 3 kolonner
+        # ---------------------------------
 
-            self.layout.setColumnStretch(0, 1)
-            self.layout.setColumnStretch(1, 1)
+        if mode == 3:
+
+            self.grid.addWidget(self.world_boss_card, 0, 0)
+            self.grid.addWidget(self.helltide_card, 0, 1)
+            self.grid.addWidget(self.legion_card, 0, 2)
+
+            self.grid.setColumnStretch(0, 1)
+            self.grid.setColumnStretch(1, 1)
+            self.grid.setColumnStretch(2, 1)
+
+            self.grid.setRowStretch(0, 1)
+
+        # ---------------------------------
+        # 2 kolonner
+        # ---------------------------------
+
+        elif mode == 2:
+
+            self.grid.addWidget(self.world_boss_card, 0, 0)
+            self.grid.addWidget(self.helltide_card, 0, 1)
+            self.grid.addWidget(self.legion_card, 1, 0, 1, 2)
+
+            self.grid.setColumnStretch(0, 1)
+            self.grid.setColumnStretch(1, 1)
+
+        # ---------------------------------
+        # 1 kolonne
+        # ---------------------------------
 
         else:
-            for row, card in enumerate(self.cards):
-                self.layout.addWidget(card, row, 0)
 
-            self.layout.setColumnStretch(0, 1)
+            for row, card in enumerate(self.cards):
+                self.grid.addWidget(card, row, 0)
+
+            self.grid.setColumnStretch(0, 1)
