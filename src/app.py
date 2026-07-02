@@ -140,8 +140,9 @@ class MainWindow(QMainWindow):
         )
 
         zone = self.current_boss["zone"][0]["name"]
-
+        
         self.world_boss_card.set_status(f"📍 {zone}")
+        self.world_boss_card.set_subtitle("Next Spawn")
 
     def update_countdown(self):
 
