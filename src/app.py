@@ -26,6 +26,7 @@ class MainWindow(QMainWindow):
 
         self.current_boss = None
         self.current_legion = None
+        self.current_helltide = None
 
         central = QWidget()
         self.setCentralWidget(central)
@@ -91,6 +92,7 @@ class MainWindow(QMainWindow):
 
         self.load_world_boss()
         self.load_legion()
+        self.load_helltide()
         self.load_upcoming_events()
 
         self.timer = QTimer()
@@ -146,6 +148,29 @@ class MainWindow(QMainWindow):
         card.set_status(
             f"🕒 {start:%H:%M}"
         )
+
+
+    # ---------------------------------------------------------
+    # HELLTIDE
+    # ---------------------------------------------------------
+
+    def load_helltide(self):
+
+        self.current_helltide = self.api.get_next_helltide()
+
+        if not self.current_helltide:
+            return
+
+        card = self.dashboard.helltide_card
+
+        card.set_title("🔥 HELLTIDE")
+        card.set_subtitle("Next Start")
+
+        start = datetime.fromisoformat(
+            self.current_helltide["startTime"].replace("Z", "+00:00")
+        ).astimezone()
+
+        card.set_status(f"🕒 {start:%H:%M}")
 
     # ---------------------------------------------------------
     # UPCOMING EVENTS
@@ -223,6 +248,29 @@ class MainWindow(QMainWindow):
                 progress = max(0, min(progress, 100))
 
                 self.dashboard.legion_card.set_progress(progress)
+
+
+        # ---------- Helltide ----------
+
+        if self.current_helltide:
+
+            start = datetime.fromisoformat(
+                self.current_helltide["startTime"].replace("Z", "+00:00")
+            )
+
+            seconds = int((start - now).total_seconds())
+
+            if seconds <= 0:
+                self.load_helltide()
+                self.load_upcoming_events()
+            else:
+                hours = seconds // 3600
+                minutes = (seconds % 3600) // 60
+                secs = seconds % 60
+                self.dashboard.helltide_card.set_timer(f"{hours:02}:{minutes:02}:{secs:02}")
+                progress = int((1 - seconds / 3600) * 100)
+                progress = max(0,min(progress,100))
+                self.dashboard.helltide_card.set_progress(progress)
 
         # ---------- Upcoming ----------
 

@@ -85,7 +85,8 @@ class EventCard(QWidget):
 
         self.progress.setRange(0, 100)
         self.progress.setValue(0)
-        self.progress.setTextVisible(False)
+        self.progress.setTextVisible(True)
+        self.progress.setFormat("%p%")
         self.progress.setFixedHeight(14)
 
         # -------------------------
