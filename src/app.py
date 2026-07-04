@@ -58,6 +58,7 @@ class MainWindow(QMainWindow):
         right_layout.addWidget(title)
 
         self.dashboard = DashboardWidget()
+
         right_layout.addWidget(self.dashboard)
 
         main_layout.addLayout(right_layout)
@@ -90,14 +91,15 @@ class MainWindow(QMainWindow):
 
         self.load_world_boss()
         self.load_legion()
+        self.load_upcoming_events()
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_countdown)
         self.timer.start(1000)
 
-    # ----------------------------------------------------
+    # ---------------------------------------------------------
     # WORLD BOSS
-    # ----------------------------------------------------
+    # ---------------------------------------------------------
 
     def load_world_boss(self):
 
@@ -117,11 +119,13 @@ class MainWindow(QMainWindow):
             self.current_boss["startTime"].replace("Z", "+00:00")
         ).astimezone()
 
-        card.set_status(f"📍 {zone}\n🕒 {start:%H:%M}")
+        card.set_status(
+            f"📍 {zone}\n🕒 {start:%H:%M}"
+        )
 
-    # ----------------------------------------------------
+    # ---------------------------------------------------------
     # LEGION
-    # ----------------------------------------------------
+    # ---------------------------------------------------------
 
     def load_legion(self):
 
@@ -139,11 +143,23 @@ class MainWindow(QMainWindow):
             self.current_legion["startTime"].replace("Z", "+00:00")
         ).astimezone()
 
-        card.set_status(f"🕒 {start:%H:%M}")
+        card.set_status(
+            f"🕒 {start:%H:%M}"
+        )
 
-    # ----------------------------------------------------
-    # UPDATE
-    # ----------------------------------------------------
+    # ---------------------------------------------------------
+    # UPCOMING EVENTS
+    # ---------------------------------------------------------
+
+    def load_upcoming_events(self):
+
+        events = self.api.get_upcoming_events()
+
+        self.dashboard.upcoming_card.set_events(events)
+
+    # ---------------------------------------------------------
+    # UPDATE TIMER
+    # ---------------------------------------------------------
 
     def update_countdown(self):
 
@@ -160,7 +176,9 @@ class MainWindow(QMainWindow):
             seconds = int((start - now).total_seconds())
 
             if seconds <= 0:
+
                 self.load_world_boss()
+                self.load_upcoming_events()
 
             else:
 
@@ -188,7 +206,9 @@ class MainWindow(QMainWindow):
             seconds = int((start - now).total_seconds())
 
             if seconds <= 0:
+
                 self.load_legion()
+                self.load_upcoming_events()
 
             else:
 
@@ -203,3 +223,7 @@ class MainWindow(QMainWindow):
                 progress = max(0, min(progress, 100))
 
                 self.dashboard.legion_card.set_progress(progress)
+
+        # ---------- Upcoming ----------
+
+        self.dashboard.upcoming_card.refresh()

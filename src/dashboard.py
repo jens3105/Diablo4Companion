@@ -2,6 +2,7 @@ from PySide6.QtCore import QEvent
 from PySide6.QtWidgets import QWidget, QGridLayout
 
 from src.event_card import EventCard
+from src.upcoming_card import UpcomingCard
 
 
 class DashboardWidget(QWidget):
@@ -16,16 +17,13 @@ class DashboardWidget(QWidget):
         self.grid.setHorizontalSpacing(20)
         self.grid.setVerticalSpacing(20)
 
-        # Cards
+        # Dashboard cards
         self.world_boss_card = EventCard("🌍", "World Boss")
         self.helltide_card = EventCard("🔥", "Helltide")
         self.legion_card = EventCard("👹", "Legion")
 
-        self.cards = [
-            self.world_boss_card,
-            self.helltide_card,
-            self.legion_card,
-        ]
+        # New Upcoming Events card
+        self.upcoming_card = UpcomingCard()
 
         self.installEventFilter(self)
 
@@ -44,15 +42,12 @@ class DashboardWidget(QWidget):
 
         width = self.width()
 
-        # 3 kolonner på stor skærm
+        # ---------- Responsive ----------
+
         if width >= 1700:
             mode = 3
-
-        # 2 kolonner
         elif width >= 900:
             mode = 2
-
-        # Mobil / smalle vinduer
         else:
             mode = 1
 
@@ -67,42 +62,48 @@ class DashboardWidget(QWidget):
             if item.widget():
                 item.widget().setParent(None)
 
-        # ---------------------------------
-        # 3 kolonner
-        # ---------------------------------
+        # ===================================================
+        # Large screens (27")
+        # ===================================================
 
         if mode == 3:
 
             self.grid.addWidget(self.world_boss_card, 0, 0)
             self.grid.addWidget(self.helltide_card, 0, 1)
-            self.grid.addWidget(self.legion_card, 0, 2)
+
+            self.grid.addWidget(self.legion_card, 1, 0)
+            self.grid.addWidget(self.upcoming_card, 1, 1)
 
             self.grid.setColumnStretch(0, 1)
             self.grid.setColumnStretch(1, 1)
-            self.grid.setColumnStretch(2, 1)
 
             self.grid.setRowStretch(0, 1)
+            self.grid.setRowStretch(1, 1)
 
-        # ---------------------------------
-        # 2 kolonner
-        # ---------------------------------
+        # ===================================================
+        # Laptop
+        # ===================================================
 
         elif mode == 2:
 
             self.grid.addWidget(self.world_boss_card, 0, 0)
             self.grid.addWidget(self.helltide_card, 0, 1)
-            self.grid.addWidget(self.legion_card, 1, 0, 1, 2)
+
+            self.grid.addWidget(self.legion_card, 1, 0)
+            self.grid.addWidget(self.upcoming_card, 1, 1)
 
             self.grid.setColumnStretch(0, 1)
             self.grid.setColumnStretch(1, 1)
 
-        # ---------------------------------
-        # 1 kolonne
-        # ---------------------------------
+        # ===================================================
+        # Small window
+        # ===================================================
 
         else:
 
-            for row, card in enumerate(self.cards):
-                self.grid.addWidget(card, row, 0)
+            self.grid.addWidget(self.world_boss_card, 0, 0)
+            self.grid.addWidget(self.helltide_card, 1, 0)
+            self.grid.addWidget(self.legion_card, 2, 0)
+            self.grid.addWidget(self.upcoming_card, 3, 0)
 
             self.grid.setColumnStretch(0, 1)

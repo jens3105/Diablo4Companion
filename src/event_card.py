@@ -22,7 +22,8 @@ class EventCard(QWidget):
             QSizePolicy.Expanding
         )
 
-        self.setMinimumSize(360, 320)
+        self.setMinimumWidth(240)
+        self.setMinimumHeight(180)
 
         layout = QVBoxLayout(self)
 
@@ -36,7 +37,7 @@ class EventCard(QWidget):
         self.title = QLabel(f"{icon} {title.upper()}")
         self.title.setAlignment(Qt.AlignCenter)
 
-        title_font = QFont("Segoe UI", 18)
+        title_font = QFont("Segoe UI", 16)
         title_font.setBold(True)
 
         self.title.setFont(title_font)
@@ -48,7 +49,7 @@ class EventCard(QWidget):
         self.timer = QLabel("--:--:--")
         self.timer.setAlignment(Qt.AlignCenter)
 
-        timer_font = QFont("Consolas", 34)
+        timer_font = QFont("Consolas", 28)
         timer_font.setBold(True)
 
         self.timer.setFont(timer_font)
@@ -72,7 +73,7 @@ class EventCard(QWidget):
         self.status.setAlignment(Qt.AlignCenter)
         self.status.setWordWrap(True)
 
-        status_font = QFont("Segoe UI", 12)
+        status_font = QFont("Segoe UI", 10)
 
         self.status.setFont(status_font)
 
