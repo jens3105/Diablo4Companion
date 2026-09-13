@@ -180,6 +180,46 @@ class LevelingManager:
 
         return True
 
+    def get_skills_data(self, build_name: str | None = None) -> dict:
+        """Return the full milestone list plus a resolved skill bar for
+        the Skills tab. Unlike ``get_progress`` this isn't scoped to a
+        level - the Skills tab tracks completion via explicit checkboxes
+        (persisted in QSettings by the caller), not the level field.
+
+        When a build has no curated ``gear.skill_bar``, falls back to the
+        (up to 6) most recent distinct skill names out of ``milestones``
+        so the section is never just empty.
+        """
+
+        key = self._normalize(build_name) if build_name else self._normalize(
+            self.current_build_name or ""
+        )
+
+        build = self._builds.get(key)
+
+        if build is None:
+            return {"milestones": [], "skill_bar": [], "skill_bar_is_fallback": False}
+
+        milestones = build["milestones"]
+        gear = build.get("gear") or {}
+        skill_bar = gear.get("skill_bar")
+        is_fallback = False
+
+        if not skill_bar:
+            is_fallback = True
+            seen = []
+            for m in milestones:
+                skill = (m.get("skill") or "").strip()
+                if skill and skill not in seen:
+                    seen.append(skill)
+            skill_bar = seen[-6:]
+
+        return {
+            "milestones": milestones,
+            "skill_bar": skill_bar,
+            "skill_bar_is_fallback": is_fallback,
+        }
+
     def get_progress(self, level: int, build_name: str | None = None):
 
         key = self._normalize(build_name) if build_name else self._normalize(

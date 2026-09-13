@@ -145,10 +145,12 @@ class MainWindow(FluentWindow):
         # Show milestones for the restored (or default) build/level
         # straight away, without re-persisting what we just loaded.
         self.on_level_changed(default_level, persist=False)
+        self._refresh_skills()
 
         self.leveling_card.level_changed.connect(self.on_level_changed)
         self.leveling_card.build_changed.connect(self.on_build_changed)
         self.leveling_card.class_changed.connect(self.on_class_changed)
+        self.leveling_card.mark_done.connect(self.on_mark_done)
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_countdown)
@@ -321,11 +323,70 @@ class MainWindow(FluentWindow):
         data = self.leveling_manager.get_progress(level)
 
         self.leveling_card.set_progress(data)
+        self._refresh_skills()
 
         self.settings.setValue("leveling/build", self.leveling_manager.current_build_name)
         self.settings.setValue(
             "leveling/class", self.leveling_manager.get_class_for_build(build_name)
         )
+
+    # ---------------------------------------------------------
+    # BUILD-GUIDE / SKILLS TAB
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def _completed_levels_key(build_name: str) -> str:
+        return f"skills/{build_name}/completed_levels"
+
+    def _load_completed_levels(self, build_name: str) -> set[int]:
+
+        raw = self.settings.value(self._completed_levels_key(build_name), [], type=list)
+        completed = set()
+
+        for value in raw:
+            try:
+                completed.add(int(value))
+            except (TypeError, ValueError):
+                continue
+
+        return completed
+
+    def _save_completed_levels(self, build_name: str, completed: set[int]):
+
+        self.settings.setValue(self._completed_levels_key(build_name), sorted(completed))
+
+    def _refresh_skills(self):
+        """Rebuild the Skills tab for the current build, combining its
+        (level-independent) milestones/skill-bar data with the persisted
+        set of completed milestone levels."""
+
+        build_name = self.leveling_manager.current_build_name
+
+        if not build_name:
+            return
+
+        skills_data = self.leveling_manager.get_skills_data(build_name)
+        completed = self._load_completed_levels(build_name)
+
+        self.leveling_card.set_skills(
+            skills_data["milestones"],
+            skills_data["skill_bar"],
+            skills_data["skill_bar_is_fallback"],
+            completed,
+        )
+
+    def on_mark_done(self, level: int):
+
+        build_name = self.leveling_manager.current_build_name
+
+        if not build_name:
+            return
+
+        completed = self._load_completed_levels(build_name)
+        completed.add(level)
+        self._save_completed_levels(build_name, completed)
+
+        self._refresh_skills()
 
     def on_class_changed(self, class_name: str):
         """Step-1 class selector changed: rebuild the step-2 build

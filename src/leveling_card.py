@@ -9,6 +9,7 @@ from qfluentwidgets import (
     FluentIcon as FIF,
     LineEdit,
     PrimaryPushButton,
+    PushButton,
     SegmentedWidget,
     SingleDirectionScrollArea,
     StrongBodyLabel,
@@ -49,8 +50,10 @@ class LevelingCard(BaseCard):
     level_changed = Signal(int)
     build_changed = Signal(str)
     class_changed = Signal(str)
+    mark_done = Signal(int)
 
     LEVELING_KEY = "leveling"
+    SKILLS_KEY = "skills"
     PARAGON_KEY = "paragon"
     GEAR_KEY = "gear"
 
@@ -123,10 +126,12 @@ class LevelingCard(BaseCard):
         self.section_stack = QStackedWidget(self.content)
 
         self.leveling_page = self._build_leveling_page()
+        self.skills_page = self._build_skills_page()
         self.paragon_page = self._build_scroll_page("paragon_container", "paragon_layout")
         self.gear_page = self._build_scroll_page("gear_container", "gear_layout")
 
         self.section_stack.addWidget(self.leveling_page)
+        self.section_stack.addWidget(self.skills_page)
         self.section_stack.addWidget(self.paragon_page)
         self.section_stack.addWidget(self.gear_page)
 
@@ -134,6 +139,11 @@ class LevelingCard(BaseCard):
             routeKey=self.LEVELING_KEY,
             text="Leveling",
             onClick=lambda: self.section_stack.setCurrentWidget(self.leveling_page),
+        )
+        self.section_selector.addItem(
+            routeKey=self.SKILLS_KEY,
+            text="Skills",
+            onClick=lambda: self.section_stack.setCurrentWidget(self.skills_page),
         )
         self.section_selector.addItem(
             routeKey=self.PARAGON_KEY,
@@ -173,6 +183,28 @@ class LevelingCard(BaseCard):
         scroll, container, inner_layout = self._make_scroll_area(page)
         self.progress_container = container
         self.progress_layout = inner_layout
+
+        layout.addWidget(scroll, 1)
+
+        return page
+
+    def _build_skills_page(self) -> QWidget:
+
+        page = QWidget(self.content)
+        layout = QVBoxLayout(page)
+        layout.setContentsMargins(0, 8, 0, 0)
+        layout.setSpacing(8)
+
+        self.skills_next_label = StrongBodyLabel(
+            "Pick a build to see your next skill point.", page
+        )
+        self.skills_next_label.setWordWrap(True)
+        self.skills_next_label.setTextColor(QColor(ACCENT_GOLD), QColor(ACCENT_GOLD))
+        layout.addWidget(self.skills_next_label)
+
+        scroll, container, inner_layout = self._make_scroll_area(page)
+        self.skills_container = container
+        self.skills_layout = inner_layout
 
         layout.addWidget(scroll, 1)
 
@@ -489,3 +521,100 @@ class LevelingCard(BaseCard):
 
         if source_url:
             self._add_row(layout, container, f"Source: {source_url}")
+
+    # ---------------------------------------------------------
+    # Skills tab
+    # ---------------------------------------------------------
+
+    def set_skills(
+        self,
+        milestones: list[dict],
+        skill_bar: list[str],
+        skill_bar_is_fallback: bool,
+        completed_levels: set[int],
+    ):
+        """Populate the Skills tab. ``milestones`` is the same data the
+        Leveling tab reads (unfiltered by the level field) - completion
+        here is tracked separately via ``completed_levels`` (persisted by
+        the caller in QSettings), not derived from the level input."""
+
+        layout = self.skills_layout
+        container = self.skills_container
+
+        self._clear_rows(layout)
+
+        header = "SKILL BAR" + (" (estimated)" if skill_bar_is_fallback else "")
+        self._add_section_header(layout, container, header)
+
+        if skill_bar:
+            self._add_row(layout, container, " • ".join(skill_bar))
+        else:
+            self._add_row(layout, container, "No skill data available for this build.")
+
+        self._add_section_header(layout, container, "SKILL TREE PROGRESSION")
+
+        if not milestones:
+            self._add_row(layout, container, "No milestones defined for this build.")
+            self.skills_next_label.setText("Pick a build to see your next skill point.")
+            return
+
+        next_milestone = next(
+            (m for m in milestones if m["level"] not in completed_levels), None
+        )
+
+        if next_milestone:
+            self.skills_next_label.setText(
+                f"Next: Lvl {next_milestone['level']} — {next_milestone['skill']}"
+            )
+        else:
+            self.skills_next_label.setText("All skill milestones completed!")
+
+        for milestone in milestones:
+            is_done = milestone["level"] in completed_levels
+            is_next = milestone is next_milestone
+            self._add_milestone_row(layout, container, milestone, is_done, is_next)
+
+    def _add_milestone_row(
+        self, layout: QVBoxLayout, container: QWidget, milestone: dict, is_done: bool, is_next: bool
+    ):
+
+        row = QWidget(container)
+        row.setObjectName("milestoneRow")
+        row_layout = QHBoxLayout(row)
+        row_layout.setContentsMargins(8, 8, 8, 8)
+        row_layout.setSpacing(8)
+
+        if is_done:
+            status = "✓ Completed"
+        elif is_next:
+            status = "→ Next"
+        else:
+            status = "○ Future"
+
+        note = milestone.get("note", "")
+        text = f"{status} — Lvl {milestone['level']} — {milestone['skill']}\n{note}".rstrip()
+
+        label = BodyLabel(text, row)
+        label.setWordWrap(True)
+        text_color = QColor(ACCENT_GOLD) if is_next else QColor(TEXT_PRIMARY)
+        label.setTextColor(text_color, text_color)
+        row_layout.addWidget(label, 1)
+
+        if not is_done:
+            done_button = PushButton("Mark as Done", row)
+            done_button.clicked.connect(
+                lambda _checked=False, lvl=milestone["level"]: self.mark_done.emit(lvl)
+            )
+            row_layout.addWidget(done_button, 0)
+
+        border = f"1px solid {ACCENT_GOLD}" if is_next else "1px solid transparent"
+        row.setStyleSheet(
+            f"""
+            QWidget#milestoneRow {{
+                background-color: {SURFACE_ALT};
+                border-radius: 8px;
+                border: {border};
+            }}
+            """
+        )
+        self._insert_row(layout, row)
