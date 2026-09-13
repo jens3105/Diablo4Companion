@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 from qfluentwidgets import CardWidget, IconWidget, StrongBodyLabel
 from qfluentwidgets.common.icon import FluentIconBase
 
-from src.theme import ACCENT_GOLD
+from src import theme
 
 
 class BaseCard(CardWidget):
@@ -33,16 +33,17 @@ class BaseCard(CardWidget):
         self.title_row = QHBoxLayout()
         self.title_row.setSpacing(8)
 
+        self._icon = icon
         self.icon_widget = None
 
         if icon is not None:
-            self.icon_widget = IconWidget(icon.icon(color=QColor(ACCENT_GOLD)), self)
+            self.icon_widget = IconWidget(icon.icon(color=QColor(theme.ACCENT_GOLD)), self)
             self.icon_widget.setFixedSize(18, 18)
             self.title_row.addWidget(self.icon_widget)
 
         self.title_label = StrongBodyLabel(title, self)
         self.title_label.setObjectName("cardTitle")
-        self.title_label.setTextColor(QColor(ACCENT_GOLD), QColor(ACCENT_GOLD))
+        self.title_label.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
         self.title_row.addWidget(self.title_label)
 
         if title or icon is not None:
@@ -79,3 +80,13 @@ class BaseCard(CardWidget):
 
     def set_title(self, text: str):
         self.title_label.setText(text)
+
+    def refresh_theme(self):
+        """Re-apply the icon/title accent color after a theme/preset
+        change - subclasses that add their own hard-coded colors should
+        override this and call ``super().refresh_theme()``."""
+
+        if self.icon_widget is not None and self._icon is not None:
+            self.icon_widget.setIcon(self._icon.icon(color=QColor(theme.ACCENT_GOLD)))
+
+        self.title_label.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))

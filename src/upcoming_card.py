@@ -6,8 +6,8 @@ from PySide6.QtWidgets import QGridLayout, QSizePolicy
 
 from qfluentwidgets import BodyLabel, CaptionLabel, FluentIcon as FIF
 
+from src import theme
 from src.base_card import BaseCard
-from src.theme import ACCENT_GOLD, TEXT_MUTED
 
 ROW_COUNT = 5
 
@@ -28,10 +28,13 @@ class UpcomingCard(BaseCard):
 
         headers = ["Event", "Starts In", "Time"]
 
+        self.header_labels = []
+
         for col, text in enumerate(headers):
             lbl = CaptionLabel(text, self.content)
-            lbl.setTextColor(QColor(ACCENT_GOLD), QColor(ACCENT_GOLD))
+            lbl.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
             self.grid.addWidget(lbl, 0, col)
+            self.header_labels.append(lbl)
 
         self.rows = []
 
@@ -40,8 +43,8 @@ class UpcomingCard(BaseCard):
             timer = BodyLabel("--:--", self.content)
             clock = BodyLabel("--:--", self.content)
 
-            timer.setTextColor(QColor(TEXT_MUTED), QColor(TEXT_MUTED))
-            clock.setTextColor(QColor(TEXT_MUTED), QColor(TEXT_MUTED))
+            timer.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
+            clock.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
 
             self.grid.addWidget(event, row + 1, 0)
             self.grid.addWidget(timer, row + 1, 1)
@@ -55,7 +58,7 @@ class UpcomingCard(BaseCard):
 
         self.empty_label = CaptionLabel("No data available right now.", self.content)
         self.empty_label.setAlignment(Qt.AlignCenter)
-        self.empty_label.setTextColor(QColor(TEXT_MUTED), QColor(TEXT_MUTED))
+        self.empty_label.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
         self.empty_label.hide()
         self.add_widget(self.empty_label)
 
@@ -109,3 +112,15 @@ class UpcomingCard(BaseCard):
             event_lbl.setText(f"{event['icon']} {event['title']}{suffix}")
             timer_lbl.setText(countdown)
             clock_lbl.setText(start.strftime("%H:%M"))
+
+    def refresh_theme(self):
+        super().refresh_theme()
+
+        for lbl in self.header_labels:
+            lbl.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
+
+        for _event, timer_lbl, clock_lbl in self.rows:
+            timer_lbl.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
+            clock_lbl.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
+
+        self.empty_label.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))

@@ -17,8 +17,8 @@ from qfluentwidgets import (
     SwitchButton,
 )
 
+from src import theme
 from src.base_card import BaseCard
-from src.theme import ACCENT_GOLD, SURFACE_ALT, TEXT_MUTED, TEXT_PRIMARY
 
 # Colors for the small "role" tag shown next to the card title and as a
 # suffix on every build in the dropdown, so it's obvious at a glance
@@ -35,7 +35,6 @@ ROLE_COLORS = {
     "Speed Farm / Bossing": "#e0a458",
     "Leveling / Early Endgame": "#4fb3bf",
 }
-DEFAULT_ROLE_COLOR = TEXT_MUTED
 
 
 class LevelingCard(BaseCard):
@@ -93,8 +92,8 @@ class LevelingCard(BaseCard):
         character_row = QHBoxLayout()
         character_row.setSpacing(8)
 
-        character_label = CaptionLabel("Character:", self.content)
-        character_label.setTextColor(QColor(TEXT_MUTED), QColor(TEXT_MUTED))
+        self.character_label = CaptionLabel("Character:", self.content)
+        self.character_label.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
 
         self.character_combo = ComboBox(self.content)
         self.character_combo.setMinimumWidth(160)
@@ -106,7 +105,7 @@ class LevelingCard(BaseCard):
         rename_character_button = PushButton("Rename", self.content)
         rename_character_button.clicked.connect(self.rename_character_requested)
 
-        character_row.addWidget(character_label)
+        character_row.addWidget(self.character_label)
         character_row.addWidget(self.character_combo, 1)
         character_row.addWidget(add_character_button)
         character_row.addWidget(rename_character_button)
@@ -151,8 +150,8 @@ class LevelingCard(BaseCard):
         input_row = QHBoxLayout()
         input_row.setSpacing(8)
 
-        input_label = CaptionLabel("Your level:", self.content)
-        input_label.setTextColor(QColor(TEXT_MUTED), QColor(TEXT_MUTED))
+        self.input_label = CaptionLabel("Your level:", self.content)
+        self.input_label.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
 
         self.level_input = LineEdit(self.content)
         self.level_input.setPlaceholderText("e.g. 18")
@@ -163,7 +162,7 @@ class LevelingCard(BaseCard):
         submit_button = PrimaryPushButton("Update", self.content)
         submit_button.clicked.connect(self._on_submit)
 
-        input_row.addWidget(input_label)
+        input_row.addWidget(self.input_label)
         input_row.addWidget(self.level_input)
         input_row.addWidget(submit_button)
         input_row.addStretch(1)
@@ -234,7 +233,7 @@ class LevelingCard(BaseCard):
             "Pick a build and enter your level to see what's next.", page
         )
         self.next_label.setWordWrap(True)
-        self.next_label.setTextColor(QColor(ACCENT_GOLD), QColor(ACCENT_GOLD))
+        self.next_label.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
         layout.addWidget(self.next_label)
 
         scroll, container, inner_layout = self._make_scroll_area(page)
@@ -256,7 +255,7 @@ class LevelingCard(BaseCard):
             "Pick a build to see your next skill point.", page
         )
         self.skills_next_label.setWordWrap(True)
-        self.skills_next_label.setTextColor(QColor(ACCENT_GOLD), QColor(ACCENT_GOLD))
+        self.skills_next_label.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
         layout.addWidget(self.skills_next_label)
 
         scroll, container, inner_layout = self._make_scroll_area(page)
@@ -282,7 +281,7 @@ class LevelingCard(BaseCard):
             "Pick a build to see gear readiness.", page
         )
         self.gear_rollup_label.setWordWrap(True)
-        self.gear_rollup_label.setTextColor(QColor(ACCENT_GOLD), QColor(ACCENT_GOLD))
+        self.gear_rollup_label.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
         layout.addWidget(self.gear_rollup_label)
 
         scroll, container, inner_layout = self._make_scroll_area(page)
@@ -307,14 +306,14 @@ class LevelingCard(BaseCard):
         layout.setContentsMargins(12, 10, 12, 10)
         layout.setSpacing(4)
 
-        header = CaptionLabel("BUILD STATUS", widget)
-        header.setTextColor(QColor(ACCENT_GOLD), QColor(ACCENT_GOLD))
-        layout.addWidget(header)
+        self.status_header_label = CaptionLabel("BUILD STATUS", widget)
+        self.status_header_label.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
+        layout.addWidget(self.status_header_label)
 
         self.status_rows_label = BodyLabel("", widget)
         self.status_rows_label.setWordWrap(True)
         self.status_rows_label.setStyleSheet(
-            f"font-family: monospace; font-size: 12px; color: {TEXT_PRIMARY};"
+            f"font-family: monospace; font-size: 12px; color: {theme.TEXT_PRIMARY};"
         )
         layout.addWidget(self.status_rows_label)
 
@@ -324,7 +323,7 @@ class LevelingCard(BaseCard):
         widget.setStyleSheet(
             f"""
             QWidget#buildStatusWidget {{
-                background-color: {SURFACE_ALT};
+                background-color: {theme.SURFACE_ALT};
                 border-radius: 8px;
             }}
             """
@@ -460,7 +459,7 @@ class LevelingCard(BaseCard):
             self.role_tag.setVisible(False)
             return
 
-        color = QColor(ROLE_COLORS.get(short, DEFAULT_ROLE_COLOR))
+        color = QColor(ROLE_COLORS.get(short, theme.TEXT_MUTED))
         self.role_tag.setText(short.upper())
         self.role_tag.setTextColor(color, color)
         self.role_tag.setVisible(True)
@@ -558,8 +557,8 @@ class LevelingCard(BaseCard):
         row.setWordWrap(True)
         row.setStyleSheet(
             f"""
-            background-color: {SURFACE_ALT};
-            color: {TEXT_PRIMARY};
+            background-color: {theme.SURFACE_ALT};
+            color: {theme.TEXT_PRIMARY};
             border-radius: 8px;
             padding: 8px;
             font-size: 12px;
@@ -570,7 +569,7 @@ class LevelingCard(BaseCard):
     def _add_section_header(self, layout: QVBoxLayout, container: QWidget, text: str):
 
         header = CaptionLabel(text, container)
-        header.setTextColor(QColor(ACCENT_GOLD), QColor(ACCENT_GOLD))
+        header.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
         self._insert_row(layout, header)
 
     # ---------------------------------------------------------
@@ -620,7 +619,7 @@ class LevelingCard(BaseCard):
         self.status_rows_label.setText("\n".join(lines))
 
         self.status_footer_label.setText(footer_text)
-        color = QColor(ACCENT_GOLD) if footer_is_ready else QColor(TEXT_MUTED)
+        color = QColor(theme.ACCENT_GOLD) if footer_is_ready else QColor(theme.TEXT_MUTED)
         self.status_footer_label.setTextColor(color, color)
         self.status_footer_label.setVisible(bool(footer_text))
 
@@ -909,15 +908,15 @@ class LevelingCard(BaseCard):
 
         label = BodyLabel(text, row)
         label.setWordWrap(True)
-        text_color = QColor(ACCENT_GOLD) if highlight else QColor(TEXT_PRIMARY)
+        text_color = QColor(theme.ACCENT_GOLD) if highlight else QColor(theme.TEXT_PRIMARY)
         label.setTextColor(text_color, text_color)
         row_layout.addWidget(label, 1)
 
-        border = f"1px solid {ACCENT_GOLD}" if bordered else "1px solid transparent"
+        border = f"1px solid {theme.ACCENT_GOLD}" if bordered else "1px solid transparent"
         row.setStyleSheet(
             f"""
             QWidget#milestoneRow {{
-                background-color: {SURFACE_ALT};
+                background-color: {theme.SURFACE_ALT};
                 border-radius: 8px;
                 border: {border};
             }}
@@ -1016,3 +1015,38 @@ class LevelingCard(BaseCard):
         row_layout.addWidget(toggle, 0)
 
         self._insert_row(layout, row)
+
+    # ---------------------------------------------------------
+    # Theme / appearance
+    # ---------------------------------------------------------
+
+    def refresh_theme(self):
+        """Re-apply this card's own hard-coded colors after a theme/preset
+        change. The checklist rows themselves (Leveling/Skills/Paragon/
+        Gear) already read ``theme.*`` fresh every time they're rendered
+        via ``_add_row``/``_make_row_shell``/``_add_section_header``, so
+        MainWindow re-running the normal "populate the active character"
+        flow after this is what actually re-colors those - this method
+        only covers the labels/backgrounds built once in ``__init__``."""
+
+        super().refresh_theme()
+
+        self.character_label.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
+        self.input_label.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
+
+        self.next_label.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
+        self.skills_next_label.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
+        self.gear_rollup_label.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
+
+        self.status_header_label.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
+        self.status_rows_label.setStyleSheet(
+            f"font-family: monospace; font-size: 12px; color: {theme.TEXT_PRIMARY};"
+        )
+        self.status_widget.setStyleSheet(
+            f"""
+            QWidget#buildStatusWidget {{
+                background-color: {theme.SURFACE_ALT};
+                border-radius: 8px;
+            }}
+            """
+        )

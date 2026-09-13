@@ -10,8 +10,8 @@ from qfluentwidgets import (
     StrongBodyLabel,
 )
 
+from src import theme
 from src.base_card import BaseCard
-from src.theme import ACCENT_GOLD, TEXT_MUTED, TEXT_PRIMARY
 
 
 class CurrentBuildCard(BaseCard):
@@ -56,27 +56,27 @@ class CurrentBuildCard(BaseCard):
         self.content_layout.addWidget(self.build_name_label)
 
         self.level_label = CaptionLabel("", self.content)
-        self.level_label.setTextColor(QColor(TEXT_MUTED), QColor(TEXT_MUTED))
+        self.level_label.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
         self.content_layout.addWidget(self.level_label)
 
         self.content_layout.addSpacing(8)
 
-        status_header = CaptionLabel("BUILD STATUS", self.content)
-        status_header.setTextColor(QColor(ACCENT_GOLD), QColor(ACCENT_GOLD))
-        self.content_layout.addWidget(status_header)
+        self.status_header = CaptionLabel("BUILD STATUS", self.content)
+        self.status_header.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
+        self.content_layout.addWidget(self.status_header)
 
         self.status_rows_label = BodyLabel("", self.content)
         self.status_rows_label.setWordWrap(True)
         self.status_rows_label.setStyleSheet(
-            f"font-family: monospace; font-size: 12px; color: {TEXT_PRIMARY};"
+            f"font-family: monospace; font-size: 12px; color: {theme.TEXT_PRIMARY};"
         )
         self.content_layout.addWidget(self.status_rows_label)
 
         self.content_layout.addSpacing(8)
 
-        next_header = CaptionLabel("NEXT ACTION", self.content)
-        next_header.setTextColor(QColor(ACCENT_GOLD), QColor(ACCENT_GOLD))
-        self.content_layout.addWidget(next_header)
+        self.next_header = CaptionLabel("NEXT ACTION", self.content)
+        self.next_header.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
+        self.content_layout.addWidget(self.next_header)
 
         self.next_action_label = BodyLabel("—", self.content)
         self.next_action_label.setWordWrap(True)
@@ -104,3 +104,13 @@ class CurrentBuildCard(BaseCard):
         self.status_rows_label.setText("\n".join(lines))
 
         self.next_action_label.setText(next_action_text or "—")
+
+    def refresh_theme(self):
+        super().refresh_theme()
+
+        self.level_label.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
+        self.status_header.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
+        self.status_rows_label.setStyleSheet(
+            f"font-family: monospace; font-size: 12px; color: {theme.TEXT_PRIMARY};"
+        )
+        self.next_header.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))

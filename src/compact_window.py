@@ -11,7 +11,7 @@ from qfluentwidgets import (
     TransparentToolButton,
 )
 
-from src.theme import ACCENT_GOLD, BACKGROUND, TEXT_MUTED, TEXT_PRIMARY
+from src import theme
 
 
 class CompactWindow(QWidget):
@@ -48,7 +48,7 @@ class CompactWindow(QWidget):
         # dark background - without this it renders as a plain white/
         # light OS window while its labels are still colored for a dark
         # background (near-invisible white-on-white text).
-        self.setStyleSheet(f"CompactWindow {{ background-color: {BACKGROUND}; }}")
+        self.setStyleSheet(f"CompactWindow {{ background-color: {theme.BACKGROUND}; }}")
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(18, 16, 18, 14)
@@ -59,7 +59,7 @@ class CompactWindow(QWidget):
 
         self.build_label = StrongBodyLabel("", self)
         self.build_label.setWordWrap(True)
-        self.build_label.setTextColor(QColor(TEXT_PRIMARY), QColor(TEXT_PRIMARY))
+        self.build_label.setTextColor(QColor(theme.TEXT_PRIMARY), QColor(theme.TEXT_PRIMARY))
         header_row.addWidget(self.build_label, 1)
 
         # Belt-and-suspenders return-to-normal: the OS title bar's own
@@ -75,18 +75,18 @@ class CompactWindow(QWidget):
         layout.addLayout(header_row)
 
         self.level_label = CaptionLabel("", self)
-        self.level_label.setTextColor(QColor(TEXT_MUTED), QColor(TEXT_MUTED))
+        self.level_label.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
         layout.addWidget(self.level_label)
 
         layout.addSpacing(8)
 
-        next_header = CaptionLabel("NEXT ACTION", self)
-        next_header.setTextColor(QColor(ACCENT_GOLD), QColor(ACCENT_GOLD))
-        layout.addWidget(next_header)
+        self.next_header = CaptionLabel("NEXT ACTION", self)
+        self.next_header.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
+        layout.addWidget(self.next_header)
 
         self.action_label = BodyLabel("—", self)
         self.action_label.setWordWrap(True)
-        self.action_label.setTextColor(QColor(TEXT_PRIMARY), QColor(TEXT_PRIMARY))
+        self.action_label.setTextColor(QColor(theme.TEXT_PRIMARY), QColor(theme.TEXT_PRIMARY))
         layout.addWidget(self.action_label)
 
         layout.addSpacing(4)
@@ -98,7 +98,7 @@ class CompactWindow(QWidget):
         layout.addSpacing(6)
 
         self.preview_label = CaptionLabel("", self)
-        self.preview_label.setTextColor(QColor(TEXT_MUTED), QColor(TEXT_MUTED))
+        self.preview_label.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
         self.preview_label.setWordWrap(True)
         layout.addWidget(self.preview_label)
 
@@ -141,3 +141,16 @@ class CompactWindow(QWidget):
 
         super().showEvent(event)
         self.shown.emit()
+
+    def refresh_theme(self):
+        """Re-apply hard-coded colors after a theme/preset change - this
+        is a plain QWidget (not a BaseCard), so unlike the dashboard cards
+        it doesn't pick up the app background from qfluentwidgets' own
+        theme system automatically."""
+
+        self.setStyleSheet(f"CompactWindow {{ background-color: {theme.BACKGROUND}; }}")
+        self.build_label.setTextColor(QColor(theme.TEXT_PRIMARY), QColor(theme.TEXT_PRIMARY))
+        self.level_label.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
+        self.next_header.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
+        self.action_label.setTextColor(QColor(theme.TEXT_PRIMARY), QColor(theme.TEXT_PRIMARY))
+        self.preview_label.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))

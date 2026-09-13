@@ -6,12 +6,17 @@ from PySide6.QtWidgets import QHBoxLayout, QInputDialog, QVBoxLayout, QWidget
 
 from qfluentwidgets import (
     BodyLabel,
+    CaptionLabel,
+    ComboBox,
     FluentIcon as FIF,
     FluentWindow,
     NavigationItemPosition,
+    StrongBodyLabel,
     SubtitleLabel,
+    SwitchButton,
 )
 
+from src import theme
 from src.api import DiabloAPI
 from src.compact_window import CompactWindow
 from src.dashboard import DashboardWidget
@@ -42,11 +47,20 @@ class BuildsInterface(QWidget):
 
 
 class SettingsInterface(QWidget):
-    """Small about page. Replaces the old decorative 'Settings' entry in
-    the plain QListWidget sidebar, which never actually did anything."""
+    """About page + appearance controls. Replaces the old decorative
+    'Settings' entry in the plain QListWidget sidebar, which never
+    actually did anything.
 
-    def __init__(self, parent=None):
+    The dark/light toggle and the seasonal accent-preset picker apply
+    live (via ``theme.set_appearance``, which both re-styles every
+    built-in qfluentwidgets widget and fires ``theme.theme_changed`` for
+    this app's own hard-coded colors - see ``MainWindow._on_theme_changed``)
+    and are persisted to ``settings`` so they survive a restart."""
+
+    def __init__(self, settings: QSettings, parent=None):
         super().__init__(parent)
+
+        self.settings = settings
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(32, 32, 32, 32)
@@ -68,7 +82,72 @@ class SettingsInterface(QWidget):
         info.setWordWrap(True)
         layout.addWidget(info)
 
+        layout.addSpacing(16)
+
+        appearance_title = StrongBodyLabel("Appearance", self)
+        layout.addWidget(appearance_title)
+
+        # -------------------------
+        # Dark / Light toggle
+        # -------------------------
+
+        theme_row = QHBoxLayout()
+        theme_row.setSpacing(10)
+
+        theme_label = CaptionLabel("Theme:", self)
+        theme_row.addWidget(theme_label)
+
+        self.theme_switch = SwitchButton(self)
+        self.theme_switch.setOnText("Dark")
+        self.theme_switch.setOffText("Light")
+        self.theme_switch.blockSignals(True)
+        self.theme_switch.setChecked(theme.current_mode() == theme.MODE_DARK)
+        self.theme_switch.blockSignals(False)
+        self.theme_switch.checkedChanged.connect(self._on_theme_toggled)
+        theme_row.addWidget(self.theme_switch)
+        theme_row.addStretch(1)
+
+        layout.addLayout(theme_row)
+
+        # -------------------------
+        # Seasonal accent preset
+        # -------------------------
+
+        preset_row = QHBoxLayout()
+        preset_row.setSpacing(10)
+
+        preset_label = CaptionLabel("Accent preset:", self)
+        preset_row.addWidget(preset_label)
+
+        self._preset_keys = [
+            theme.PRESET_DEFAULT,
+            theme.PRESET_CHRISTMAS,
+            theme.PRESET_HALLOWEEN,
+        ]
+
+        self.preset_combo = ComboBox(self)
+        self.preset_combo.addItems([theme.PRESET_LABELS[key] for key in self._preset_keys])
+        self.preset_combo.setMinimumWidth(140)
+        self.preset_combo.blockSignals(True)
+        self.preset_combo.setCurrentIndex(self._preset_keys.index(theme.current_preset()))
+        self.preset_combo.blockSignals(False)
+        self.preset_combo.currentIndexChanged.connect(self._on_preset_changed)
+        preset_row.addWidget(self.preset_combo)
+        preset_row.addStretch(1)
+
+        layout.addLayout(preset_row)
+
         layout.addStretch(1)
+
+    def _on_theme_toggled(self, checked: bool):
+        mode = theme.MODE_DARK if checked else theme.MODE_LIGHT
+        self.settings.setValue("appearance/theme", mode)
+        theme.set_appearance(mode, theme.current_preset())
+
+    def _on_preset_changed(self, index: int):
+        preset = self._preset_keys[index]
+        self.settings.setValue("appearance/accent_preset", preset)
+        theme.set_appearance(theme.current_mode(), preset)
 
 
 class MainWindow(FluentWindow):
@@ -125,7 +204,7 @@ class MainWindow(FluentWindow):
         self.builds_interface = BuildsInterface(self.leveling_card)
         self.builds_interface.setObjectName("buildsInterface")
 
-        self.settings_interface = SettingsInterface()
+        self.settings_interface = SettingsInterface(self.settings)
         self.settings_interface.setObjectName("settingsInterface")
 
         self.addSubInterface(self.dashboard, FIF.HOME, "Dashboard")
@@ -180,9 +259,50 @@ class MainWindow(FluentWindow):
         self.leveling_card.add_character_requested.connect(self.on_add_character)
         self.leveling_card.rename_character_requested.connect(self.on_rename_character)
 
+        # Settings page's dark/light + seasonal accent-preset picker fires
+        # this whenever it changes theme.py's colors, so every already-
+        # built widget with a hard-coded color can re-apply it live.
+        theme.theme_changed.changed.connect(self._on_theme_changed)
+
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_countdown)
         self.timer.start(1000)
+
+    # ---------------------------------------------------------
+    # Theme / appearance
+    # ---------------------------------------------------------
+
+    def _on_theme_changed(self):
+        """Re-color every already-built widget after the Settings page
+        flips dark/light mode or the seasonal accent preset.
+
+        qfluentwidgets' own widgets (CardWidget backgrounds, buttons,
+        combo boxes, the nav bar, scrollbars, ...) already re-styled
+        themselves the moment ``theme.set_appearance`` called
+        ``setTheme``/``setThemeColor`` - this only has to cover colors
+        this app hard-codes itself (see ``src/theme.py``'s module
+        docstring)."""
+
+        for card in (
+            self.dashboard.world_boss_card,
+            self.dashboard.helltide_card,
+            self.dashboard.legion_card,
+            self.dashboard.season_card,
+            self.dashboard.build_card,
+            self.dashboard.upcoming_card,
+            self.leveling_card,
+        ):
+            card.refresh_theme()
+
+        if self.compact_window is not None:
+            self.compact_window.refresh_theme()
+
+        # The Build Guide's checklist rows (Leveling/Skills/Paragon/Gear)
+        # and the Build Status summary already read theme.* fresh every
+        # time they're drawn - re-running the same "populate the active
+        # character" flow used on every build/level/character switch is
+        # the simplest way to redraw them with the new colors too.
+        self._apply_active_character()
 
     # ---------------------------------------------------------
     # Window sizing

@@ -5,8 +5,8 @@ from PySide6.QtWidgets import QLabel, QSizePolicy
 from qfluentwidgets import BodyLabel, CaptionLabel, ProgressBar
 from qfluentwidgets.common.icon import FluentIconBase
 
+from src import theme
 from src.base_card import BaseCard
-from src.theme import ACCENT_GOLD, ACCENT_RED, TEXT_MUTED
 
 
 class EventCard(BaseCard):
@@ -28,7 +28,7 @@ class EventCard(BaseCard):
 
         self.subtitle = CaptionLabel("Next Event", self.content)
         self.subtitle.setAlignment(Qt.AlignCenter)
-        self.subtitle.setTextColor(QColor(TEXT_MUTED), QColor(TEXT_MUTED))
+        self.subtitle.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
         self.content_layout.addWidget(self.subtitle)
 
         # -------------------------
@@ -41,7 +41,7 @@ class EventCard(BaseCard):
         timer_font = QFont("Consolas", 26)
         timer_font.setBold(True)
         self.timer_label.setFont(timer_font)
-        self.timer_label.setStyleSheet(f"color: {ACCENT_GOLD}; background: transparent;")
+        self.timer_label.setStyleSheet(f"color: {theme.ACCENT_GOLD}; background: transparent;")
 
         self.content_layout.addWidget(self.timer_label)
 
@@ -65,13 +65,13 @@ class EventCard(BaseCard):
         self.progress.setRange(0, 100)
         self.progress.setValue(0)
         self.progress.setFixedHeight(6)
-        self.progress.setCustomBarColor(QColor(ACCENT_RED), QColor("#c0392b"))
+        self.progress.setCustomBarColor(QColor(theme.ACCENT_RED), QColor(theme.ACCENT_RED))
 
         self.content_layout.addWidget(self.progress)
 
         self.progress_caption = CaptionLabel("0%", self.content)
         self.progress_caption.setAlignment(Qt.AlignCenter)
-        self.progress_caption.setTextColor(QColor(TEXT_MUTED), QColor(TEXT_MUTED))
+        self.progress_caption.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
 
         self.content_layout.addWidget(self.progress_caption)
 
@@ -95,3 +95,11 @@ class EventCard(BaseCard):
 
     def set_subtitle(self, text):
         self.subtitle.setText(text)
+
+    def refresh_theme(self):
+        super().refresh_theme()
+
+        self.subtitle.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
+        self.timer_label.setStyleSheet(f"color: {theme.ACCENT_GOLD}; background: transparent;")
+        self.progress.setCustomBarColor(QColor(theme.ACCENT_RED), QColor(theme.ACCENT_RED))
+        self.progress_caption.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
