@@ -1,0 +1,79 @@
+{
+  "build_name": "Apocalypse Warlock",
+  "class_name": "Warlock",
+  "source_url": "https://maxroll.gg/d4/build-guides/apocalypse-warlock-leveling-guide",
+  "milestones": [
+    {
+      "level": 3,
+      "skill": "Bombardment",
+      "note": "Core skill for early AoE damage output."
+    },
+    {
+      "level": 4,
+      "skill": "Nether Step",
+      "note": "Primary mobility tool for traversing the battlefield."
+    },
+    {
+      "level": 8,
+      "skill": "Rampage",
+      "note": "AoE powerhouse fueled by Dominance resource."
+    },
+    {
+      "level": 9,
+      "skill": "Dominance",
+      "note": "Secondary resource system to fuel other abilities."
+    },
+    {
+      "level": 12,
+      "skill": "Lesser Demon Wrath",
+      "note": "Enables Lesser Demon skills to generate resources."
+    },
+    {
+      "level": 14,
+      "skill": "Lunatic setup (temporary)",
+      "note": "Build strengthens significantly; run a Lunatic-style setup until level 32."
+    },
+    {
+      "level": 15,
+      "skill": "Legion Shard - Summon Ae'grom",
+      "note": "Summons a demon army for protection."
+    },
+    {
+      "level": 17,
+      "skill": "Elite Eviscerate (Rampage)",
+      "note": "Applies Eviscerate to all elites on first hit with Rampage."
+    },
+    {
+      "level": 22,
+      "skill": "Terror Swarm",
+      "note": "Temporary ultimate tool for elites and bosses."
+    },
+    {
+      "level": 25,
+      "skill": "Metamorphosis: Destruction Demon",
+      "note": "Primary ultimate; grants damage/life/resource reduction."
+    },
+    {
+      "level": 32,
+      "skill": "Umbral Chains (Chain Whips)",
+      "note": "Respec into the full Apocalypse Annihilation build."
+    },
+    {
+      "level": 35,
+      "skill": "Annihilation stacking",
+      "note": "Ramp Umbral Chains stacks for massive AoE bursts; build reaches full functionality."
+    }
+  ],
+  "strategy": "Start with a Lunatic setup until level 32, then respec into the Apocalypse build with Umbral Chains to ramp stacks for massive AoE bursts. Upgrade your weapon and apply useful Occultist Aspects early, then progress through War Plans activities after the campaign for consistent experience gain.",
+  "paragon": {
+    "boards": [],
+    "glyphs": [
+      "Wrath",
+      "Unbound",
+      "Empowered",
+      "Hellforge",
+      "Occultist"
+    ],
+    "note": "Occultist is strong here since almost all skills are Occult skills. Level glyphs as high as comfortable in speedruns. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  }
+}

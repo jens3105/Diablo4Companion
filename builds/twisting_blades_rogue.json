@@ -1,0 +1,38 @@
+{
+  "build_name": "Twisting Blades Rogue",
+  "class_name": "Rogue",
+  "source_url": "https://maxroll.gg/d4/build-guides/twisting-blades-rogue-leveling-guide",
+  "milestones": [
+    {
+      "level": 1,
+      "skill": "Blade Shift + Twisting Blades",
+      "note": "Basic and Core Skill; energy management is the hardest part here. Phase = Early Game (Levels 1-19)."
+    },
+    {
+      "level": 20,
+      "skill": "Inner Sight",
+      "note": "A far superior option replacing Combo Points for superior Energy economy."
+    },
+    {
+      "level": 20,
+      "skill": "Dash + Shadow Step",
+      "note": "Mobility tools to reposition for optimal blade returns."
+    },
+    {
+      "level": 20,
+      "skill": "Shadow Imbuement + Poison Imbuement",
+      "note": "Shadow Imbuement is an AoE tool for groups; Poison Imbuement for bosses/elites."
+    },
+    {
+      "level": 30,
+      "skill": "Key synergies complete",
+      "note": "Most key synergies are unlocked; remaining points fill skill ranks on primary abilities."
+    }
+  ],
+  "strategy": "Prioritize upgrading melee weapons while using high mobility through Dash and Shadow Step to maximize Twisting Blades' returning-blade damage. Once Inner Sight unlocks at level 20, energy management becomes manageable, allowing Shadow Imbuement for groups and Poison Imbuement for tough single targets through level 70.",
+  "paragon": {
+    "boards": [],
+    "glyphs": [],
+    "note": "Maxroll has not published a separate endgame/Paragon guide for this build - only the leveling guide exists, so no Paragon board or glyph data is available."
+  }
+}

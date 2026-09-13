@@ -1,71 +1,47 @@
 from datetime import datetime, timezone
 
-from PySide6.QtWidgets import (
-    QWidget,
-    QLabel,
-    QVBoxLayout,
-    QGridLayout,
-)
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QGridLayout, QSizePolicy
+
+from qfluentwidgets import BodyLabel, CaptionLabel, FluentIcon as FIF
+
+from src.base_card import BaseCard
+from src.theme import ACCENT_GOLD, TEXT_MUTED
+
+ROW_COUNT = 5
 
 
-class UpcomingCard(QWidget):
+class UpcomingCard(BaseCard):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__("UPCOMING EVENTS", icon=FIF.HISTORY, parent=parent)
 
-        self.setObjectName("card")
-
-        outer = QVBoxLayout(self)
-        outer.setContentsMargins(20, 20, 20, 20)
-        outer.setSpacing(12)
-
-        title = QLabel("📅 UPCOMING EVENTS")
-        title.setStyleSheet("""
-            font-size:18px;
-            font-weight:bold;
-            color:#d9b36c;
-        """)
-
-        outer.addWidget(title)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.setMinimumSize(260, 190)
 
         self.grid = QGridLayout()
-        self.grid.setHorizontalSpacing(15)
+        self.grid.setHorizontalSpacing(16)
         self.grid.setVerticalSpacing(8)
 
-        outer.addLayout(self.grid)
-        outer.addStretch()
+        self.add_layout(self.grid)
 
         headers = ["Event", "Starts In", "Time"]
 
         for col, text in enumerate(headers):
-
-            lbl = QLabel(text)
-
-            lbl.setStyleSheet("""
-                font-weight:bold;
-                color:#d9b36c;
-                font-size:13px;
-            """)
-
+            lbl = CaptionLabel(text, self.content)
+            lbl.setTextColor(QColor(ACCENT_GOLD), QColor(ACCENT_GOLD))
             self.grid.addWidget(lbl, 0, col)
 
         self.rows = []
 
-        for row in range(5):
+        for row in range(ROW_COUNT):
+            event = BodyLabel("-", self.content)
+            timer = BodyLabel("--:--", self.content)
+            clock = BodyLabel("--:--", self.content)
 
-            event = QLabel("-")
-            timer = QLabel("--:--")
-            clock = QLabel("--:--")
-
-            event.setStyleSheet("font-size:13px;")
-            timer.setStyleSheet("""
-                font-family:Consolas;
-                font-size:13px;
-            """)
-            clock.setStyleSheet("""
-                font-family:Consolas;
-                font-size:13px;
-            """)
+            timer.setTextColor(QColor(TEXT_MUTED), QColor(TEXT_MUTED))
+            clock.setTextColor(QColor(TEXT_MUTED), QColor(TEXT_MUTED))
 
             self.grid.addWidget(event, row + 1, 0)
             self.grid.addWidget(timer, row + 1, 1)
@@ -73,19 +49,19 @@ class UpcomingCard(QWidget):
 
             self.rows.append((event, timer, clock))
 
+        self.grid.setColumnStretch(0, 3)
+        self.grid.setColumnStretch(1, 1)
+        self.grid.setColumnStretch(2, 1)
+
+        self.empty_label = CaptionLabel("No data available right now.", self.content)
+        self.empty_label.setAlignment(Qt.AlignCenter)
+        self.empty_label.setTextColor(QColor(TEXT_MUTED), QColor(TEXT_MUTED))
+        self.empty_label.hide()
+        self.add_widget(self.empty_label)
+
+        self.add_stretch()
+
         self.events = []
-
-        self.setStyleSheet("""
-            QWidget#card{
-                background:#1d1f24;
-                border:1px solid #353535;
-                border-radius:14px;
-            }
-
-            QLabel{
-                color:white;
-            }
-        """)
 
     def set_events(self, events):
 
@@ -94,6 +70,8 @@ class UpcomingCard(QWidget):
 
     def refresh(self):
 
+        self.empty_label.setVisible(len(self.events) == 0)
+
         now = datetime.now(timezone.utc)
 
         for i, widgets in enumerate(self.rows):
@@ -101,11 +79,9 @@ class UpcomingCard(QWidget):
             event_lbl, timer_lbl, clock_lbl = widgets
 
             if i >= len(self.events):
-
                 event_lbl.setText("")
                 timer_lbl.setText("")
                 clock_lbl.setText("")
-
                 continue
 
             event = self.events[i]
@@ -129,12 +105,7 @@ class UpcomingCard(QWidget):
                 timezone.utc
             ).astimezone()
 
-            event_lbl.setText(
-                f"{event['icon']} {event['title']}"
-            )
-
+            suffix = " (est.)" if event.get("estimated") else ""
+            event_lbl.setText(f"{event['icon']} {event['title']}{suffix}")
             timer_lbl.setText(countdown)
-
-            clock_lbl.setText(
-                start.strftime("%H:%M")
-            )
+            clock_lbl.setText(start.strftime("%H:%M"))

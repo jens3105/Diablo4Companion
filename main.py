@@ -4,14 +4,21 @@ from PySide6.QtWidgets import QApplication
 
 from src.app import MainWindow
 from src.api import DiabloAPI
+from src.theme import apply_theme
 
 
 def main():
     app = QApplication(sys.argv)
 
+    apply_theme()
+
     api = DiabloAPI()
 
-    boss = api.get_next_world_boss()
+    try:
+        boss = api.get_next_world_boss()
+    except Exception as exc:
+        print(f"Kunne ikke hente world boss-data ved opstart: {exc}")
+        boss = None
 
     print("\n===== NÆSTE WORLD BOSS =====")
 

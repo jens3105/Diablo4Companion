@@ -1,0 +1,49 @@
+{
+  "build_name": "Frenzy Barbarian",
+  "class_name": "Barbarian",
+  "source_url": "https://maxroll.gg/d4/build-guides/frenzy-barbarian-leveling-guide",
+  "milestones": [
+    {
+      "level": 1,
+      "skill": "Frenzy + Upheaval",
+      "note": "Main ability plus Core Skill for AoE. Phase = Early Phase."
+    },
+    {
+      "level": 1,
+      "skill": "Iron Skin + Ground Stomp",
+      "note": "Survival plus damage/CC. Phase = Early Phase."
+    },
+    {
+      "level": 1,
+      "skill": "Rallying Cry + War Cry",
+      "note": "Movement speed and damage multiplier. Phase = Early Phase."
+    },
+    {
+      "level": 14,
+      "skill": "Frenzy (Throw variant) + Lunging Strike",
+      "note": "Unallocate Upheaval and Ground Stomp to put points into Frenzy and Lunging Strike after unlocking throwing variants."
+    },
+    {
+      "level": 25,
+      "skill": "Call of the Ancients (Ultimate)",
+      "note": "Chosen for lowest cooldown. Phase = Mid Phase (approx.)."
+    },
+    {
+      "level": 45,
+      "skill": "Main skill / support scaling",
+      "note": "Allocate remaining skill points to main skill and supportive abilities. Phase = Late Phase (approx.)."
+    }
+  ],
+  "strategy": "Focus on War Plans activities such as Helltides, Undercity of Kurast, or the Pit while progressing difficulty as gear improves. Prioritize constantly upgrading weapons (one-handed priority for Frenzy), temper regular gear early, and clear Strongholds near level 60 for experience boosts before transitioning to endgame at level 70.",
+  "paragon": {
+    "boards": [],
+    "glyphs": [
+      "Wrath",
+      "Challenger",
+      "Undaunted",
+      "Exploit",
+      "Ambidextrous"
+    ],
+    "note": "Same glyph priority across Starter/Midgame/Endgame variants. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  }
+}

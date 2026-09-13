@@ -1,0 +1,59 @@
+{
+  "build_name": "Judgement Paladin",
+  "class_name": "Paladin",
+  "source_url": "https://maxroll.gg/d4/build-guides/judgement-paladin-leveling-guide",
+  "milestones": [
+    {
+      "level": 1,
+      "skill": "Holy Bolt",
+      "note": "Starter skill used to apply Judgement early on. Phase = Early Game."
+    },
+    {
+      "level": 1,
+      "skill": "Blessed Hammer",
+      "note": "Pairs with Judicator to detonate Judgement early for a faster reapply. Phase = Early Game."
+    },
+    {
+      "level": 1,
+      "skill": "Holy Light Aura",
+      "note": "Passive damage with a big active burst; generates Fortify. Phase = Early Game."
+    },
+    {
+      "level": 1,
+      "skill": "Rally",
+      "note": "Staple early mobility and resource recovery. Phase = Early Game."
+    },
+    {
+      "level": 25,
+      "skill": "Spear of the Heavens",
+      "note": "Cast on cooldown as the real star of the build. Phase = Mid Game (approx. level, not stated exactly)."
+    },
+    {
+      "level": 25,
+      "skill": "Defiance Aura",
+      "note": "Grants Unstoppable plus passive healing and Resolve. Phase = Mid Game (approx. level, not stated exactly)."
+    },
+    {
+      "level": 45,
+      "skill": "Arbiter of Justice (Ultimate)",
+      "note": "Passively applies Judgement to nearby enemies every second. Phase = Late Game (approx.)."
+    },
+    {
+      "level": 45,
+      "skill": "Fanaticism Aura",
+      "note": "Great replacement for Holy Light Aura once enough healing is gathered. Phase = Late Game (approx.)."
+    }
+  ],
+  "strategy": "Repeatedly cast Spear of the Heavens while maintaining Arbiter of Justice for constant Judgement application. Use Blessed Hammer to detonate Judgements for explosions, lean on Rally and healing for life-based resource spending, and unlock auras for defensive/offensive scaling through level 70.",
+  "paragon": {
+    "boards": [],
+    "glyphs": [
+      "Law",
+      "Judicator",
+      "Resplendence",
+      "Spirit",
+      "Sentinel"
+    ],
+    "note": "Hit minimum glyph requirements first, then fill them out with spare points. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  }
+}

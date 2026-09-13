@@ -1,0 +1,43 @@
+{
+  "build_name": "Dance of Knives Rogue",
+  "class_name": "Rogue",
+  "source_url": "https://maxroll.gg/d4/build-guides/dance-of-knives-rogue-leveling-guide",
+  "milestones": [
+    {
+      "level": 3,
+      "skill": "Blade Shift",
+      "note": "Foundational early energy management."
+    },
+    {
+      "level": 5,
+      "skill": "Energy node swap",
+      "note": "Addresses early resource constraints."
+    },
+    {
+      "level": 10,
+      "skill": "Dance of Knives (Pierce and Size)",
+      "note": "Massively increases damage in AoE."
+    },
+    {
+      "level": 15,
+      "skill": "Dance of Knives (Poison Imbuement + Star Shards)",
+      "note": "Unlocks screen-wide coverage via Combo Points specialization."
+    },
+    {
+      "level": 20,
+      "skill": "Dark Shroud (Overflow) + Inner Sight",
+      "note": "Solves energy regeneration issues; unlearn Blade Shift."
+    },
+    {
+      "level": 30,
+      "skill": "Preparation specialization",
+      "note": "Increases Shadow Clone uptime once energy is comfortable."
+    }
+  ],
+  "strategy": "Get Pierce and Size upgrades for Dance of Knives by level 10 to enable screen-wide damage, then solve energy dependency by level 20 through Inner Sight and Dark Shroud Overflow. Progress through War Plans activities (Helltides, Pit, Undercity) on Hard difficulty or higher post-campaign to reach level 70 while working seasonal objectives.",
+  "paragon": {
+    "boards": [],
+    "glyphs": [],
+    "note": "Glyph names aren't given in this guide's text - it recommends the optional 'Legendary Node Rush' setup for early power since glyphs matter far less than legendary nodes at low Paragon. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  }
+}

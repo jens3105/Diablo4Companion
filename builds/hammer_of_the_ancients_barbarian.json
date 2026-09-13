@@ -1,0 +1,48 @@
+{
+  "build_name": "Hammer of the Ancients Barbarian",
+  "class_name": "Barbarian",
+  "source_url": "https://maxroll.gg/d4/build-guides/hammer-of-the-ancients-barbarian-leveling-guide",
+  "milestones": [
+    {
+      "level": 1,
+      "skill": "Bash",
+      "note": "Basic skill for Fury generation. Phase = Early Phase."
+    },
+    {
+      "level": 1,
+      "skill": "Hammer of the Ancients",
+      "note": "Core skill. Phase = Early Phase."
+    },
+    {
+      "level": 15,
+      "skill": "Explosive or Fissure variant",
+      "note": "Pick one variant of Hammer of the Ancients."
+    },
+    {
+      "level": 14,
+      "skill": "Lunging Strike (Impaling variant)",
+      "note": "Unlocked for mobility."
+    },
+    {
+      "level": 25,
+      "skill": "Rallying Cry + Iron Skin",
+      "note": "Movement speed, Fury generation, and a defensive ability. Phase = Mid Phase (approx.)."
+    },
+    {
+      "level": 30,
+      "skill": "Leap",
+      "note": "Mobility and Fury generation. Phase = Mobility Phase (approx.)."
+    },
+    {
+      "level": 45,
+      "skill": "Main skill / support scaling",
+      "note": "Allocate remaining points to main skill and supportive abilities. Phase = Late Phase toward level 70 (approx.)."
+    }
+  ],
+  "strategy": "Use your highest-DPS two-handed bludgeoning weapon while generating Fury with Bash to fuel Hammer of the Ancients. Progress through War Plans activities (Helltides, Pit, Undercity) on Hard difficulty or above, using Tempers and Imprints on gear to maintain scaling and clear speed as you approach level 70.",
+  "paragon": {
+    "boards": [],
+    "glyphs": [],
+    "note": "Maxroll has not published a separate endgame/Paragon guide for this build - only the leveling guide exists, so no Paragon board or glyph data is available."
+  }
+}

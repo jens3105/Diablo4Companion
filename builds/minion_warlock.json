@@ -1,0 +1,59 @@
+{
+  "build_name": "Minion Warlock",
+  "class_name": "Warlock",
+  "source_url": "https://maxroll.gg/d4/build-guides/minion-warlock-leveling-guide",
+  "milestones": [
+    {
+      "level": 3,
+      "skill": "Bombardment",
+      "note": "Smashes demons down onto enemies as your primary damage source."
+    },
+    {
+      "level": 4,
+      "skill": "Nether Step",
+      "note": "Mobility tool with upgrade benefits."
+    },
+    {
+      "level": 9,
+      "skill": "Rampage",
+      "note": "First Dominance-cost skill; summons a Greater Demon."
+    },
+    {
+      "level": 13,
+      "skill": "Sigil of Summons",
+      "note": "Doubles down on Lesser Demon summoning."
+    },
+    {
+      "level": 14,
+      "skill": "Command Fallen (Mega Lunatic upgrade)",
+      "note": "Generates a ton of Wrath."
+    },
+    {
+      "level": 15,
+      "skill": "Summon Ae'grom",
+      "note": "Constant companion with passive damage and Lesser Demon spawning."
+    },
+    {
+      "level": 30,
+      "skill": "Fragments (secondary Soul Shard)",
+      "note": "Grants Unstoppable for crowd-control management."
+    },
+    {
+      "level": 34,
+      "skill": "Core loop complete",
+      "note": "Remaining points enhance primary abilities."
+    }
+  ],
+  "strategy": "Spam Command Fallen to generate Wrath, then use Bombardment as your primary damage dealer while Ae'grom and summoned Lesser Demons handle additional combat. Killing monsters or your own demons fuels Sigil summons, creating a self-reinforcing 'automated damage' cycle that scales through leveling.",
+  "paragon": {
+    "boards": [],
+    "glyphs": [
+      "Unbound",
+      "Eliminator",
+      "Demonologist",
+      "Archfiend",
+      "Eldritch Sight"
+    ],
+    "note": "Vanguard swaps for Attrition in the boss-fight variant. Prioritize survivability over damage early; hit minimum glyph requirements instead of maxing them out. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  }
+}

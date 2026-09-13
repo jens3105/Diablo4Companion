@@ -1,0 +1,84 @@
+{
+  "build_name": "Crushing Hand Spiritborn",
+  "class_name": "Spiritborn",
+  "source_url": "https://maxroll.gg/d4/build-guides/crushing-hand-spiritborn-leveling-guide",
+  "milestones": [
+    {
+      "level": 3,
+      "skill": "Withering Fist",
+      "note": "Generates resource, healing, and basic damage plus movement."
+    },
+    {
+      "level": 3,
+      "skill": "Crushing Hand",
+      "note": "Primary damage focus; grants Barrier and Resolve."
+    },
+    {
+      "level": 3,
+      "skill": "Vortex",
+      "note": "Enemy grouping utility."
+    },
+    {
+      "level": 3,
+      "skill": "Ravager",
+      "note": "Passive attack speed and vigor generation."
+    },
+    {
+      "level": 3,
+      "skill": "Toxic Skin",
+      "note": "Poison retaliation and vigor generation."
+    },
+    {
+      "level": 3,
+      "skill": "Armored Hide",
+      "note": "Unstoppable effect and defense."
+    },
+    {
+      "level": 15,
+      "skill": "Eagle Main Spirit Hall",
+      "note": "40% movement speed and makes enemies Vulnerable."
+    },
+    {
+      "level": 15,
+      "skill": "Crushing Hand (Unrelenting Assault)",
+      "note": "Upgrade to Crushing Hand."
+    },
+    {
+      "level": 15,
+      "skill": "Precision Strike",
+      "note": "Additional damage."
+    },
+    {
+      "level": 19,
+      "skill": "Ultimate skill available",
+      "note": "Guide recommends delaying the choice."
+    },
+    {
+      "level": 30,
+      "skill": "Eagle Secondary Spirit Hall",
+      "note": "Additional Vulnerable damage and increased critical strike chance."
+    },
+    {
+      "level": 30,
+      "skill": "Withering Fist -> GorFist (Fist of the Forest)",
+      "note": "Adds healing, barrier, vigor, and Weaken to enemies."
+    },
+    {
+      "level": 40,
+      "skill": "Tag Team (Firebird variant, Ultimate)",
+      "note": "Stack Ferocity and ramp damage on bosses; drop Vortex from the bar."
+    }
+  ],
+  "strategy": "Follow the skill tree progression stages while maintaining adequate defenses and resource management. Prioritize upgrading your weapon, use Vortex for grouping, and increase difficulty when content becomes too easy, reaching level 70 to unlock Paragon and transition to Torment 1 endgame content via War Plans.",
+  "paragon": {
+    "boards": [],
+    "glyphs": [
+      "Ritual",
+      "Canny",
+      "Spirit",
+      "Hubris",
+      "Colossal"
+    ],
+    "note": "Canny is only used in steps 4-5; Outmatch replaces it later to maximize Convergence. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  }
+}

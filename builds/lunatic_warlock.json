@@ -1,0 +1,84 @@
+{
+  "build_name": "Lunatic Warlock",
+  "class_name": "Warlock",
+  "source_url": "https://maxroll.gg/d4/build-guides/lunatic-warlock-leveling-guide",
+  "milestones": [
+    {
+      "level": 3,
+      "skill": "Bombardment",
+      "note": "Core AoE skill for early damage output."
+    },
+    {
+      "level": 4,
+      "skill": "Nether Step",
+      "note": "Mobility tool to teleport around the battlefield."
+    },
+    {
+      "level": 8,
+      "skill": "Rampage",
+      "note": "AoE powerhouse fueled by Dominance resource."
+    },
+    {
+      "level": 9,
+      "skill": "Dominance",
+      "note": "Unlocks resource generation through Command Fallen."
+    },
+    {
+      "level": 12,
+      "skill": "Lesser Demon Wrath",
+      "note": "Allows Lesser Demon skills to generate resources."
+    },
+    {
+      "level": 13,
+      "skill": "Sigil of Summons",
+      "note": "Grants additional minions and buffs demon damage."
+    },
+    {
+      "level": 14,
+      "skill": "Command Fallen (Mega Lunatic variant)",
+      "note": "Build's main damage scaling begins."
+    },
+    {
+      "level": 15,
+      "skill": "Legion Shard - Summon Ae'grom",
+      "note": "Summons a demon army for protection."
+    },
+    {
+      "level": 17,
+      "skill": "Elite Eviscerate (Rampage)",
+      "note": "Applies Eviscerate to all elites on first hit."
+    },
+    {
+      "level": 22,
+      "skill": "Terror Swarm",
+      "note": "Temporary elite/boss tool."
+    },
+    {
+      "level": 25,
+      "skill": "Metamorphosis: Destruction Demon",
+      "note": "Ultimate transformation for extra damage."
+    },
+    {
+      "level": 30,
+      "skill": "Sacrificial Fragment",
+      "note": "Boosts all damage and grants permanent Unstoppable."
+    },
+    {
+      "level": 38,
+      "skill": "Summon Hellwyrm",
+      "note": "Mimics Command Fallen and Bombardment for extra damage."
+    }
+  ],
+  "strategy": "Scale Command Fallen and Bombardment through resource generation while summoning demons for protection and additional AoE damage, progressing smoothly to level 70 with a strong early and late-game power curve that needs minimal setup to be effective.",
+  "paragon": {
+    "boards": [],
+    "glyphs": [
+      "Demonologist",
+      "Vanguard",
+      "Death Aura",
+      "Eldritch Sight",
+      "Eliminator"
+    ],
+    "note": "Level glyphs as high as comfortable in speedruns, push further once geared. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  }
+}

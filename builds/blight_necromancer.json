@@ -1,0 +1,144 @@
+{
+  "build_name": "Blight Necromancer",
+  "class_name": "Necromancer",
+  "source_url": "https://maxroll.gg/d4/build-guides/blight-necromancer-leveling-guide",
+  "milestones": [
+    {
+      "level": 3,
+      "skill": "Blight",
+      "note": "Primary damage dealer: instant damage plus damage-over-time."
+    },
+    {
+      "level": 3,
+      "skill": "Skeleton Mage",
+      "note": "Adds additional damage output."
+    },
+    {
+      "level": 3,
+      "skill": "Skeleton Warrior",
+      "note": "Automates life gain and applies Vulnerable."
+    },
+    {
+      "level": 3,
+      "skill": "Golem",
+      "note": "Survivability and Unstoppable access."
+    },
+    {
+      "level": 5,
+      "skill": "Reap",
+      "note": "Solid Essence generator throughout leveling."
+    },
+    {
+      "level": 6,
+      "skill": "Blight (area variant)",
+      "note": "Choose increased area over additional damage."
+    },
+    {
+      "level": 7,
+      "skill": "Skeleton Warrior (healing upgrade)",
+      "note": "Healing enhancement when hitting targets."
+    },
+    {
+      "level": 8,
+      "skill": "Golem (Book of the Dead)",
+      "note": "Unlocked for customization."
+    },
+    {
+      "level": 9,
+      "skill": "Reap (corpse upgrade)",
+      "note": "Generates bonus corpses for skill usage."
+    },
+    {
+      "level": 10,
+      "skill": "Blight (CC damage)",
+      "note": "Deals additional damage to crowd-controlled enemies."
+    },
+    {
+      "level": 11,
+      "skill": "Skeleton Mage (Ferocity)",
+      "note": "Generates a Ferocity bonus."
+    },
+    {
+      "level": 13,
+      "skill": "Golem (Unstoppable)",
+      "note": "Grants Unstoppable when activated."
+    },
+    {
+      "level": 15,
+      "skill": "Blight (Cold variant)",
+      "note": "Converts to Cold damage, applies Chill, pulls enemies inward."
+    },
+    {
+      "level": 15,
+      "skill": "Skeleton Mage (Essence scaling)",
+      "note": "Grants Essence generation percentage scaling."
+    },
+    {
+      "level": 16,
+      "skill": "Skeleton Warrior (Primary variant)",
+      "note": "Bonus minions via Book of the Dead."
+    },
+    {
+      "level": 17,
+      "skill": "Golem (Resolve)",
+      "note": "Grants Resolve for increased Armor."
+    },
+    {
+      "level": 18,
+      "skill": "Iron Maiden",
+      "note": "Incredible utility tool for the build."
+    },
+    {
+      "level": 19,
+      "skill": "Iron Maiden (free cast)",
+      "note": "Becomes free to cast; generates Essence based on targets affected."
+    },
+    {
+      "level": 20,
+      "skill": "Golem (Primary variant)",
+      "note": "Splits into three golems."
+    },
+    {
+      "level": 21,
+      "skill": "Iron Maiden (Lucky Hit)",
+      "note": "Adds Lucky Hit Chance for Ferocity and Overpower procs."
+    },
+    {
+      "level": 22,
+      "skill": "Reap (Primary variant)",
+      "note": "Hits twice, doubling Essence generation."
+    },
+    {
+      "level": 23,
+      "skill": "Damage scaling",
+      "note": "Important skills are all unlocked; focus scaling on Blight, then Skeleton Mages, then Golem and Warriors."
+    }
+  ],
+  "strategy": "Use Reap as an Essence generator while Blight serves as your primary damage dealer, with Skeleton Minions providing substantial damage and survivability. After level 23 all important skills are unlocked, so progression focuses on maximizing direct and minion damage through the endgame transition at level 70.",
+  "paragon": {
+    "boards": [
+      {
+        "name": "Dominate",
+        "note": "Initial board."
+      },
+      {
+        "name": "Corporeal",
+        "note": "Second board in the progression."
+      },
+      {
+        "name": "Amplify",
+        "note": "Third board."
+      },
+      {
+        "name": "Essence",
+        "note": "Fourth board - needs to be leveled to 50 first to activate."
+      },
+      {
+        "name": "Exploit",
+        "note": "Final board."
+      }
+    ],
+    "glyphs": [],
+    "note": "Glyph priorities aren't listed in this guide's text - see source_url."
+  }
+}

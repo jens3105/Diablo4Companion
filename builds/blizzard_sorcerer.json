@@ -1,0 +1,63 @@
+{
+  "build_name": "Blizzard Sorcerer",
+  "class_name": "Sorcerer",
+  "source_url": "https://maxroll.gg/d4/build-guides/blizzard-sorcerer-leveling-guide",
+  "milestones": [
+    {
+      "level": 3,
+      "skill": "Fireball",
+      "note": "Primary Core Skill for early AoE damage spending."
+    },
+    {
+      "level": 4,
+      "skill": "Teleport",
+      "note": "Mobility tool for battlefield movement."
+    },
+    {
+      "level": 6,
+      "skill": "Ice Armor",
+      "note": "Defensive barrier and Mana Regen source."
+    },
+    {
+      "level": 8,
+      "skill": "Hydra",
+      "note": "Support skill for consistent damage output."
+    },
+    {
+      "level": 13,
+      "skill": "Blizzard",
+      "note": "Main skill - reallocate points here once unlocked."
+    },
+    {
+      "level": 16,
+      "skill": "Teleport (Wormhole variant)",
+      "note": "Enables double Teleport usage."
+    },
+    {
+      "level": 18,
+      "skill": "Blizzard (damage upgrade)",
+      "note": "Increased primary damage."
+    },
+    {
+      "level": 21,
+      "skill": "Blizzard (Seek and Duration)",
+      "note": "Improved effectiveness."
+    },
+    {
+      "level": 38,
+      "skill": "Blizzard (Static Field variant)",
+      "note": "Transforms into a Shock skill and solves Mana problems."
+    },
+    {
+      "level": 38,
+      "skill": "Unstable Currents",
+      "note": "Ultimate skill for boss encounters."
+    }
+  ],
+  "strategy": "Cast Blizzard repeatedly as your primary damage source while using Hydra for passive support and Teleport for mobility. Once Static Field unlocks at level 38, the build becomes significantly more powerful and resource-efficient, with Unstable Currents reserved primarily for boss fights.",
+  "paragon": {
+    "boards": [],
+    "glyphs": [],
+    "note": "Neither Paragon board names nor glyph priorities are given as text in this guide - it points to Maxroll's separate Paragon Guide and Season Rank Guide instead. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  }
+}

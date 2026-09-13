@@ -1,0 +1,54 @@
+{
+  "build_name": "Shield of Retribution Paladin",
+  "class_name": "Paladin",
+  "source_url": "https://maxroll.gg/d4/build-guides/shield-of-retribution-paladin-leveling-guide",
+  "milestones": [
+    {
+      "level": 1,
+      "skill": "Clash",
+      "note": "Basic skill for resource generation and Punishment buff uptime. Phase = Early Game."
+    },
+    {
+      "level": 1,
+      "skill": "Blessed Shield: Shield of Justice",
+      "note": "Core spam skill until level 32. Phase = Early Game."
+    },
+    {
+      "level": 1,
+      "skill": "Holy Light Aura",
+      "note": "Passive damage and active burst with healing via Rite of Mercy. Phase = Early Game."
+    },
+    {
+      "level": 1,
+      "skill": "Defiance Aura",
+      "note": "Grants Unstoppable and a Thorns stat boost from Rite of Thorns. Phase = Early Game."
+    },
+    {
+      "level": 1,
+      "skill": "Fanaticism Aura",
+      "note": "Attack speed, critical strike bonuses, and resource generation. Phase = Early Game."
+    },
+    {
+      "level": 1,
+      "skill": "Rally: Words of Sacrifice",
+      "note": "Mobility and resource recovery using health as a resource. Phase = Early Game."
+    },
+    {
+      "level": 32,
+      "skill": "Blessed Shield: Shield of Retribution",
+      "note": "Upgrades your main attack; throws pulsing disks dealing Thorns damage."
+    }
+  ],
+  "strategy": "Maintain Clash's Punishment buff every 5 seconds while spamming Blessed Shield into enemy packs. Rely on Thorns scaling rather than weapon damage, use Rally frequently for speed and sustain, and transition to endgame content at level 70 after unlocking Paragon Boards.",
+  "paragon": {
+    "boards": [],
+    "glyphs": [
+      "Revenge",
+      "Spirit",
+      "Outmatch",
+      "Sentinel",
+      "Chip"
+    ],
+    "note": "Chip swaps for Honed in the push variant. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  }
+}

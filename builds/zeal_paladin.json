@@ -1,0 +1,54 @@
+{
+  "build_name": "Zeal Paladin",
+  "class_name": "Paladin",
+  "source_url": "https://maxroll.gg/d4/build-guides/zeal-paladin-leveling-guide",
+  "milestones": [
+    {
+      "level": 1,
+      "skill": "Advance",
+      "note": "Basic resource generator with mobility benefits. Phase = Early Game."
+    },
+    {
+      "level": 1,
+      "skill": "Zeal",
+      "note": "Primary multi-hitting spam skill. Phase = Core Setup."
+    },
+    {
+      "level": 15,
+      "skill": "Fanaticism Aura",
+      "note": "Attack speed and critical strike chance. Phase = Aura Phase (approx. level, not stated exactly)."
+    },
+    {
+      "level": 15,
+      "skill": "Defiance Aura",
+      "note": "Unstoppable, extra max life, and healing. Phase = Support Addition (approx.)."
+    },
+    {
+      "level": 25,
+      "skill": "Rally",
+      "note": "Resource recovery and movement speed. Phase = Mobility/Resource (approx.)."
+    },
+    {
+      "level": 25,
+      "skill": "Consecration",
+      "note": "Comfort healing and damage amplification to enemies. Phase = Healing (approx.)."
+    },
+    {
+      "level": 70,
+      "skill": "Final skill tree completion",
+      "note": "Complete build and transition to a higher-tier endgame setup."
+    }
+  ],
+  "strategy": "Hit fast with no downtime by stacking attack speed and critical strike chance while maintaining aura uptime. Progress through War Plans activities like Helltide and the Pit rather than the campaign, using tempers and imprints to scale difficulty as you gain power.",
+  "paragon": {
+    "boards": [],
+    "glyphs": [
+      "Feverous",
+      "Resplendence",
+      "Spirit",
+      "Chip",
+      "Exploit"
+    ],
+    "note": "Feverous is ranked first across every configuration; Resplendence/Spirit and Exploit/Outmatch vary by path. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  }
+}

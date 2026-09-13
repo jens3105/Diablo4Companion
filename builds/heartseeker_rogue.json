@@ -1,0 +1,43 @@
+{
+  "build_name": "Heartseeker Rogue",
+  "class_name": "Rogue",
+  "source_url": "https://maxroll.gg/d4/build-guides/heartseeker-rogue-leveling-build-guide",
+  "milestones": [
+    {
+      "level": 1,
+      "skill": "Heartseeker + Flurry",
+      "note": "Max Heartseeker as the main ability; Flurry applies Vulnerable and adds mobility via teleporting. Phase = Getting Started."
+    },
+    {
+      "level": 1,
+      "skill": "Dash + Resolve/Stealth",
+      "note": "Traversal speed plus Resolve and Stealth perks. Phase = Mobility Phase."
+    },
+    {
+      "level": 15,
+      "skill": "Dark Shroud",
+      "note": "Toughness and movement speed to reposition during combat."
+    },
+    {
+      "level": 20,
+      "skill": "Shadow Imbuement",
+      "note": "Additional explosions and energy recovery via Consuming Shadows passive."
+    },
+    {
+      "level": 25,
+      "skill": "Shadow Clone",
+      "note": "Increased damage against Elites and Bosses."
+    },
+    {
+      "level": 30,
+      "skill": "Key synergies complete",
+      "note": "Most key synergies are unlocked; gameplay loop is almost complete; remaining points go into skill ranks and utility."
+    }
+  ],
+  "strategy": "Focus on War Plans activities like Helltide and the Pit while maintaining difficulty at Hard or above for XP multipliers. Prioritize imprinting powerful Legendary Aspects early (especially the Amulet), and use Combo Points with Flurry to maintain high Heartseeker attack speed throughout leveling.",
+  "paragon": {
+    "boards": [],
+    "glyphs": [],
+    "note": "Both board and glyph detail are only shown via the embedded interactive planner - see source_url."
+  }
+}

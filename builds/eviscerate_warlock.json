@@ -1,0 +1,74 @@
+{
+  "build_name": "Eviscerate Warlock",
+  "class_name": "Warlock",
+  "source_url": "https://maxroll.gg/d4/build-guides/eviscerate-warlock-leveling-guide",
+  "milestones": [
+    {
+      "level": 3,
+      "skill": "Bombardment",
+      "note": "Core AoE skill for spamming damage."
+    },
+    {
+      "level": 4,
+      "skill": "Nether Step",
+      "note": "Mobility tool for traversing the battlefield."
+    },
+    {
+      "level": 8,
+      "skill": "Rampage",
+      "note": "AoE powerhouse fueled by Dominance resource."
+    },
+    {
+      "level": 9,
+      "skill": "Hellion Sting (Eviscerate upgrade)",
+      "note": "Applies a powerful DoT to targets."
+    },
+    {
+      "level": 12,
+      "skill": "Lesser Demon Wrath",
+      "note": "Allows Lesser Demon skills to generate resources."
+    },
+    {
+      "level": 13,
+      "skill": "Sigil of Summons",
+      "note": "Grants minions and buffs demon damage."
+    },
+    {
+      "level": 14,
+      "skill": "Tail Spikes (variant)",
+      "note": "Enhances single-target melting via Hellion Sting."
+    },
+    {
+      "level": 15,
+      "skill": "Legion Shard (Soul Shard)",
+      "note": "Unlocks Summon Ae'grom."
+    },
+    {
+      "level": 17,
+      "skill": "Elite Eviscerate (Rampage)",
+      "note": "Applies Eviscerate to all elites."
+    },
+    {
+      "level": 30,
+      "skill": "Evisceration Fragment",
+      "note": "Alternate Soul Shard; triggers bleeds from Lesser Demons."
+    },
+    {
+      "level": 38,
+      "skill": "Summon Hellwyrm",
+      "note": "Mimics Bombardment casts for extra damage."
+    }
+  ],
+  "strategy": "Apply the Eviscerate bleed effect through multiple trigger sources: Hellion Sting for single targets, Bombardment and Rampage for AoE, and summoned demons (Ae'grom, Hellwyrm) to scale damage. Progress via campaigns or War Plans activities at appropriate difficulty, using tempers/imprints to maintain power scaling.",
+  "paragon": {
+    "boards": [],
+    "glyphs": [
+      "Demonologist",
+      "Ichor Carapace",
+      "Death Aura",
+      "Blood Frenzy",
+      "Eliminator"
+    ],
+    "note": "Under Paragon 200, use a 'Board Rush' to grab multipliers early, then respec. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  }
+}

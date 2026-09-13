@@ -1,0 +1,69 @@
+{
+  "build_name": "Stinger Spiritborn",
+  "class_name": "Spiritborn",
+  "source_url": "https://maxroll.gg/d4/build-guides/stinger-spiritborn-leveling-guide",
+  "milestones": [
+    {
+      "level": 3,
+      "skill": "Withering Fist",
+      "note": "Generates resource, spreads poisoning, and deals basic damage. Phase = Getting Started (1-14)."
+    },
+    {
+      "level": 3,
+      "skill": "Stinger",
+      "note": "Enables the 'poison bomb' combo mechanic. Phase = Getting Started (1-14)."
+    },
+    {
+      "level": 3,
+      "skill": "Soar / Ravager / Toxic Skin",
+      "note": "Soar adds mobility; Ravager passively increases attack speed via Ferocity and vigor generation; Toxic Skin adds poison spreading via retaliation damage, healing, and vigor generation."
+    },
+    {
+      "level": 15,
+      "skill": "Eagle Primary Spirit Hall",
+      "note": "Additional poisoning, reduces enemy damage, and slows them. Phase = Main Spirit Hall & Utility (15-29)."
+    },
+    {
+      "level": 15,
+      "skill": "Stinger: Potent Sting",
+      "note": "50% damage multiplier upgrade."
+    },
+    {
+      "level": 15,
+      "skill": "Ravager: Flurry of Claws / Toxic Skin: Skuttle Bug",
+      "note": "Cooldown effectiveness and cooldown reduction upgrades."
+    },
+    {
+      "level": 20,
+      "skill": "Scourge",
+      "note": "Extra damage reduction, Vulnerable, and more poison damage."
+    },
+    {
+      "level": 30,
+      "skill": "Eagle Secondary Spirit Hall",
+      "note": "Additional Vulnerable damage and increased critical strike chance. Phase = Secondary Spirit Hall & Ultimate (30-40)."
+    },
+    {
+      "level": 40,
+      "skill": "The Devourer (Ultimate: Sky and Soil)",
+      "note": "Ultimate skill unlock."
+    },
+    {
+      "level": 45,
+      "skill": "Stinger / Toxic Skin / Ravager ranks",
+      "note": "Continue ranking Stinger as primary focus, adding ranks to Toxic Skin and Ravager as needed. Phase = Finish Leveling (41-70)."
+    }
+  ],
+  "strategy": "Use the Withering Fist-to-Stinger combo to spread poison then detonate it for massive AoE damage. Maintain survivability through built-in healing and armor scaling, adjusting difficulty dynamically to keep clear speed fast while progressing through War Plans activities (Helltide, Pit, Undercity) toward and past level 70.",
+  "paragon": {
+    "boards": [],
+    "glyphs": [
+      "Menagerist",
+      "Canny",
+      "Spirit",
+      "Talon",
+      "Ritual"
+    ],
+    "note": "Start on Menagerist; switch to Ritual around 210 Paragon points spent. Talon swaps for Fitness, and Fulminate for Colossal, in the midgame variant. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  }
+}

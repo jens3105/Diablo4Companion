@@ -1,0 +1,49 @@
+{
+  "build_name": "Whirlwind Barbarian",
+  "class_name": "Barbarian",
+  "source_url": "https://maxroll.gg/d4/build-guides/whirlwind-barbarian-leveling-guide",
+  "milestones": [
+    {
+      "level": 1,
+      "skill": "Lunging Strike",
+      "note": "Resource generation and mobility Basic Skill. Phase = Early Phase."
+    },
+    {
+      "level": 1,
+      "skill": "Whirlwind + Ground Stomp",
+      "note": "Core damage skill plus crowd control. Phase = Early Phase."
+    },
+    {
+      "level": 15,
+      "skill": "Whirlwind (Dust Devils)",
+      "note": "Whirlwind begins spawning Dust Devils, significantly improving clear speed."
+    },
+    {
+      "level": 15,
+      "skill": "War Cry + Challenging Shout",
+      "note": "Buffs and enemy debuffs. Phase = Mid Phase (Level 15+)."
+    },
+    {
+      "level": 30,
+      "skill": "Call of the Ancients (Ultimate)",
+      "note": "Chosen for lowest cooldown and damage multiplier. Phase = Late Phase (approx.)."
+    },
+    {
+      "level": 45,
+      "skill": "Main skill / support scaling",
+      "note": "Allocate remaining points into main skill and supportive abilities. Phase = Final Journey to Level 70 (approx.)."
+    }
+  ],
+  "strategy": "Upgrade weapons constantly while using War Plans activities like Helltides and Pit runs at appropriate levels. Prioritize difficulty levels that maintain fast clear speed with XP multipliers, tempering gear early and imprinting powerful Legendary Aspects to accelerate progression toward level 70.",
+  "paragon": {
+    "boards": [],
+    "glyphs": [
+      "Twister",
+      "Exploit",
+      "Wrath",
+      "Challenger",
+      "Marshal"
+    ],
+    "note": "Under Paragon 200, use a Board Rush for legendary-node power before respeccing. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  }
+}

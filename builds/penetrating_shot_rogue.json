@@ -1,0 +1,58 @@
+{
+  "build_name": "Penetrating Shot Rogue",
+  "class_name": "Rogue",
+  "source_url": "https://maxroll.gg/d4/build-guides/penetrating-shot-rogue-leveling-guide",
+  "milestones": [
+    {
+      "level": 1,
+      "skill": "Forceful Arrow + Penetrating Shot",
+      "note": "Basic Skill into Core Skill main damage source. Phase = Getting Started."
+    },
+    {
+      "level": 1,
+      "skill": "Dash",
+      "note": "Repositioning and combat flow. Phase = Mobility Phase."
+    },
+    {
+      "level": 10,
+      "skill": "Shadow Imbuement",
+      "note": "AoE / pack clearing. Phase = Imbuements Phase."
+    },
+    {
+      "level": 10,
+      "skill": "Poison Imbuement",
+      "note": "Bosses / elites. Phase = Imbuements Phase."
+    },
+    {
+      "level": 15,
+      "skill": "Combo Points specialization",
+      "note": "Better energy economy."
+    },
+    {
+      "level": 20,
+      "skill": "Inner Sight specialization",
+      "note": "Swap for easier Core Skill spam."
+    },
+    {
+      "level": 30,
+      "skill": "Key synergies complete",
+      "note": "Remaining skill points max primary abilities, then utility skills."
+    },
+    {
+      "level": 60,
+      "skill": "Clear Strongholds",
+      "note": "Clear all Strongholds for an experience boost toward level 70."
+    },
+    {
+      "level": 70,
+      "skill": "Endgame transition",
+      "note": "New gear and Paragon Levels."
+    }
+  ],
+  "strategy": "Stay on Hard difficulty or above for extra XP multipliers, focusing on War Plans activities like Helltides and Nightmare Dungeons while maintaining fast clear speed. Constantly upgrade your ranged weapon above all other items, and use tempers/imprints on gear to manage difficulty scaling.",
+  "paragon": {
+    "boards": [],
+    "glyphs": [],
+    "note": "Glyph names aren't given in this guide's text - it links out to Maxroll's Paragon Guide and Season Rank Guide instead. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  }
+}

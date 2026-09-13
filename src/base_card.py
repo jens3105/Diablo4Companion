@@ -1,67 +1,81 @@
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (
-    QFrame,
-    QLabel,
-    QVBoxLayout,
-    QWidget,
-)
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
+
+from qfluentwidgets import CardWidget, IconWidget, StrongBodyLabel
+from qfluentwidgets.common.icon import FluentIconBase
+
+from src.theme import ACCENT_GOLD
 
 
-class BaseCard(QFrame):
-    """Base class for all dashboard cards."""
+class BaseCard(CardWidget):
+    """Fluent-based foundation for every dashboard card.
 
-    def __init__(self, title: str):
-        super().__init__()
+    Wraps qfluentwidgets' ``CardWidget`` (which already gives us the
+    correct dark-theme background, hover/press elevation and rounded
+    corners) with a small icon + title + content-area convention so the
+    concrete cards (EventCard, UpcomingCard, LevelingCard, ...) don't
+    each have to hand-roll their own QFrame/stylesheet like before.
 
-        self.setObjectName("card")
-        self.setMinimumSize(300, 220)
+    ``icon`` takes a ``qfluentwidgets.FluentIcon`` member (a proper vector
+    icon) instead of an emoji glyph, matching the icons used in the
+    navigation sidebar.
+    """
+
+    def __init__(self, title: str = "", icon: FluentIconBase = None, parent=None):
+        super().__init__(parent)
+
+        self.setBorderRadius(12)
 
         self.main_layout = QVBoxLayout(self)
-        self.main_layout.setContentsMargins(20, 20, 20, 20)
-        self.main_layout.setSpacing(15)
+        self.main_layout.setContentsMargins(22, 18, 22, 18)
+        self.main_layout.setSpacing(10)
 
-        self.title_label = QLabel(title)
-        self.title_label.setAlignment(Qt.AlignLeft)
+        self.title_row = QHBoxLayout()
+        self.title_row.setSpacing(8)
+
+        self.icon_widget = None
+
+        if icon is not None:
+            self.icon_widget = IconWidget(icon.icon(color=QColor(ACCENT_GOLD)), self)
+            self.icon_widget.setFixedSize(18, 18)
+            self.title_row.addWidget(self.icon_widget)
+
+        self.title_label = StrongBodyLabel(title, self)
         self.title_label.setObjectName("cardTitle")
+        self.title_label.setTextColor(QColor(ACCENT_GOLD), QColor(ACCENT_GOLD))
+        self.title_row.addWidget(self.title_label)
 
-        self.main_layout.addWidget(self.title_label)
+        if title or icon is not None:
+            self.main_layout.addLayout(self.title_row)
 
-        self.content = QWidget()
-
+        self.content = QWidget(self)
         self.content_layout = QVBoxLayout(self.content)
         self.content_layout.setContentsMargins(0, 0, 0, 0)
-        self.content_layout.setSpacing(10)
+        self.content_layout.setSpacing(8)
 
         self.main_layout.addWidget(self.content, 1)
 
-        self.setStyleSheet("""
-            QFrame#card {
-                background-color: #252525;
-                border: 1px solid #3d3d3d;
-                border-radius: 12px;
-            }
+    # ---------------------------------------------------------
+    # Convenience helpers used by subclasses
+    # ---------------------------------------------------------
 
-            QFrame#card:hover {
-                border: 1px solid #d8a24a;
-            }
+    def center_title(self):
+        """Center the icon+title row instead of the default left-align."""
 
-            QLabel#cardTitle {
-                color: #d8a24a;
-                font-size: 18px;
-                font-weight: bold;
-            }
+        self.title_row.insertStretch(0)
+        self.title_row.addStretch()
 
-            QLabel {
-                color: white;
-                font-size: 14px;
-            }
-        """)
-
-    def add_widget(self, widget: QWidget):
+    def add_widget(self, widget):
         self.content_layout.addWidget(widget)
+
+    def add_layout(self, layout):
+        self.content_layout.addLayout(layout)
 
     def add_spacing(self, amount: int = 10):
         self.content_layout.addSpacing(amount)
 
     def add_stretch(self):
         self.content_layout.addStretch()
+
+    def set_title(self, text: str):
+        self.title_label.setText(text)

@@ -1,0 +1,49 @@
+{
+  "build_name": "Rend Barbarian",
+  "class_name": "Barbarian",
+  "source_url": "https://maxroll.gg/d4/build-guides/rend-barbarian-leveling-guide",
+  "milestones": [
+    {
+      "level": 3,
+      "skill": "Flay",
+      "note": "Core Skills unlock; use Flay for Fury generation."
+    },
+    {
+      "level": 14,
+      "skill": "Lunging Strike (Impaling variant)",
+      "note": "Skill variants unlock; mobility tool."
+    },
+    {
+      "level": 20,
+      "skill": "Leap + Rallying Cry",
+      "note": "Movement, Fury, and speed bursts. Phase = Early Game Phase (approx.)."
+    },
+    {
+      "level": 30,
+      "skill": "Iron Maelstrom (Ultimate) + Hidden Technique",
+      "note": "Screen-clearing burst potential and burst damage. Phase = Mid Game Phase (approx.)."
+    },
+    {
+      "level": 45,
+      "skill": "Main skill / support scaling",
+      "note": "Extra points go into main skill and supportive ones. Phase = Late Game Phase toward level 70 (approx.)."
+    },
+    {
+      "level": 70,
+      "skill": "Paragon Levels",
+      "note": "Unlocked; transition to endgame with higher item power gear."
+    }
+  ],
+  "strategy": "Use Flay to apply Vulnerable and generate Fury, then rely on Rend's high base damage for primary offense, supplementing with Iron Maelstrom for screen-clearing burst potential. Focus on generic damage modifiers, Fury generation, Armor, and Resistances across progression to level 70.",
+  "paragon": {
+    "boards": [],
+    "glyphs": [
+      "Challenger",
+      "Exploit",
+      "Disembowel",
+      "Might",
+      "Executioner"
+    ],
+    "note": "This is the Endgame (Physical) variant order. The Self-Cast (Fire) variant uses Challenger, Undaunted, Disembowel, Might, Executioner; Push (Overpower) variants use Dominate, Challenger, Crusher/Exploit, Ambidextrous/Executioner, Disembowel. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  }
+}

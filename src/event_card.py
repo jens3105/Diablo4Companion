@@ -1,155 +1,97 @@
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QFont
-from PySide6.QtWidgets import (
-    QLabel,
-    QProgressBar,
-    QSizePolicy,
-    QVBoxLayout,
-    QWidget,
-)
+from PySide6.QtGui import QColor, QFont
+from PySide6.QtWidgets import QLabel, QSizePolicy
+
+from qfluentwidgets import BodyLabel, CaptionLabel, ProgressBar
+from qfluentwidgets.common.icon import FluentIconBase
+
+from src.base_card import BaseCard
+from src.theme import ACCENT_GOLD, ACCENT_RED, TEXT_MUTED
 
 
-class EventCard(QWidget):
+class EventCard(BaseCard):
+    """A single countdown tile: World Boss / Helltide / Legion / Season."""
 
-    def __init__(self, icon: str, title: str):
-        super().__init__()
+    def __init__(self, icon: FluentIconBase, title: str, parent=None):
+        super().__init__(title.upper(), icon=icon, parent=parent)
 
-        self.setObjectName("card")
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.setMinimumSize(220, 190)
 
-        # Kortet skal fylde den plads det får
-        self.setSizePolicy(
-            QSizePolicy.Expanding,
-            QSizePolicy.Expanding
-        )
+        self.center_title()
 
-        self.setMinimumWidth(240)
-        self.setMinimumHeight(180)
-
-        layout = QVBoxLayout(self)
-
-        layout.setContentsMargins(30, 25, 30, 25)
-        layout.setSpacing(12)
-
-        # -------------------------
-        # Titel
-        # -------------------------
-
-        self.title = QLabel(f"{icon} {title.upper()}")
-        self.title.setAlignment(Qt.AlignCenter)
-
-        title_font = QFont("Segoe UI", 16)
-        title_font.setBold(True)
-
-        self.title.setFont(title_font)
-
-        # -------------------------
-        # Countdown
-        # -------------------------
-
-        self.timer = QLabel("--:--:--")
-        self.timer.setAlignment(Qt.AlignCenter)
-
-        timer_font = QFont("Consolas", 28)
-        timer_font.setBold(True)
-
-        self.timer.setFont(timer_font)
+        self.content_layout.addStretch(1)
 
         # -------------------------
         # Subtitle
         # -------------------------
 
-        self.subtitle = QLabel("Next Event")
+        self.subtitle = CaptionLabel("Next Event", self.content)
         self.subtitle.setAlignment(Qt.AlignCenter)
+        self.subtitle.setTextColor(QColor(TEXT_MUTED), QColor(TEXT_MUTED))
+        self.content_layout.addWidget(self.subtitle)
 
-        subtitle_font = QFont("Segoe UI", 11)
+        # -------------------------
+        # Big countdown
+        # -------------------------
 
-        self.subtitle.setFont(subtitle_font)
+        self.timer_label = QLabel("--:--:--", self.content)
+        self.timer_label.setAlignment(Qt.AlignCenter)
+
+        timer_font = QFont("Consolas", 26)
+        timer_font.setBold(True)
+        self.timer_label.setFont(timer_font)
+        self.timer_label.setStyleSheet(f"color: {ACCENT_GOLD}; background: transparent;")
+
+        self.content_layout.addWidget(self.timer_label)
 
         # -------------------------
         # Status
         # -------------------------
 
-        self.status = QLabel("Waiting for data...")
+        self.status = BodyLabel("Waiting for data...", self.content)
         self.status.setAlignment(Qt.AlignCenter)
         self.status.setWordWrap(True)
 
-        status_font = QFont("Segoe UI", 10)
+        self.content_layout.addWidget(self.status)
 
-        self.status.setFont(status_font)
+        self.content_layout.addStretch(1)
 
         # -------------------------
         # Progress
         # -------------------------
 
-        self.progress = QProgressBar()
-
+        self.progress = ProgressBar(self.content)
         self.progress.setRange(0, 100)
         self.progress.setValue(0)
-        self.progress.setTextVisible(True)
-        self.progress.setFormat("%p%")
-        self.progress.setFixedHeight(14)
+        self.progress.setFixedHeight(6)
+        self.progress.setCustomBarColor(QColor(ACCENT_RED), QColor("#c0392b"))
 
-        # -------------------------
-        # Layout
-        # -------------------------
+        self.content_layout.addWidget(self.progress)
 
-        layout.addWidget(self.title)
+        self.progress_caption = CaptionLabel("0%", self.content)
+        self.progress_caption.setAlignment(Qt.AlignCenter)
+        self.progress_caption.setTextColor(QColor(TEXT_MUTED), QColor(TEXT_MUTED))
 
-        layout.addStretch()
+        self.content_layout.addWidget(self.progress_caption)
 
-        layout.addWidget(self.timer)
-
-        layout.addWidget(self.subtitle)
-
-        layout.addWidget(self.status)
-
-        layout.addStretch()
-
-        layout.addWidget(self.progress)
-
-        # -------------------------
-        # Style
-        # -------------------------
-
-        self.setStyleSheet("""
-            QWidget#card{
-                background:#1d1f24;
-                border:1px solid #353535;
-                border-radius:14px;
-            }
-
-            QWidget#card:hover{
-                border:2px solid #D4AF37;
-            }
-
-            QLabel{
-                color:white;
-                background:transparent;
-            }
-
-            QProgressBar{
-                background:#111;
-                border:none;
-                border-radius:7px;
-            }
-
-            QProgressBar::chunk{
-                background:#8B0000;
-                border-radius:7px;
-            }
-        """)
+    # ---------------------------------------------------------
+    # Public API (unchanged from the pre-redesign EventCard)
+    # ---------------------------------------------------------
 
     def set_title(self, text):
-        self.title.setText(text.upper())
+        self.title_label.setText(text.upper())
 
     def set_timer(self, text):
-        self.timer.setText(text)
+        self.timer_label.setText(text)
 
     def set_status(self, text):
         self.status.setText(text)
 
     def set_progress(self, value):
+        value = max(0, min(int(value), 100))
         self.progress.setValue(value)
+        self.progress_caption.setText(f"{value}%")
 
     def set_subtitle(self, text):
         self.subtitle.setText(text)

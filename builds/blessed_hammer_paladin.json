@@ -1,0 +1,54 @@
+{
+  "build_name": "Blessed Hammer Paladin",
+  "class_name": "Paladin",
+  "source_url": "https://maxroll.gg/d4/build-guides/blessed-hammer-paladin-leveling-guide",
+  "milestones": [
+    {
+      "level": 1,
+      "skill": "Advance",
+      "note": "Basic resource generator. Guide gives no exact level; phase = Getting Started."
+    },
+    {
+      "level": 1,
+      "skill": "Blessed Hammer",
+      "note": "Core spam skill. Phase = Getting Started."
+    },
+    {
+      "level": 1,
+      "skill": "Fanaticism Aura",
+      "note": "Early passive aura. Phase = Getting Started."
+    },
+    {
+      "level": 1,
+      "skill": "Defiance Aura",
+      "note": "Early passive aura. Phase = Getting Started."
+    },
+    {
+      "level": 25,
+      "skill": "Falling Star",
+      "note": "Disciple skill to maintain Arbiter of Justice form. Phase = Mid-Game (approx. level, not stated exactly)."
+    },
+    {
+      "level": 25,
+      "skill": "Condemn",
+      "note": "Disciple skill to maintain Arbiter of Justice form. Phase = Mid-Game (approx. level, not stated exactly)."
+    },
+    {
+      "level": 45,
+      "skill": "Main skill / support scaling",
+      "note": "Extra points go into your main skill and supportive ones to improve damage. Phase = Final Journey to Level 70 (approx.)."
+    }
+  ],
+  "strategy": "Spam Blessed Hammer while maintaining Arbiter of Justice form by regularly activating Falling Star and Condemn. Prioritize weapon upgrades, use War Plans activities like Helltides and Pit runs, and raise difficulty as damage scales to maximize XP before level 70. Note: the guide describes phases ('branches gradually unlock at specific level thresholds') without giving most exact numbers.",
+  "paragon": {
+    "boards": [],
+    "glyphs": [
+      "Apostle",
+      "Spirit",
+      "Exploit",
+      "Canny",
+      "Arbiter"
+    ],
+    "note": "Under Paragon 200, use the Board Rush setup for max legendary-node power, then respec into the Step 1 setup. Glyph priorities are consistent across Endgame/Push variants. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  }
+}

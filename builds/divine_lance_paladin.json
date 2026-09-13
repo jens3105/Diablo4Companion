@@ -1,0 +1,54 @@
+{
+  "build_name": "Divine Lance Paladin",
+  "class_name": "Paladin",
+  "source_url": "https://maxroll.gg/d4/build-guides/divine-lance-paladin-leveling-guide",
+  "milestones": [
+    {
+      "level": 1,
+      "skill": "Advance",
+      "note": "Basic attack for resource generation. Phase = Early Game."
+    },
+    {
+      "level": 1,
+      "skill": "Divine Lance",
+      "note": "Core spam skill. Phase = Early Game."
+    },
+    {
+      "level": 1,
+      "skill": "Fanaticism Aura",
+      "note": "Passive aura. Phase = Early Game."
+    },
+    {
+      "level": 1,
+      "skill": "Defiance Aura",
+      "note": "Passive aura. Phase = Early Game."
+    },
+    {
+      "level": 25,
+      "skill": "Rally",
+      "note": "Mobility and resource recovery. Phase = Mid Game (approx. level, not stated exactly)."
+    },
+    {
+      "level": 25,
+      "skill": "Consecration",
+      "note": "Healing and debuffs. Phase = Mid Game (approx. level, not stated exactly)."
+    },
+    {
+      "level": 45,
+      "skill": "Main skill / support scaling",
+      "note": "Extra points go into your main skill and supportive ones. Phase = Final Journey to Level 70 (approx.)."
+    }
+  ],
+  "strategy": "Spam Divine Lance as your primary damage source while using Advance and Rally for resource generation and mobility. Maintain Fanaticism and Defiance Auras passively, use Consecration for survivability, and attack in bursts to maximize Zealot synergy buffs through level 70.",
+  "paragon": {
+    "boards": [],
+    "glyphs": [
+      "Feverous",
+      "Resplendence",
+      "Spirit",
+      "Chip",
+      "Exploit"
+    ],
+    "note": "Resplendence/Spirit and Exploit/Outmatch are interchangeable depending on path. Board Rush under Paragon 200, then move to the Step 1 setup. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  }
+}

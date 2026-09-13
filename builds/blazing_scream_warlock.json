@@ -1,0 +1,80 @@
+{
+  "build_name": "Blazing Scream Warlock",
+  "class_name": "Warlock",
+  "source_url": "https://maxroll.gg/d4/build-guides/blazing-scream-warlock-leveling-guide",
+  "milestones": [
+    {
+      "level": 3,
+      "skill": "Blazing Scream",
+      "note": "Din primaere skill - kaster et flyvende daemonhoved i en retning."
+    },
+    {
+      "level": 4,
+      "skill": "Dark Prison",
+      "note": "Overlevelsesskill. Sigt efter 100% uptime paa denne hele vejen igennem."
+    },
+    {
+      "level": 9,
+      "skill": "Rampage",
+      "note": "Din foerste Dominance-cost skill."
+    },
+    {
+      "level": 13,
+      "skill": "Sigil of Chaos",
+      "note": "Genererer Volatility."
+    },
+    {
+      "level": 15,
+      "skill": "Legion Shard (Soul Shard)",
+      "note": "Soul Shard-mekanikken laases op. Orbital Scream aendrer spillestilen: daemonskallen kredser om dig og skader automatisk. Kanal kort paa Blazing Scream for at holde skallens omloeb og varighed oppe."
+    },
+    {
+      "level": 24,
+      "skill": "Apocalypse",
+      "note": "Det store payoff-skill i denne build. Kernen i skade herfra."
+    },
+    {
+      "level": 30,
+      "skill": "Fallen Army (opgraderet) / Sacrificial Fragment",
+      "note": "Fallen Army faar Abyss Recast. Sacrificial Fragment bliver et alternativ til Legion Shard som Soul Shard."
+    },
+    {
+      "level": 36,
+      "skill": "Demonic Smash (variant)",
+      "note": "Laaser Demonform op."
+    }
+  ],
+  "strategy": "Fyld ranks paa hovedskillet (Blazing Scream) foerst, derefter utility. Spam Blazing Scream naar Wrath er tilgaengelig.",
+  "paragon": {
+    "boards": [
+      {
+        "name": "Hellforge",
+        "note": "Primary damage-scaling board (starter/midgame/endgame path)."
+      },
+      {
+        "name": "Unbound",
+        "note": "Resource and power enhancement."
+      },
+      {
+        "name": "Eliminator",
+        "note": "Damage multiplier focus."
+      },
+      {
+        "name": "Demonologist",
+        "note": "Demon synergy bonuses."
+      },
+      {
+        "name": "Vanguard",
+        "note": "Survivability and tankiness."
+      }
+    ],
+    "glyphs": [
+      "Unbound",
+      "Eliminator",
+      "Demonologist",
+      "Hellforge",
+      "Vanguard"
+    ],
+    "note": "Level glyphs first to 50, then 100, then 150. Prioritize survivability over damage early - hit minimum glyph requirements instead of maxing them out. A 'Push' variant swaps in Ritualism (large damage multiplier via Sigil of Subversion) plus Death Aura and Ichor Carapace for survivability."
+  }
+}
