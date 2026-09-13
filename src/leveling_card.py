@@ -55,6 +55,9 @@ class LevelingCard(BaseCard):
     mark_done = Signal(int)
     mark_board_done = Signal(int)
     gear_owned_changed = Signal(str, bool)
+    character_changed = Signal(str)
+    add_character_requested = Signal()
+    rename_character_requested = Signal()
 
     LEVELING_KEY = "leveling"
     SKILLS_KEY = "skills"
@@ -78,6 +81,37 @@ class LevelingCard(BaseCard):
         self.role_tag.setVisible(False)
         self.title_row.addStretch(1)
         self.title_row.addWidget(self.role_tag)
+
+        # -------------------------
+        # Character switcher (Phase 8) - lets the player track multiple
+        # characters/builds (e.g. one on PS5, one on PC) without their
+        # progress mixing together. Sits above everything else on the
+        # page since it scopes every tab below it (Build Status, class/
+        # build/level, and Leveling/Skills/Paragon/Gear).
+        # -------------------------
+
+        character_row = QHBoxLayout()
+        character_row.setSpacing(8)
+
+        character_label = CaptionLabel("Character:", self.content)
+        character_label.setTextColor(QColor(TEXT_MUTED), QColor(TEXT_MUTED))
+
+        self.character_combo = ComboBox(self.content)
+        self.character_combo.setMinimumWidth(160)
+        self.character_combo.currentIndexChanged.connect(self._on_character_selected)
+
+        add_character_button = PushButton("+ New", self.content)
+        add_character_button.clicked.connect(self.add_character_requested)
+
+        rename_character_button = PushButton("Rename", self.content)
+        rename_character_button.clicked.connect(self.rename_character_requested)
+
+        character_row.addWidget(character_label)
+        character_row.addWidget(self.character_combo, 1)
+        character_row.addWidget(add_character_button)
+        character_row.addWidget(rename_character_button)
+
+        self.add_layout(character_row)
 
         # -------------------------
         # Build Status summary (Phase 6) - a compact, always-visible
@@ -333,10 +367,63 @@ class LevelingCard(BaseCard):
     # Class / build list wiring
     # ---------------------------------------------------------
 
+    def set_characters(self, characters: list[dict], active_id: str | None = None):
+        """Populate the character switcher. ``characters`` is a list of
+        {"id", "name"} dicts in display order; selecting one fires
+        ``character_changed`` via ``currentIndexChanged`` - blocked here
+        so restoring the active character on startup/add/rename doesn't
+        re-trigger a redundant switch."""
+
+        self.character_combo.blockSignals(True)
+        self.character_combo.clear()
+
+        selected_index = 0
+
+        for i, character in enumerate(characters):
+            self.character_combo.addItem(character["name"], userData=character["id"])
+            if active_id and character["id"] == active_id:
+                selected_index = i
+
+        if characters:
+            self.character_combo.setCurrentIndex(selected_index)
+
+        self.character_combo.blockSignals(False)
+
+    def _on_character_selected(self, index: int):
+
+        if index < 0:
+            return
+
+        character_id = self.character_combo.itemData(index)
+
+        if not character_id:
+            return
+
+        self.character_changed.emit(character_id)
+
     def set_classes(self, classes: list[str], current_class_name: str | None = None):
         """Populate the step-1 class selector. Selecting an item fires
         ``class_changed`` via the ``currentItemChanged`` signal wired in
-        ``__init__`` - no per-item ``onClick`` needed here."""
+        ``__init__`` - no per-item ``onClick`` needed here.
+
+        The class list is the same fixed set of game classes regardless
+        of which character/build is active (Phase 8 calls this again on
+        every character switch, since each character can be sitting on a
+        different class). If the tab set hasn't actually changed, just
+        move the selection instead of tearing down and rebuilding every
+        item - rebuilding leaves the freshly recreated tab widgets
+        without valid layout geometry yet, which made the segmented
+        indicator briefly paint under the wrong (stale/first) tab when
+        switching straight to a non-first class on an already-visible
+        page."""
+
+        if list(self.class_selector.items.keys()) == classes:
+            if classes:
+                target = current_class_name if current_class_name in classes else classes[0]
+                self.class_selector.blockSignals(True)
+                self.class_selector.setCurrentItem(target)
+                self.class_selector.blockSignals(False)
+            return
 
         self.class_selector.blockSignals(True)
         self.class_selector.clear()

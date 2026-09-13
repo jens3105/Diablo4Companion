@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 from PySide6.QtCore import QSettings, Qt, QTimer
 from PySide6.QtGui import QGuiApplication
-from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QHBoxLayout, QInputDialog, QVBoxLayout, QWidget
 
 from qfluentwidgets import (
     BodyLabel,
@@ -93,6 +93,25 @@ class MainWindow(FluentWindow):
         # read back once at startup in _restore_leveling_selection.
         self.settings = QSettings("Diablo4Companion", "DesktopCompanion")
 
+        # The manager's own baked-in default build (Blazing Scream Warlock,
+        # or whatever build sorts first) - captured once, before anything
+        # can mutate ``current_build_name``, so a freshly created character
+        # with no saved build of its own always falls back to this instead
+        # of silently inheriting whatever build was active a moment ago.
+        self._manager_default_build = self.leveling_manager.current_build_name
+
+        # Phase 8: multiple characters, each with its own class/build/level
+        # selection and its own Skills/Paragon/Gear completion state, so
+        # e.g. a PS5 character and a PC character never mix progress. See
+        # _migrate_to_characters for how pre-Phase-8 single-profile data
+        # (the old "leveling/*", "skills/*", "paragon/*", "gear/*" keys)
+        # is folded into a first "Character 1" instead of being lost.
+        self._migrate_to_characters()
+        self.active_character_id = self.settings.value(
+            "characters/active", "character_1", type=str
+        )
+        self.characters = self._load_characters()
+
         # ---------------------------------------------------------
         # Pages / navigation
         # ---------------------------------------------------------
@@ -136,26 +155,10 @@ class MainWindow(FluentWindow):
         self.load_upcoming_events()
         self.load_season_15()
 
-        default_build = self._restore_leveling_selection()
-        default_class = self.leveling_manager.get_class_for_build(default_build)
-
-        default_level = self.settings.value("leveling/level", 1, type=int)
-        default_level = max(1, min(100, default_level))
-
-        self.leveling_card.set_classes(
-            self.leveling_manager.list_classes(), default_class
-        )
-        self.leveling_card.set_builds_for_class(
-            self.leveling_manager.list_builds_for_class(default_class), default_build
-        )
-        self.leveling_card.set_level_value(default_level)
+        self.leveling_card.set_characters(self.characters, self.active_character_id)
         # Show milestones for the restored (or default) build/level
         # straight away, without re-persisting what we just loaded.
-        self.on_level_changed(default_level, persist=False)
-        self._refresh_skills()
-        self._refresh_paragon()
-        self._refresh_gear()
-        self._refresh_build_status()
+        self._apply_active_character()
 
         self.leveling_card.level_changed.connect(self.on_level_changed)
         self.leveling_card.build_changed.connect(self.on_build_changed)
@@ -163,6 +166,9 @@ class MainWindow(FluentWindow):
         self.leveling_card.mark_done.connect(self.on_mark_done)
         self.leveling_card.mark_board_done.connect(self.on_mark_board_done)
         self.leveling_card.gear_owned_changed.connect(self.on_gear_owned_changed)
+        self.leveling_card.character_changed.connect(self.on_character_changed)
+        self.leveling_card.add_character_requested.connect(self.on_add_character)
+        self.leveling_card.rename_character_requested.connect(self.on_rename_character)
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_countdown)
@@ -303,17 +309,177 @@ class MainWindow(FluentWindow):
     # ---------------------------------------------------------
 
     def _restore_leveling_selection(self) -> str:
-        """Look up the last-selected build from QSettings and make it the
-        LevelingManager's current build, if it still exists. Falls back
-        to LevelingManager's own baked-in default (unchanged) when
-        nothing was saved yet or the saved build was removed."""
+        """Look up the active character's last-selected build from
+        QSettings and make it the LevelingManager's current build, if it
+        still exists. Falls back to LevelingManager's own baked-in
+        default (captured in ``_manager_default_build``) when this
+        character has no saved build yet (e.g. it was just created) or
+        the saved build was removed - never leaves the previously active
+        character's build silently applied to a different character."""
 
-        saved_build = self.settings.value("leveling/build", "", type=str)
+        saved_build = self.settings.value(f"{self._char_prefix()}/build", "", type=str)
+        target_build = saved_build or self._manager_default_build
 
-        if saved_build:
-            self.leveling_manager.set_current_build(saved_build)
+        if target_build:
+            self.leveling_manager.set_current_build(target_build)
 
         return self.leveling_manager.current_build_name
+
+    # ---------------------------------------------------------
+    # CHARACTERS (Phase 8)
+    #
+    # Everything the app tracks per build (class/build/level selection,
+    # plus Skills/Paragon/Gear completion state) now lives under
+    # "characters/<id>/..." instead of directly under
+    # "leveling/"/"skills/"/"paragon/"/"gear/", so multiple characters
+    # (e.g. one on PS5, one on PC) never mix progress. Only one
+    # LevelingManager instance exists - switching characters just points
+    # it at a different build and re-reads that character's completion
+    # state, the same way switching builds within one character already
+    # worked.
+    # ---------------------------------------------------------
+
+    def _migrate_to_characters(self):
+        """One-time migration: if no character list exists yet, create
+        "Character 1" and copy every pre-Phase-8 key ("leveling/build",
+        "leveling/class", "leveling/level", and every "skills/*",
+        "paragon/*", "gear/*" completion key) under it. The old keys are
+        left in place untouched, never deleted - this is purely additive,
+        so a bug here can at worst leave stale duplicate keys around, not
+        lose anything."""
+
+        existing_ids = self.settings.value("characters/ids", [], type=list)
+
+        if existing_ids:
+            return
+
+        char_id = "character_1"
+
+        self.settings.setValue(f"characters/{char_id}/name", "Character 1")
+
+        old_build = self.settings.value("leveling/build", "", type=str)
+        old_level = self.settings.value("leveling/level", 1, type=int)
+
+        if old_build:
+            self.settings.setValue(f"characters/{char_id}/build", old_build)
+
+        self.settings.setValue(f"characters/{char_id}/level", old_level)
+
+        for key in self.settings.allKeys():
+            if key.startswith("skills/") or key.startswith("paragon/") or key.startswith("gear/"):
+                self.settings.setValue(
+                    f"characters/{char_id}/{key}", self.settings.value(key)
+                )
+
+        self.settings.setValue("characters/ids", [char_id])
+        self.settings.setValue("characters/next_num", 2)
+        self.settings.setValue("characters/active", char_id)
+
+    def _load_characters(self) -> list[dict]:
+
+        ids = self.settings.value("characters/ids", [], type=list)
+
+        return [
+            {
+                "id": char_id,
+                "name": self.settings.value(f"characters/{char_id}/name", char_id, type=str),
+            }
+            for char_id in ids
+        ]
+
+    def _char_prefix(self) -> str:
+        return f"characters/{self.active_character_id}"
+
+    def _apply_active_character(self):
+        """Point every character-scoped view - LevelingManager's current
+        build, the Build Guide's class/build/level selectors and its 4
+        tabs + Build Status widget, and the Dashboard's Current Build
+        card - at ``self.active_character_id``'s saved class/build/level
+        and completion state. Used both at startup and whenever the
+        character switcher fires."""
+
+        default_build = self._restore_leveling_selection()
+        default_class = self.leveling_manager.get_class_for_build(default_build)
+
+        default_level = self.settings.value(f"{self._char_prefix()}/level", 1, type=int)
+        default_level = max(1, min(100, default_level))
+
+        self.leveling_card.set_classes(
+            self.leveling_manager.list_classes(), default_class
+        )
+        self.leveling_card.set_builds_for_class(
+            self.leveling_manager.list_builds_for_class(default_class), default_build
+        )
+        self.leveling_card.set_level_value(default_level)
+        # Don't re-persist what we just loaded back onto this same
+        # character.
+        self.on_level_changed(default_level, persist=False)
+        self._refresh_skills()
+        self._refresh_paragon()
+        self._refresh_gear()
+        self._refresh_build_status()
+
+    def _switch_character(self, char_id: str):
+
+        self.active_character_id = char_id
+        self.settings.setValue("characters/active", char_id)
+
+        self._apply_active_character()
+
+    def on_character_changed(self, char_id: str):
+
+        if char_id == self.active_character_id:
+            return
+
+        self._switch_character(char_id)
+
+    def on_add_character(self):
+
+        next_num = self.settings.value("characters/next_num", 2, type=int)
+        default_name = f"Character {next_num}"
+
+        name, ok = QInputDialog.getText(
+            self, "New Character", "Character name:", text=default_name
+        )
+
+        if not ok:
+            return
+
+        name = name.strip() or default_name
+        char_id = f"character_{next_num}"
+
+        ids = self.settings.value("characters/ids", [], type=list)
+        ids.append(char_id)
+
+        self.settings.setValue("characters/ids", ids)
+        self.settings.setValue("characters/next_num", next_num + 1)
+        self.settings.setValue(f"characters/{char_id}/name", name)
+
+        self.characters = self._load_characters()
+        self.leveling_card.set_characters(self.characters, char_id)
+        self._switch_character(char_id)
+
+    def on_rename_character(self):
+
+        current_name = self.settings.value(
+            f"characters/{self.active_character_id}/name", "", type=str
+        )
+
+        name, ok = QInputDialog.getText(
+            self, "Rename Character", "Character name:", text=current_name
+        )
+
+        if not ok:
+            return
+
+        name = name.strip()
+
+        if not name:
+            return
+
+        self.settings.setValue(f"characters/{self.active_character_id}/name", name)
+        self.characters = self._load_characters()
+        self.leveling_card.set_characters(self.characters, self.active_character_id)
 
     def _current_level(self) -> int:
 
@@ -343,7 +509,7 @@ class MainWindow(FluentWindow):
         self._refresh_dashboard_build_card()
 
         if persist:
-            self.settings.setValue("leveling/level", level)
+            self.settings.setValue(f"{self._char_prefix()}/level", level)
 
     def on_build_changed(self, build_name: str):
 
@@ -358,18 +524,20 @@ class MainWindow(FluentWindow):
         self._refresh_gear()
         self._refresh_build_status()
 
-        self.settings.setValue("leveling/build", self.leveling_manager.current_build_name)
         self.settings.setValue(
-            "leveling/class", self.leveling_manager.get_class_for_build(build_name)
+            f"{self._char_prefix()}/build", self.leveling_manager.current_build_name
+        )
+        self.settings.setValue(
+            f"{self._char_prefix()}/class",
+            self.leveling_manager.get_class_for_build(build_name),
         )
 
     # ---------------------------------------------------------
     # BUILD-GUIDE / SKILLS TAB
     # ---------------------------------------------------------
 
-    @staticmethod
-    def _completed_levels_key(build_name: str) -> str:
-        return f"skills/{build_name}/completed_levels"
+    def _completed_levels_key(self, build_name: str) -> str:
+        return f"{self._char_prefix()}/skills/{build_name}/completed_levels"
 
     def _load_completed_levels(self, build_name: str) -> set[int]:
 
@@ -427,12 +595,11 @@ class MainWindow(FluentWindow):
     # BUILD-GUIDE / PARAGON TAB
     # ---------------------------------------------------------
 
-    @staticmethod
-    def _completed_boards_key(build_name: str) -> str:
+    def _completed_boards_key(self, build_name: str) -> str:
         # Its own QSettings key - Paragon boards and skill milestones are
         # different lists/units, so completion state is never conflated
         # into the shared "skills/.../completed_levels" key.
-        return f"paragon/{build_name}/completed_boards"
+        return f"{self._char_prefix()}/paragon/{build_name}/completed_boards"
 
     def _load_completed_boards(self, build_name: str) -> set[int]:
 
@@ -489,13 +656,12 @@ class MainWindow(FluentWindow):
     # BUILD-GUIDE / GEAR & POWERS TAB
     # ---------------------------------------------------------
 
-    @staticmethod
-    def _owned_items_key(build_name: str) -> str:
+    def _owned_items_key(self, build_name: str) -> str:
         # Its own QSettings key, separate from the one-way completion
         # keys above - gear ownership can go backwards (an item sold or
         # replaced), so this stores a toggle state, not a monotonic
         # "completed" set.
-        return f"gear/{build_name}/owned_items"
+        return f"{self._char_prefix()}/gear/{build_name}/owned_items"
 
     def _load_owned_items(self, build_name: str) -> set[str]:
 
