@@ -13,6 +13,7 @@ from qfluentwidgets import (
 )
 
 from src.api import DiabloAPI
+from src.compact_window import CompactWindow
 from src.dashboard import DashboardWidget
 from src.leveling_card import LevelingCard
 from src.managers.leveling_manager import LevelingManager
@@ -141,6 +142,15 @@ class MainWindow(FluentWindow):
         # to FluentWindow's built-in switchTo.
         self.dashboard.build_card.clicked.connect(
             lambda: self.switchTo(self.builds_interface)
+        )
+
+        # Phase 9: Compact Mode - lazily created on first use, torn down
+        # (set back to None) when the user closes it, so re-opening it
+        # always starts from a clean, freshly-synced window.
+        self.compact_window = None
+        self._compact_done_level = None
+        self.dashboard.build_card.compact_mode_requested.connect(
+            self.open_compact_mode
         )
 
         # Keep the sidebar expanded (with text labels) at our default
@@ -810,24 +820,34 @@ class MainWindow(FluentWindow):
     # DASHBOARD / CURRENT BUILD CARD (Phase 7)
     # ---------------------------------------------------------
 
-    def _next_action_text(self, build_name: str) -> str:
-        """Pick the single simplest "next thing to do": the next
-        not-yet-completed Leveling/Skills milestone for ``build_name``,
-        same data + completion state as the Leveling/Skills tabs
-        (``get_skills_data``/``_load_completed_levels``). Deliberately not
-        a cross-category prioritizer over Paragon/Gear too - Dashboard
-        2.0 is meant to stay simple, not become a second Build Guide."""
+    def _pending_milestones(self, build_name: str) -> list[dict]:
+        """Leveling/Skills milestones for ``build_name`` that aren't
+        completed yet, in order - the single source of truth for "what's
+        next", same data + completion state as the Leveling/Skills tabs
+        (``get_skills_data``/``_load_completed_levels``). Shared by
+        ``_next_action_text`` (Dashboard's Current Build card) and
+        ``_compact_next_action`` (Phase 9's Compact Mode window) so both
+        surfaces always agree on the next action."""
 
         milestones = self.leveling_manager.get_skills_data(build_name)["milestones"]
         completed = self._load_completed_levels(build_name)
 
-        next_milestone = next(
-            (m for m in milestones if m["level"] not in completed), None
-        )
+        return [m for m in milestones if m["level"] not in completed]
 
-        if next_milestone:
-            return f"Lvl {next_milestone['level']} — {next_milestone['skill']}"
+    def _next_action_text(self, build_name: str) -> str:
+        """Pick the single simplest "next thing to do": the next
+        not-yet-completed Leveling/Skills milestone for ``build_name``.
+        Deliberately not a cross-category prioritizer over Paragon/Gear
+        too - Dashboard 2.0 is meant to stay simple, not become a second
+        Build Guide."""
 
+        pending = self._pending_milestones(build_name)
+
+        if pending:
+            m = pending[0]
+            return f"Lvl {m['level']} — {m['skill']}"
+
+        milestones = self.leveling_manager.get_skills_data(build_name)["milestones"]
         return "Build fully unlocked!" if milestones else "—"
 
     def _refresh_dashboard_build_card(self):
@@ -841,6 +861,7 @@ class MainWindow(FluentWindow):
 
         if not build_name:
             self.dashboard.build_card.set_build("", 0, [], "")
+            self._refresh_compact_window()
             return
 
         rows, _footer_text, _ready = self._compute_build_status(build_name)
@@ -849,6 +870,114 @@ class MainWindow(FluentWindow):
         self.dashboard.build_card.set_build(
             build_name, self._current_level(), rows, next_action
         )
+
+        # Everything that can move the Dashboard card's needle (build/
+        # class/level/character switch, or any mark-done in the four
+        # Build Guide tabs, all of which route through here already) also
+        # moves Compact Mode's - so pushing it from this one spot is
+        # enough to keep an already-open Compact window live-synced
+        # without a second signal wiring.
+        self._refresh_compact_window()
+
+    # ---------------------------------------------------------
+    # COMPACT MODE (Phase 9)
+    #
+    # A small always-on-top window (src/compact_window.py) for glancing
+    # at while actually playing - PC or, per the user, a PS5 on a second
+    # screen. It owns no state of its own: everything it shows comes from
+    # the same LevelingManager/QSettings data the main window already
+    # reads, and its Done button routes through the existing
+    # ``on_mark_done`` so a mark made in Compact Mode is indistinguishable
+    # from one made in the Build Guide.
+    # ---------------------------------------------------------
+
+    def _compact_next_action(self, build_name: str):
+        """Like ``_next_action_text`` but also returns the milestone
+        *after* the next one (for Compact Mode's "Next: ..." preview
+        line) and the level number Done should mark, built on the same
+        ``_pending_milestones`` list so Compact Mode and the Dashboard
+        card can never disagree about what's next.
+
+        Returns ``(current_text, preview_text, done_level)`` -
+        ``done_level`` is ``None`` when there is nothing left to mark."""
+
+        pending = self._pending_milestones(build_name)
+
+        if not pending:
+            milestones = self.leveling_manager.get_skills_data(build_name)["milestones"]
+            current_text = "Build fully unlocked!" if milestones else "—"
+            return current_text, "", None
+
+        current = pending[0]
+        current_text = f"Lvl {current['level']} — {current['skill']}"
+
+        if len(pending) > 1:
+            nxt = pending[1]
+            preview_text = f"Lvl {nxt['level']} — {nxt['skill']}"
+        else:
+            preview_text = ""
+
+        return current_text, preview_text, current["level"]
+
+    def open_compact_mode(self):
+        """Create (once) and show the Compact Mode window."""
+
+        if self.compact_window is None:
+            self.compact_window = CompactWindow()
+            self.compact_window.done_clicked.connect(self.on_compact_done)
+            self.compact_window.shown.connect(self._refresh_compact_window)
+            self.compact_window.destroyed.connect(self._on_compact_window_destroyed)
+
+        self._refresh_compact_window()
+        self.compact_window.show()
+        self.compact_window.raise_()
+        self.compact_window.activateWindow()
+
+    def _on_compact_window_destroyed(self):
+        # Qt has already torn down the C++ object by the time this fires -
+        # just drop our reference so open_compact_mode knows to build a
+        # fresh one next time instead of touching a dead widget.
+        self.compact_window = None
+
+    def _refresh_compact_window(self):
+        """Push the active character's build/level/next-action onto an
+        open Compact window. Safe to call unconditionally (e.g. from
+        ``_refresh_dashboard_build_card`` on every state change) - it's a
+        no-op while Compact Mode isn't open."""
+
+        if self.compact_window is None:
+            return
+
+        build_name = self.leveling_manager.current_build_name
+
+        if not build_name:
+            self._compact_done_level = None
+            self.compact_window.set_content("", 0, "", "", False)
+            return
+
+        char_name = next(
+            (c["name"] for c in self.characters if c["id"] == self.active_character_id),
+            "",
+        )
+        title = f"{char_name} — {build_name}" if char_name else build_name
+
+        current_text, preview_text, done_level = self._compact_next_action(build_name)
+        self._compact_done_level = done_level
+
+        self.compact_window.set_content(
+            title, self._current_level(), current_text, preview_text, done_level is not None
+        )
+
+    def on_compact_done(self):
+        """Compact window's Done button - routes through the exact same
+        ``on_mark_done`` the Build Guide's own Done buttons use, so the
+        main window's Skills/Leveling tabs and Build Status update
+        immediately too, not just Compact Mode's own view."""
+
+        if self._compact_done_level is None:
+            return
+
+        self.on_mark_done(self._compact_done_level)
 
     def on_class_changed(self, class_name: str):
         """Step-1 class selector changed: rebuild the step-2 build

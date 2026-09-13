@@ -1,8 +1,14 @@
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QSizePolicy
 
-from qfluentwidgets import BodyLabel, CaptionLabel, FluentIcon as FIF, StrongBodyLabel
+from qfluentwidgets import (
+    BodyLabel,
+    CaptionLabel,
+    FluentIcon as FIF,
+    PushButton,
+    StrongBodyLabel,
+)
 
 from src.base_card import BaseCard
 from src.theme import ACCENT_GOLD, TEXT_MUTED
@@ -15,7 +21,13 @@ class CurrentBuildCard(BaseCard):
     Build Guide page (``MainWindow._compute_build_status`` /
     ``_load_completed_levels``), not a new tracker of its own. Click
     anywhere on the card to jump to the Build Guide page (wired by
-    MainWindow via the inherited ``clicked`` signal)."""
+    MainWindow via the inherited ``clicked`` signal).
+
+    Phase 9 adds the "Compact Mode" button (top-right of the card) that
+    opens the small always-on-top companion window - a separate signal
+    so it doesn't fight with the card-wide ``clicked`` navigation."""
+
+    compact_mode_requested = Signal()
 
     def __init__(self, parent=None):
         super().__init__("CURRENT BUILD", icon=FIF.GAME, parent=parent)
@@ -27,6 +39,17 @@ class CurrentBuildCard(BaseCard):
         # card visibly reads as clickable before the user tries it.
         self.setClickEnabled(True)
         self.setCursor(Qt.PointingHandCursor)
+
+        # Sits in the title row (added by BaseCard) rather than the
+        # content area, so it reads as a card-level action, not part of
+        # the build info itself. QPushButton consumes its own clicks, so
+        # pressing it never also triggers the card's navigate-away
+        # ``clicked``.
+        self.compact_mode_button = PushButton("Compact Mode", self)
+        self.compact_mode_button.setFixedHeight(24)
+        self.compact_mode_button.clicked.connect(self.compact_mode_requested)
+        self.title_row.addStretch(1)
+        self.title_row.addWidget(self.compact_mode_button)
 
         self.build_name_label = StrongBodyLabel("No build selected", self.content)
         self.build_name_label.setWordWrap(True)
