@@ -547,6 +547,14 @@ class MainWindow(FluentWindow):
     # ---------------------------------------------------------
 
     def _completed_levels_key(self, build_name: str) -> str:
+        # Historically named after "level", but actually keyed by each
+        # milestone's *index* in the build's milestone list (see
+        # LevelingCard._render_milestone_checklist) - several builds
+        # unlock more than one skill at the same level, so a level-keyed
+        # set would mark every milestone sharing that level as done at
+        # once. Left as "completed_levels" rather than renamed, since the
+        # per-build QSettings path already scopes it and nothing outside
+        # this file/leveling_card.py ever reads the raw key name.
         return f"{self._char_prefix()}/skills/{build_name}/completed_levels"
 
     def _load_completed_levels(self, build_name: str) -> set[int]:
@@ -586,7 +594,10 @@ class MainWindow(FluentWindow):
             completed,
         )
 
-    def on_mark_done(self, level: int):
+    def on_mark_done(self, index: int):
+        """``index`` is a milestone's position in its build's milestone
+        list (see ``LevelingCard._render_milestone_checklist``), not a
+        game level - multiple milestones can share a level."""
 
         build_name = self.leveling_manager.current_build_name
 
@@ -594,7 +605,7 @@ class MainWindow(FluentWindow):
             return
 
         completed = self._load_completed_levels(build_name)
-        completed.add(level)
+        completed.add(index)
         self._save_completed_levels(build_name, completed)
 
         self._refresh_skills()
@@ -820,19 +831,21 @@ class MainWindow(FluentWindow):
     # DASHBOARD / CURRENT BUILD CARD (Phase 7)
     # ---------------------------------------------------------
 
-    def _pending_milestones(self, build_name: str) -> list[dict]:
-        """Leveling/Skills milestones for ``build_name`` that aren't
+    def _pending_milestones(self, build_name: str) -> list[tuple[int, dict]]:
+        """``(index, milestone)`` pairs for ``build_name`` that aren't
         completed yet, in order - the single source of truth for "what's
         next", same data + completion state as the Leveling/Skills tabs
         (``get_skills_data``/``_load_completed_levels``). Shared by
         ``_next_action_text`` (Dashboard's Current Build card) and
         ``_compact_next_action`` (Phase 9's Compact Mode window) so both
-        surfaces always agree on the next action."""
+        surfaces always agree on the next action. The index (not the
+        milestone's ``level``) is what completion is keyed on - see
+        ``on_mark_done``."""
 
         milestones = self.leveling_manager.get_skills_data(build_name)["milestones"]
         completed = self._load_completed_levels(build_name)
 
-        return [m for m in milestones if m["level"] not in completed]
+        return [(i, m) for i, m in enumerate(milestones) if i not in completed]
 
     def _next_action_text(self, build_name: str) -> str:
         """Pick the single simplest "next thing to do": the next
@@ -844,7 +857,7 @@ class MainWindow(FluentWindow):
         pending = self._pending_milestones(build_name)
 
         if pending:
-            m = pending[0]
+            _index, m = pending[0]
             return f"Lvl {m['level']} — {m['skill']}"
 
         milestones = self.leveling_manager.get_skills_data(build_name)["milestones"]
@@ -898,8 +911,10 @@ class MainWindow(FluentWindow):
         ``_pending_milestones`` list so Compact Mode and the Dashboard
         card can never disagree about what's next.
 
-        Returns ``(current_text, preview_text, done_level)`` -
-        ``done_level`` is ``None`` when there is nothing left to mark."""
+        Returns ``(current_text, preview_text, done_index)`` -
+        ``done_index`` is ``None`` when there is nothing left to mark,
+        otherwise the milestone's position in its build's list (what
+        completion is actually keyed on - see ``on_mark_done``)."""
 
         pending = self._pending_milestones(build_name)
 
@@ -908,16 +923,16 @@ class MainWindow(FluentWindow):
             current_text = "Build fully unlocked!" if milestones else "—"
             return current_text, "", None
 
-        current = pending[0]
+        current_index, current = pending[0]
         current_text = f"Lvl {current['level']} — {current['skill']}"
 
         if len(pending) > 1:
-            nxt = pending[1]
+            _next_index, nxt = pending[1]
             preview_text = f"Lvl {nxt['level']} — {nxt['skill']}"
         else:
             preview_text = ""
 
-        return current_text, preview_text, current["level"]
+        return current_text, preview_text, current_index
 
     def open_compact_mode(self):
         """Create (once) and show the Compact Mode window."""

@@ -313,7 +313,9 @@ class LevelingCard(BaseCard):
 
         self.status_rows_label = BodyLabel("", widget)
         self.status_rows_label.setWordWrap(True)
-        self.status_rows_label.setStyleSheet("font-family: monospace; font-size: 12px;")
+        self.status_rows_label.setStyleSheet(
+            f"font-family: monospace; font-size: 12px; color: {TEXT_PRIMARY};"
+        )
         layout.addWidget(self.status_rows_label)
 
         self.status_footer_label = CaptionLabel("", widget)
@@ -787,21 +789,27 @@ class LevelingCard(BaseCard):
         (via ``_add_milestone_row``), driven by the shared per-build
         ``completed_levels`` state. Used by both the Leveling and Skills
         tabs so the two views never fall out of sync. Returns the next
-        incomplete milestone, or ``None`` if everything is done."""
+        incomplete milestone, or ``None`` if everything is done.
 
-        next_milestone = next(
-            (m for m in milestones if m["level"] not in completed_levels), None
+        Completion is tracked by each milestone's *position* in the list,
+        not its ``level`` - several builds legitimately unlock more than
+        one skill at the same level (e.g. three separate level-1 picks),
+        so keying on level would mark every milestone that shares a level
+        as done the moment any one of them is checked off."""
+
+        next_index = next(
+            (i for i in range(len(milestones)) if i not in completed_levels), None
         )
 
-        for milestone in milestones:
-            is_done = milestone["level"] in completed_levels
-            is_next = milestone is next_milestone
-            self._add_milestone_row(layout, container, milestone, is_done, is_next)
+        for i, milestone in enumerate(milestones):
+            is_done = i in completed_levels
+            is_next = i == next_index
+            self._add_milestone_row(layout, container, milestone, is_done, is_next, i)
 
-        return next_milestone
+        return milestones[next_index] if next_index is not None else None
 
     def _add_milestone_row(
-        self, layout: QVBoxLayout, container: QWidget, milestone: dict, is_done: bool, is_next: bool
+        self, layout: QVBoxLayout, container: QWidget, milestone: dict, is_done: bool, is_next: bool, index: int
     ):
 
         skill_label = milestone["skill"]
@@ -824,7 +832,7 @@ class LevelingCard(BaseCard):
             notes.append(f"★ {points_note}")
 
         self._add_checklist_row(
-            layout, container, title, notes, is_done, is_next, self.mark_done, milestone["level"]
+            layout, container, title, notes, is_done, is_next, self.mark_done, index
         )
 
     # ---------------------------------------------------------

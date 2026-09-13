@@ -11,7 +11,7 @@ from qfluentwidgets import (
 )
 
 from src.base_card import BaseCard
-from src.theme import ACCENT_GOLD, TEXT_MUTED
+from src.theme import ACCENT_GOLD, TEXT_MUTED, TEXT_PRIMARY
 
 
 class CurrentBuildCard(BaseCard):
@@ -67,7 +67,9 @@ class CurrentBuildCard(BaseCard):
 
         self.status_rows_label = BodyLabel("", self.content)
         self.status_rows_label.setWordWrap(True)
-        self.status_rows_label.setStyleSheet("font-family: monospace; font-size: 12px;")
+        self.status_rows_label.setStyleSheet(
+            f"font-family: monospace; font-size: 12px; color: {TEXT_PRIMARY};"
+        )
         self.content_layout.addWidget(self.status_rows_label)
 
         self.content_layout.addSpacing(8)

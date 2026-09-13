@@ -11,7 +11,7 @@ from qfluentwidgets import (
     TransparentToolButton,
 )
 
-from src.theme import ACCENT_GOLD, TEXT_MUTED
+from src.theme import ACCENT_GOLD, BACKGROUND, TEXT_MUTED, TEXT_PRIMARY
 
 
 class CompactWindow(QWidget):
@@ -43,6 +43,13 @@ class CompactWindow(QWidget):
         # freshly-synced showEvent) next time Compact Mode is opened.
         self.setAttribute(Qt.WA_DeleteOnClose)
 
+        # Unlike the main window, this is a plain QWidget rather than a
+        # FluentWindow, so it doesn't automatically pick up the app's
+        # dark background - without this it renders as a plain white/
+        # light OS window while its labels are still colored for a dark
+        # background (near-invisible white-on-white text).
+        self.setStyleSheet(f"CompactWindow {{ background-color: {BACKGROUND}; }}")
+
         layout = QVBoxLayout(self)
         layout.setContentsMargins(18, 16, 18, 14)
         layout.setSpacing(4)
@@ -52,6 +59,7 @@ class CompactWindow(QWidget):
 
         self.build_label = StrongBodyLabel("", self)
         self.build_label.setWordWrap(True)
+        self.build_label.setTextColor(QColor(TEXT_PRIMARY), QColor(TEXT_PRIMARY))
         header_row.addWidget(self.build_label, 1)
 
         # Belt-and-suspenders return-to-normal: the OS title bar's own
@@ -78,6 +86,7 @@ class CompactWindow(QWidget):
 
         self.action_label = BodyLabel("—", self)
         self.action_label.setWordWrap(True)
+        self.action_label.setTextColor(QColor(TEXT_PRIMARY), QColor(TEXT_PRIMARY))
         layout.addWidget(self.action_label)
 
         layout.addSpacing(4)
