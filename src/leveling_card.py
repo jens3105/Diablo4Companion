@@ -14,6 +14,7 @@ from qfluentwidgets import (
     SingleDirectionScrollArea,
     StrongBodyLabel,
     SubtitleLabel,
+    SwitchButton,
 )
 
 from src.base_card import BaseCard
@@ -53,6 +54,7 @@ class LevelingCard(BaseCard):
     class_changed = Signal(str)
     mark_done = Signal(int)
     mark_board_done = Signal(int)
+    gear_owned_changed = Signal(str, bool)
 
     LEVELING_KEY = "leveling"
     SKILLS_KEY = "skills"
@@ -134,7 +136,7 @@ class LevelingCard(BaseCard):
         self.leveling_page = self._build_leveling_page()
         self.skills_page = self._build_skills_page()
         self.paragon_page = self._build_scroll_page("paragon_container", "paragon_layout")
-        self.gear_page = self._build_scroll_page("gear_container", "gear_layout")
+        self.gear_page = self._build_gear_page()
 
         self.section_stack.addWidget(self.leveling_page)
         self.section_stack.addWidget(self.skills_page)
@@ -214,6 +216,32 @@ class LevelingCard(BaseCard):
         scroll, container, inner_layout = self._make_scroll_area(page)
         self.skills_container = container
         self.skills_layout = inner_layout
+
+        layout.addWidget(scroll, 1)
+
+        return page
+
+    def _build_gear_page(self) -> QWidget:
+        """Like ``_build_leveling_page``/``_build_skills_page``, but the
+        strong label up top is a build-readiness rollup ("X / Y key items
+        equipped") instead of a "next" pointer - gear has no natural
+        order, so there's nothing to point at, only a count."""
+
+        page = QWidget(self.content)
+        layout = QVBoxLayout(page)
+        layout.setContentsMargins(0, 8, 0, 0)
+        layout.setSpacing(8)
+
+        self.gear_rollup_label = StrongBodyLabel(
+            "Pick a build to see gear readiness.", page
+        )
+        self.gear_rollup_label.setWordWrap(True)
+        self.gear_rollup_label.setTextColor(QColor(ACCENT_GOLD), QColor(ACCENT_GOLD))
+        layout.addWidget(self.gear_rollup_label)
+
+        scroll, container, inner_layout = self._make_scroll_area(page)
+        self.gear_container = container
+        self.gear_layout = inner_layout
 
         layout.addWidget(scroll, 1)
 
@@ -411,10 +439,6 @@ class LevelingCard(BaseCard):
     # Content population
     # ---------------------------------------------------------
 
-    def set_progress(self, data: dict):
-
-        self._set_gear(data)
-
     def set_leveling(self, level: int, milestones: list[dict], completed_levels: set[int]):
         """Populate the Leveling tab as the same kind of checklist the
         Skills tab shows - ``milestones``/``completed_levels`` are the
@@ -478,16 +502,26 @@ class LevelingCard(BaseCard):
         if note:
             self._add_row(layout, container, note)
 
-    def _set_gear(self, data: dict):
+    def set_gear(self, gear: dict | None, owned_names: set[str]):
+        """Populate the Gear & Powers tab as a toggle checklist over
+        ``key_items``/``key_aspects`` - unlike the one-way Leveling/
+        Skills/Paragon checklists, gear ownership can be lost (an item
+        sold/replaced), so each row gets a two-way "Have it"/"Missing"
+        toggle (see ``_add_toggle_row``) instead of a one-way "Mark as
+        Done" button, and there's a rollup ("X / Y key items equipped")
+        up top instead of a "next" pointer so build-readiness is visible
+        at a glance. ``stat_priority``/``skill_bar`` stay plain reference
+        text, same as before - they aren't checkable items."""
 
         layout = self.gear_layout
         container = self.gear_container
 
         self._clear_rows(layout)
 
-        gear = data.get("gear")
-
         if not gear:
+            self.gear_rollup_label.setText(
+                "No endgame gear guide available for this build."
+            )
             self._add_section_header(layout, container, "GEAR && POWERS")
             self._add_row(
                 layout,
@@ -502,23 +536,27 @@ class LevelingCard(BaseCard):
         stat_priority = gear.get("stat_priority") or []
         skill_bar = gear.get("skill_bar") or []
 
+        checkable = key_items + key_aspects
+        owned_count = sum(1 for entry in checkable if entry["name"] in owned_names)
+
+        if checkable:
+            self.gear_rollup_label.setText(
+                f"{owned_count} / {len(checkable)} key items equipped"
+            )
+        else:
+            self.gear_rollup_label.setText("No specific gear checklist for this build.")
+
         self._add_section_header(layout, container, "KEY / SIGNATURE ITEMS")
 
         if key_items:
-            for item in key_items:
-                slot = item.get("slot", "")
-                header = f"{item['name']} ({slot})" if slot else item["name"]
-                note = item.get("note", "")
-                self._add_row(layout, container, f"{header}\n{note}".rstrip())
+            self._render_gear_checklist(layout, container, key_items, owned_names)
         else:
             self._add_row(layout, container, "No specific key items listed.")
 
         self._add_section_header(layout, container, "KEY ASPECTS")
 
         if key_aspects:
-            for aspect in key_aspects:
-                note = aspect.get("note", "")
-                self._add_row(layout, container, f"{aspect['name']}\n{note}".rstrip())
+            self._render_gear_checklist(layout, container, key_aspects, owned_names)
         else:
             self._add_row(layout, container, "No specific key aspects listed.")
 
@@ -678,9 +716,54 @@ class LevelingCard(BaseCard):
         )
 
     # ---------------------------------------------------------
-    # Shared checklist row renderer (Leveling/Skills milestones and
-    # Paragon boards all funnel through this one row style).
+    # Shared checklist row renderer (Leveling/Skills milestones, Paragon
+    # boards, and Gear items/aspects all funnel through the same row
+    # shell - ``_make_row_shell`` - and only differ in what action
+    # widget goes on the right: a one-way "Mark as Done" button for the
+    # first three, or a two-way "Have it"/"Missing" toggle for gear.
     # ---------------------------------------------------------
+
+    def _make_row_shell(
+        self,
+        container: QWidget,
+        status: str,
+        title: str,
+        notes: list[str],
+        highlight: bool,
+        bordered: bool = False,
+    ):
+        """Build the shared row background/label (status + title + notes)
+        used by every checklist row. Returns ``(row, row_layout)`` so the
+        caller can append its own action widget (button or toggle) to
+        ``row_layout`` before inserting ``row`` into the page layout."""
+
+        row = QWidget(container)
+        row.setObjectName("milestoneRow")
+        row_layout = QHBoxLayout(row)
+        row_layout.setContentsMargins(8, 8, 8, 8)
+        row_layout.setSpacing(8)
+
+        lines = [f"{status} — {title}"] + notes
+        text = "\n".join(lines)
+
+        label = BodyLabel(text, row)
+        label.setWordWrap(True)
+        text_color = QColor(ACCENT_GOLD) if highlight else QColor(TEXT_PRIMARY)
+        label.setTextColor(text_color, text_color)
+        row_layout.addWidget(label, 1)
+
+        border = f"1px solid {ACCENT_GOLD}" if bordered else "1px solid transparent"
+        row.setStyleSheet(
+            f"""
+            QWidget#milestoneRow {{
+                background-color: {SURFACE_ALT};
+                border-radius: 8px;
+                border: {border};
+            }}
+            """
+        )
+
+        return row, row_layout
 
     def _add_checklist_row(
         self,
@@ -694,12 +777,6 @@ class LevelingCard(BaseCard):
         key,
     ):
 
-        row = QWidget(container)
-        row.setObjectName("milestoneRow")
-        row_layout = QHBoxLayout(row)
-        row_layout.setContentsMargins(8, 8, 8, 8)
-        row_layout.setSpacing(8)
-
         if is_done:
             status = "✓ Completed"
         elif is_next:
@@ -707,14 +784,9 @@ class LevelingCard(BaseCard):
         else:
             status = "○ Future"
 
-        lines = [f"{status} — {title}"] + notes
-        text = "\n".join(lines)
-
-        label = BodyLabel(text, row)
-        label.setWordWrap(True)
-        text_color = QColor(ACCENT_GOLD) if is_next else QColor(TEXT_PRIMARY)
-        label.setTextColor(text_color, text_color)
-        row_layout.addWidget(label, 1)
+        row, row_layout = self._make_row_shell(
+            container, status, title, notes, highlight=is_next, bordered=is_next
+        )
 
         if not is_done:
             done_button = PushButton("Mark as Done", row)
@@ -723,14 +795,63 @@ class LevelingCard(BaseCard):
             )
             row_layout.addWidget(done_button, 0)
 
-        border = f"1px solid {ACCENT_GOLD}" if is_next else "1px solid transparent"
-        row.setStyleSheet(
-            f"""
-            QWidget#milestoneRow {{
-                background-color: {SURFACE_ALT};
-                border-radius: 8px;
-                border: {border};
-            }}
-            """
+        self._insert_row(layout, row)
+
+    # ---------------------------------------------------------
+    # Gear tab
+    # ---------------------------------------------------------
+
+    def _render_gear_checklist(
+        self,
+        layout: QVBoxLayout,
+        container: QWidget,
+        entries: list[dict],
+        owned_names: set[str],
+    ):
+        """Render ``entries`` (``key_items`` or ``key_aspects``) as
+        toggle rows via ``_add_toggle_row``. Both lists share the same
+        ``{"name", "note"}`` shape (items also carry a ``slot``), and
+        both toggle the same ``gear_owned_changed`` signal/QSettings set
+        keyed by name - Maxroll item and aspect names don't collide, so
+        one flat "owned names" set is enough for both."""
+
+        for entry in entries:
+            slot = entry.get("slot", "")
+            title = f"{entry['name']} ({slot})" if slot else entry["name"]
+
+            notes = []
+            note = entry.get("note", "")
+            if note:
+                notes.append(note)
+
+            is_owned = entry["name"] in owned_names
+            self._add_toggle_row(
+                layout, container, title, notes, is_owned, entry["name"]
+            )
+
+    def _add_toggle_row(
+        self,
+        layout: QVBoxLayout,
+        container: QWidget,
+        title: str,
+        notes: list[str],
+        is_owned: bool,
+        key: str,
+    ):
+
+        status = "✓ Have it" if is_owned else "○ Missing"
+
+        row, row_layout = self._make_row_shell(
+            container, status, title, notes, highlight=is_owned
         )
+
+        toggle = SwitchButton(row)
+        toggle.setOnText("Have it")
+        toggle.setOffText("Missing")
+        toggle.setChecked(is_owned)
+        toggle.checkedChanged.connect(
+            lambda checked, k=key: self.gear_owned_changed.emit(k, checked)
+        )
+        row_layout.addWidget(toggle, 0)
+
         self._insert_row(layout, row)

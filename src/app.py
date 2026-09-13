@@ -147,12 +147,14 @@ class MainWindow(FluentWindow):
         self.on_level_changed(default_level, persist=False)
         self._refresh_skills()
         self._refresh_paragon()
+        self._refresh_gear()
 
         self.leveling_card.level_changed.connect(self.on_level_changed)
         self.leveling_card.build_changed.connect(self.on_build_changed)
         self.leveling_card.class_changed.connect(self.on_class_changed)
         self.leveling_card.mark_done.connect(self.on_mark_done)
         self.leveling_card.mark_board_done.connect(self.on_mark_board_done)
+        self.leveling_card.gear_owned_changed.connect(self.on_gear_owned_changed)
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_countdown)
@@ -329,9 +331,6 @@ class MainWindow(FluentWindow):
 
     def on_level_changed(self, level: int, persist: bool = True):
 
-        data = self.leveling_manager.get_progress(level)
-
-        self.leveling_card.set_progress(data)
         self._refresh_leveling(level)
 
         if persist:
@@ -344,12 +343,10 @@ class MainWindow(FluentWindow):
 
         level = self._current_level()
 
-        data = self.leveling_manager.get_progress(level)
-
-        self.leveling_card.set_progress(data)
         self._refresh_leveling(level)
         self._refresh_skills()
         self._refresh_paragon()
+        self._refresh_gear()
 
         self.settings.setValue("leveling/build", self.leveling_manager.current_build_name)
         self.settings.setValue(
@@ -475,6 +472,60 @@ class MainWindow(FluentWindow):
         self._save_completed_boards(build_name, completed)
 
         self._refresh_paragon()
+
+    # ---------------------------------------------------------
+    # BUILD-GUIDE / GEAR & POWERS TAB
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def _owned_items_key(build_name: str) -> str:
+        # Its own QSettings key, separate from the one-way completion
+        # keys above - gear ownership can go backwards (an item sold or
+        # replaced), so this stores a toggle state, not a monotonic
+        # "completed" set.
+        return f"gear/{build_name}/owned_items"
+
+    def _load_owned_items(self, build_name: str) -> set[str]:
+
+        raw = self.settings.value(self._owned_items_key(build_name), [], type=list)
+        return {str(name) for name in raw}
+
+    def _save_owned_items(self, build_name: str, owned: set[str]):
+
+        self.settings.setValue(self._owned_items_key(build_name), sorted(owned))
+
+    def _refresh_gear(self):
+        """Rebuild the Gear & Powers tab's toggle checklist for the
+        current build, combining its (level-independent) key items/
+        aspects data with the persisted set of owned item/aspect names."""
+
+        build_name = self.leveling_manager.current_build_name
+
+        if not build_name:
+            return
+
+        gear = self.leveling_manager.get_gear_data(build_name)
+        owned = self._load_owned_items(build_name)
+
+        self.leveling_card.set_gear(gear, owned)
+
+    def on_gear_owned_changed(self, name: str, owned: bool):
+
+        build_name = self.leveling_manager.current_build_name
+
+        if not build_name:
+            return
+
+        owned_names = self._load_owned_items(build_name)
+
+        if owned:
+            owned_names.add(name)
+        else:
+            owned_names.discard(name)
+
+        self._save_owned_items(build_name, owned_names)
+
+        self._refresh_gear()
 
     def on_class_changed(self, class_name: str):
         """Step-1 class selector changed: rebuild the step-2 build

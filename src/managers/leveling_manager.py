@@ -237,6 +237,24 @@ class LevelingManager:
 
         return build.get("paragon") or {"boards": [], "glyphs": [], "note": ""}
 
+    def get_gear_data(self, build_name: str | None = None) -> dict | None:
+        """Return the raw ``gear`` dict for the Gear & Powers tab, or
+        ``None`` when the build has no dedicated endgame guide yet. Like
+        ``get_skills_data``/``get_paragon_data`` this isn't level-scoped -
+        gear "ownership" is tracked via explicit toggles (persisted in
+        QSettings by the caller), not derived from the level field."""
+
+        key = self._normalize(build_name) if build_name else self._normalize(
+            self.current_build_name or ""
+        )
+
+        build = self._builds.get(key)
+
+        if build is None:
+            return None
+
+        return build.get("gear")
+
     def get_progress(self, level: int, build_name: str | None = None):
 
         key = self._normalize(build_name) if build_name else self._normalize(
