@@ -3,12 +3,14 @@ from PySide6.QtWidgets import QGridLayout, QVBoxLayout, QWidget
 
 from qfluentwidgets import FluentIcon as FIF, SingleDirectionScrollArea
 
+from src.current_build_card import CurrentBuildCard
 from src.event_card import EventCard
 from src.upcoming_card import UpcomingCard
 
 
 class DashboardWidget(QWidget):
-    """Overview page: world boss / helltide / legion / season timers plus
+    """Overview page: world boss / helltide / legion / season timers,
+    a Current Build card (Phase 7) summarizing Build Guide state, plus
     the upcoming-events table. Wrapped in a vertical scroll area so the
     grid can never force the main window taller than the screen, even on
     small displays - it just becomes scrollable instead of cut off."""
@@ -39,6 +41,7 @@ class DashboardWidget(QWidget):
         self.helltide_card = EventCard(FIF.FLAG, "Helltide")
         self.legion_card = EventCard(FIF.PEOPLE, "Legion")
         self.season_card = EventCard(FIF.CALENDAR, "Season 15")
+        self.build_card = CurrentBuildCard()
         self.upcoming_card = UpcomingCard()
 
         self.installEventFilter(self)
@@ -77,10 +80,10 @@ class DashboardWidget(QWidget):
             if item.widget():
                 item.widget().setParent(None)
 
-        for col in range(3):
+        for col in range(4):
             self.grid.setColumnStretch(col, 0)
 
-        for row in range(3):
+        for row in range(6):
             self.grid.setRowStretch(row, 0)
 
         # ===================================================
@@ -92,11 +95,12 @@ class DashboardWidget(QWidget):
             self.grid.addWidget(self.world_boss_card, 0, 0)
             self.grid.addWidget(self.helltide_card, 0, 1)
             self.grid.addWidget(self.legion_card, 0, 2)
+            self.grid.addWidget(self.build_card, 0, 3)
 
             self.grid.addWidget(self.season_card, 1, 0)
-            self.grid.addWidget(self.upcoming_card, 1, 1, 1, 2)
+            self.grid.addWidget(self.upcoming_card, 1, 1, 1, 3)
 
-            for col in range(3):
+            for col in range(4):
                 self.grid.setColumnStretch(col, 1)
 
             self.grid.setRowStretch(0, 1)
@@ -114,7 +118,8 @@ class DashboardWidget(QWidget):
             self.grid.addWidget(self.legion_card, 1, 0)
             self.grid.addWidget(self.season_card, 1, 1)
 
-            self.grid.addWidget(self.upcoming_card, 2, 0, 1, 2)
+            self.grid.addWidget(self.build_card, 2, 0, 1, 2)
+            self.grid.addWidget(self.upcoming_card, 3, 0, 1, 2)
 
             self.grid.setColumnStretch(0, 1)
             self.grid.setColumnStretch(1, 1)
@@ -129,6 +134,7 @@ class DashboardWidget(QWidget):
             self.grid.addWidget(self.helltide_card, 1, 0)
             self.grid.addWidget(self.legion_card, 2, 0)
             self.grid.addWidget(self.season_card, 3, 0)
-            self.grid.addWidget(self.upcoming_card, 4, 0)
+            self.grid.addWidget(self.build_card, 4, 0)
+            self.grid.addWidget(self.upcoming_card, 5, 0)
 
             self.grid.setColumnStretch(0, 1)

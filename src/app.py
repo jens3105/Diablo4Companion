@@ -117,6 +117,13 @@ class MainWindow(FluentWindow):
             position=NavigationItemPosition.BOTTOM,
         )
 
+        # Current Build card on the Dashboard jumps straight to the Build
+        # Guide page when clicked (Phase 7 nice-to-have) - trivial thanks
+        # to FluentWindow's built-in switchTo.
+        self.dashboard.build_card.clicked.connect(
+            lambda: self.switchTo(self.builds_interface)
+        )
+
         # Keep the sidebar expanded (with text labels) at our default
         # window width instead of collapsing to icon-only.
         self.navigationInterface.setMinimumExpandWidth(800)
@@ -333,6 +340,7 @@ class MainWindow(FluentWindow):
     def on_level_changed(self, level: int, persist: bool = True):
 
         self._refresh_leveling(level)
+        self._refresh_dashboard_build_card()
 
         if persist:
             self.settings.setValue("leveling/level", level)
@@ -565,17 +573,17 @@ class MainWindow(FluentWindow):
     def _pct_text(pct: int | None) -> str:
         return "N/A" if pct is None else f"{pct}%"
 
-    def _refresh_build_status(self):
-        """Recompute and redraw the Build Status summary for the current
-        build from the same persisted state each tab already reads:
-        ``skills/<build>/completed_levels`` (Skills + Leveling, they
-        share one set), ``paragon/<build>/completed_boards`` and
-        ``gear/<build>/owned_items``."""
+    def _compute_build_status(self, build_name: str):
+        """Pure aggregation over the persisted completion state each tab
+        already reads: ``skills/<build>/completed_levels`` (Skills +
+        Leveling, they share one set), ``paragon/<build>/completed_boards``
+        and ``gear/<build>/owned_items``. Factored out of
+        ``_refresh_build_status`` (Phase 7) so the Build Guide's status
+        widget and the Dashboard's Current Build card compute the exact
+        same 🟢/🟡/🔴 rows instead of two copies of this math.
 
-        build_name = self.leveling_manager.current_build_name
-
-        if not build_name:
-            return
+        Returns ``(rows, footer_text, ready)`` - see
+        ``LevelingCard.set_build_status`` for the shape of ``rows``."""
 
         milestones = self.leveling_manager.get_skills_data(build_name)["milestones"]
         completed_levels = self._load_completed_levels(build_name)
@@ -615,7 +623,66 @@ class MainWindow(FluentWindow):
         else:
             footer_text = ""
 
+        return rows, footer_text, ready
+
+    def _refresh_build_status(self):
+        """Recompute and redraw the Build Guide's Build Status summary
+        for the current build, then keep the Dashboard's Current Build
+        card in sync too - see ``_compute_build_status``."""
+
+        build_name = self.leveling_manager.current_build_name
+
+        if not build_name:
+            return
+
+        rows, footer_text, ready = self._compute_build_status(build_name)
         self.leveling_card.set_build_status(rows, footer_text, ready)
+
+        self._refresh_dashboard_build_card()
+
+    # ---------------------------------------------------------
+    # DASHBOARD / CURRENT BUILD CARD (Phase 7)
+    # ---------------------------------------------------------
+
+    def _next_action_text(self, build_name: str) -> str:
+        """Pick the single simplest "next thing to do": the next
+        not-yet-completed Leveling/Skills milestone for ``build_name``,
+        same data + completion state as the Leveling/Skills tabs
+        (``get_skills_data``/``_load_completed_levels``). Deliberately not
+        a cross-category prioritizer over Paragon/Gear too - Dashboard
+        2.0 is meant to stay simple, not become a second Build Guide."""
+
+        milestones = self.leveling_manager.get_skills_data(build_name)["milestones"]
+        completed = self._load_completed_levels(build_name)
+
+        next_milestone = next(
+            (m for m in milestones if m["level"] not in completed), None
+        )
+
+        if next_milestone:
+            return f"Lvl {next_milestone['level']} — {next_milestone['skill']}"
+
+        return "Build fully unlocked!" if milestones else "—"
+
+    def _refresh_dashboard_build_card(self):
+        """Push the current build/level/status/next-action onto the
+        Dashboard's Current Build card. Called whenever anything that
+        could move the needle changes: build/class switch, level input,
+        or any checkbox/toggle in the Build Guide's four tabs (via
+        ``_refresh_build_status``)."""
+
+        build_name = self.leveling_manager.current_build_name
+
+        if not build_name:
+            self.dashboard.build_card.set_build("", 0, [], "")
+            return
+
+        rows, _footer_text, _ready = self._compute_build_status(build_name)
+        next_action = self._next_action_text(build_name)
+
+        self.dashboard.build_card.set_build(
+            build_name, self._current_level(), rows, next_action
+        )
 
     def on_class_changed(self, class_name: str):
         """Step-1 class selector changed: rebuild the step-2 build
