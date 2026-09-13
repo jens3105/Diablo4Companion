@@ -45,5 +45,68 @@
       "Abyssal"
     ],
     "note": "Default is the Mixed Minion variant glyph order shown here. A Warrior-focused variant uses Warrior, Mage, Essence, Eliminator, Abyssal; a Mage-focused variant uses Mage, Essence, Deadraiser, Eliminator, Abyssal. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/minion-necromancer-guide",
+    "key_items": [
+      {
+        "name": "Deathgrip",
+        "slot": "Gloves",
+        "note": "Grants additional Warrior/Mage minions and AoE damage."
+      },
+      {
+        "name": "The Undercrown",
+        "slot": "Helm",
+        "note": "Provides extra Warriors/Mages and a damage multiplier."
+      },
+      {
+        "name": "Blood Moon Breeches",
+        "slot": "Legs",
+        "note": "Curse delivery system."
+      },
+      {
+        "name": "Pact of Bone",
+        "slot": "Chest",
+        "note": "Adds significant Attack Speed and Crit Chance."
+      },
+      {
+        "name": "Bloodless Scream",
+        "slot": "Weapon",
+        "note": "Damage multiplier and damage reduction."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Aspect of Reanimation",
+        "note": "90% damage multiplier for minions as long as they stay alive."
+      },
+      {
+        "name": "Exploiter's Aspect",
+        "note": "Huge multiplier when mobs are Unstoppable."
+      },
+      {
+        "name": "Aspect of Heavenly Strength",
+        "note": "40% damage reduction when paired with Bloodless Scream."
+      },
+      {
+        "name": "Hellbent Commander Aspect",
+        "note": "Enables flexible minion type selection."
+      }
+    ],
+    "stat_priority": [
+      "100% Attack Speed (max Cult Leader multiplier)",
+      "100% Critical Strike Chance",
+      "Critical Strike Damage",
+      "Vulnerable Damage",
+      "Maximum Life (30k+)",
+      "40+ Resolve stacks (Warrior variant)"
+    ],
+    "skill_bar": [
+      "Decrepify",
+      "Skeleton Warrior Command",
+      "Golem",
+      "Blood Mist/Sever",
+      "Army of the Dead"
+    ]
   }
 }

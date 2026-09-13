@@ -34,5 +34,56 @@
     "boards": [],
     "glyphs": [],
     "note": "Maxroll has not published a separate endgame/Paragon guide for this build - only the leveling guide exists, so no Paragon board or glyph data is available."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/twisting-blades-rogue-guide",
+    "key_items": [
+      {
+        "name": "The Maestro",
+        "slot": "Weapon",
+        "note": "Essentially doubles damage output with Twisting Blades."
+      },
+      {
+        "name": "Etna's Lost Dagger",
+        "slot": "Weapon",
+        "note": "Powerful damage buff via the Spellbound Steel Set."
+      },
+      {
+        "name": "Fist of the Iron Rose",
+        "slot": "Weapon",
+        "note": "Damage and Attack Speed, activated by Marksman skills."
+      },
+      {
+        "name": "Harlequin Crest",
+        "slot": "Helm",
+        "note": "Grants +6 ranks to core skills."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Aspect of Imitated Imbuement",
+        "note": "Increases poison/non-physical damage."
+      },
+      {
+        "name": "Aspect of Corruption",
+        "note": "Boosts poison damage output."
+      },
+      {
+        "name": "Aspect of Alchemical Advantage",
+        "note": "Provides needed Attack Speed."
+      },
+      {
+        "name": "Aspect of Disobedience",
+        "note": "Defensive option for survivability."
+      }
+    ],
+    "stat_priority": null,
+    "skill_bar": [
+      "Twisting Blades (held)",
+      "Shadow Clone",
+      "Poison Imbuement",
+      "Dash/Shadow Step",
+      "Blade Shift"
+    ]
   }
 }

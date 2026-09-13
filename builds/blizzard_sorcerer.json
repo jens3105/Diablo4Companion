@@ -59,5 +59,71 @@
     "boards": [],
     "glyphs": [],
     "note": "Neither Paragon board names nor glyph priorities are given as text in this guide - it points to Maxroll's separate Paragon Guide and Season Rank Guide instead. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/blizzard-sorcerer-guide",
+    "key_items": [
+      {
+        "name": "Raiment of the Sea",
+        "slot": "Mythic Unique (slot not specified in guide)",
+        "note": "Top-priority mythic; +16% damage."
+      },
+      {
+        "name": "Orsivane",
+        "slot": "Mythic Unique (slot not specified in guide)",
+        "note": "+13% damage and grants the Teleport Enchantment for free."
+      },
+      {
+        "name": "Galvanic Azurite",
+        "slot": "Mythic Unique (slot not specified in guide)",
+        "note": "+11% damage, third-priority mythic."
+      },
+      {
+        "name": "Ring of Starless Skies",
+        "slot": "Ring",
+        "note": "Only a small QoL increase - recommended only with excellent stats."
+      },
+      {
+        "name": "Tal Rasha's Iridescent Loop",
+        "slot": "Ring/Talisman",
+        "note": "Listed as a seal/talisman option for the endgame setup."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Aspect of Elemental Constellation",
+        "note": "Required to balance skills across two elemental schools."
+      },
+      {
+        "name": "Aspect of Shredding Blades",
+        "note": "Needed to apply Vulnerable via Familiar."
+      },
+      {
+        "name": "Aspect of Disobedience",
+        "note": "Defensive layer for survivability."
+      },
+      {
+        "name": "Mage-Lord's Aspect",
+        "note": "Additional defensive support."
+      }
+    ],
+    "stat_priority": [
+      "Damage over Time",
+      "Vulnerable Damage",
+      "Lightning/All Damage multipliers",
+      "Life",
+      "Armor",
+      "Resistances",
+      "Cooldown Reduction (lower priority)",
+      "Attack Speed (lower priority)"
+    ],
+    "skill_bar": [
+      "Blizzard",
+      "Unstable Currents",
+      "Ice Armor",
+      "Hydra",
+      "Familiar",
+      "Fire Bolt"
+    ]
   }
 }

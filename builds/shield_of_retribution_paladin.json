@@ -50,5 +50,68 @@
       "Chip"
     ],
     "note": "Chip swaps for Honed in the push variant. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/shield-of-retribution-paladin-guide",
+    "key_items": [
+      {
+        "name": "Ward of the White Dove",
+        "slot": "Amulet",
+        "note": "Massive multiplier on Blessed Shield while lowering its Faith cost."
+      },
+      {
+        "name": "Mantle of the Grey",
+        "slot": "Chest",
+        "note": "Significant damage increase from a defensive slot."
+      },
+      {
+        "name": "Godslayer Crown",
+        "slot": "Helm",
+        "note": "Pulls enemies in for grouping."
+      },
+      {
+        "name": "Ceh (gloves item)",
+        "slot": "Gloves",
+        "note": "Enables Aspect of Dominance and Aspect of the Umbral synergies."
+      },
+      {
+        "name": "Gar (ring item)",
+        "slot": "Ring",
+        "note": "Provides Critical Strike Chance."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Aspect of Dominance",
+        "note": "Instantly caps Resolve."
+      },
+      {
+        "name": "Aspect of the Umbral",
+        "note": "Generates Faith."
+      },
+      {
+        "name": "Juggernaut scaling (Shield of Retribution upgrade)",
+        "note": "Accessed through the skill's upgrade for extra scaling."
+      },
+      {
+        "name": "Thorns synergies",
+        "note": "Primary damage-scaling mechanic for the build."
+      }
+    ],
+    "stat_priority": [
+      "Maximum Life",
+      "Life on Hit",
+      "Life Regen (early)",
+      "Critical Strike Chance (via Fanaticism Aura and gear, endgame)",
+      "Maximum Resolve (from tempers, endgame)"
+    ],
+    "skill_bar": [
+      "Blessed Shield (primary)",
+      "Clash",
+      "Fanaticism Aura",
+      "Condemn",
+      "Defiance Aura",
+      "Fortress"
+    ]
   }
 }

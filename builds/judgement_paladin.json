@@ -55,5 +55,43 @@
       "Sentinel"
     ],
     "note": "Hit minimum glyph requirements first, then fill them out with spare points. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/judgement-paladin-guide",
+    "key_items": [
+      {
+        "name": "Seal of the Second Trumpet",
+        "slot": "Unique",
+        "note": "Massive multiplier plus a chance for Judgement to explode twice."
+      },
+      {
+        "name": "Judicant's Glaivehelm",
+        "slot": "Helm",
+        "note": "Adds more Judgements to the battlefield, increasing damage output."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Aspect of the Golden Hour",
+        "note": "Enables chain reactions between Judgement explosions across targets."
+      },
+      {
+        "name": "Aspect of the Judicator",
+        "note": "Increases explosion radius for better coverage."
+      },
+      {
+        "name": "Aspect of Interdiction",
+        "note": "Can grant up to 100% block chance with sufficient maximum Resolve."
+      }
+    ],
+    "stat_priority": null,
+    "skill_bar": [
+      "Arbiter of Justice",
+      "Spear of the Heavens",
+      "Blessed Hammer",
+      "Fanaticism Aura",
+      "Defiance Aura",
+      "Purify"
+    ]
   }
 }

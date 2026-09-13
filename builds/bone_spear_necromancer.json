@@ -45,5 +45,55 @@
       "Amplify"
     ],
     "note": "Rank glyphs in this order via the Pit. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/bone-spear-necromancer-guide",
+    "key_items": [
+      {
+        "name": "Deathless Visage",
+        "slot": "Helm",
+        "note": "Boosts shard count and critical strike damage."
+      },
+      {
+        "name": "Blood Moon Breeches",
+        "slot": "Legs",
+        "note": "Applies curses automatically for a damage boost."
+      },
+      {
+        "name": "Lidless Wall",
+        "slot": "Off-hand (Shield)",
+        "note": "Provides a damage-reduction multiplier."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Aspect of Glynn's Anvil",
+        "note": "Defensive boost once Resolve stacks are capped (Chest)."
+      },
+      {
+        "name": "Aspect of Shielding Bones",
+        "note": "Grants instant and ongoing Resolve stacks (Chest)."
+      },
+      {
+        "name": "Aspect of the Bone Weaver (Berú)",
+        "note": "Critical strike chance, Essence regen, damage reduction, and a damage multiplier (Charm)."
+      },
+      {
+        "name": "Red Blessing (Charm)",
+        "note": "Additional Overpower stacks plus a damage boost."
+      },
+      {
+        "name": "Aspect of Rapid Ossification",
+        "note": "Resets Bone Storm through Essence spending."
+      }
+    ],
+    "stat_priority": [
+      "Critical Strike Chance (top priority)",
+      "Critical Strike Damage",
+      "Essence generation",
+      "Maximum Life",
+      "Attack Speed (target 100% Attack Speed, 100% Crit Chance, 30k+ Life)"
+    ],
+    "skill_bar": null
   }
 }

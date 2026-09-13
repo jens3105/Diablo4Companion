@@ -55,5 +55,68 @@
       "Eldritch Sight"
     ],
     "note": "Vanguard swaps for Attrition in the boss-fight variant. Prioritize survivability over damage early; hit minimum glyph requirements instead of maxing them out. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/minion-warlock-guide",
+    "key_items": [
+      {
+        "name": "Ae'grom's Schism",
+        "slot": "Chest (Unique Armor)",
+        "note": "Creates two Ae'groms with dual activation charges."
+      },
+      {
+        "name": "Eye of Baal",
+        "slot": "Mythic Unique",
+        "note": "Priority craft item."
+      },
+      {
+        "name": "Seed of Horazon",
+        "slot": "Mythic Unique",
+        "note": "Priority craft item."
+      },
+      {
+        "name": "Crown of Lucion",
+        "slot": "Helm (Mythic)",
+        "note": "Requires casting Bombardment every 6 seconds for scaling."
+      },
+      {
+        "name": "Bindings of Attrition",
+        "slot": "Mythic Unique",
+        "note": "Damage-reduction scaling."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Sadistic Aspect",
+        "note": "Generates more demon deaths to trigger Legion Shard free casts."
+      },
+      {
+        "name": "Aspect of Heavenly Strength",
+        "note": "Requires a 2-Handed weapon for damage reduction."
+      },
+      {
+        "name": "Aspect of Accursed Touch",
+        "note": "Applies Vulnerable for damage scaling."
+      },
+      {
+        "name": "Malicious Aspect",
+        "note": "Swaps to Remorseless Aspect for boss fights."
+      }
+    ],
+    "stat_priority": [
+      ">50% Attack Speed (with Berú of Horazon's Chains 2p bonus)",
+      ">50% Critical Strike Chance",
+      "Maximum Life on nearly every gear piece"
+    ],
+    "skill_bar": [
+      "Destruction Demon",
+      "Summon Ae'grom",
+      "Command Ae'grom",
+      "Sigil of Summons",
+      "Bombardment",
+      "Tortured Wretch",
+      "Command Fallen",
+      "Nether Step (or Jah rune teleport)"
+    ]
   }
 }

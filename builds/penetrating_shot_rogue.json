@@ -54,5 +54,55 @@
     "boards": [],
     "glyphs": [],
     "note": "Glyph names aren't given in this guide's text - it links out to Maxroll's Paragon Guide and Season Rank Guide instead. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/penetrating-shot-rogue-guide",
+    "key_items": [
+      {
+        "name": "Eaglehorn",
+        "slot": "Weapon",
+        "note": "Bounces off walls and returns like a boomerang for double hits."
+      },
+      {
+        "name": "Etna's Lost Dagger",
+        "slot": "Weapon",
+        "note": "Activated through elemental damage or a Shadow Step explosion."
+      },
+      {
+        "name": "The Sightless (set, 2pc)",
+        "slot": "Set",
+        "note": "Resets ultimate quickly for frequent Shadow Clone casts."
+      },
+      {
+        "name": "Harlequin Crest",
+        "slot": "Helm",
+        "note": "+6 ranks to Penetrating Shot and imbuements."
+      },
+      {
+        "name": "Shrouded Gift",
+        "slot": "Pants (Poison variant)",
+        "note": "Frequent Concealment access after gaining stealth."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Aspect of Imitated Imbuement",
+        "note": "The most important aspect for this build."
+      },
+      {
+        "name": "Aspect of Frozen Memories",
+        "note": "Cold variant; leans into frozen damage output."
+      },
+      {
+        "name": "Nightstalker's Aspect",
+        "note": "Cold variant core damage multiplier."
+      },
+      {
+        "name": "Ferocious Aspect",
+        "note": "Increases damage through Attack Speed, interacts with Scoundrel's Kiss."
+      }
+    ],
+    "stat_priority": null,
+    "skill_bar": null
   }
 }

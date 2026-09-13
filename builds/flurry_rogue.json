@@ -54,5 +54,71 @@
     "boards": [],
     "glyphs": [],
     "note": "Glyph names aren't given in this guide's text - see source_url. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/flurry-rogue-guide",
+    "key_items": [
+      {
+        "name": "Deathmask of Nirmitruq",
+        "slot": "Helm",
+        "note": "Fixes all Energy resource issues."
+      },
+      {
+        "name": "Azurewrath",
+        "slot": "Weapon",
+        "note": "Primary damage source against frozen/staggered enemies."
+      },
+      {
+        "name": "Shrouded Gift",
+        "slot": "Chest",
+        "note": "Gives frequent access to Concealment after gaining stealth."
+      },
+      {
+        "name": "Fist of the Iron Rose",
+        "slot": "Weapon",
+        "note": "Damage and Attack Speed boost, requires Caltrops activation."
+      },
+      {
+        "name": "Etna's Lost Dagger",
+        "slot": "Weapon",
+        "note": "Activated by Caltrops' shadow damage."
+      },
+      {
+        "name": "Blurring Blade Set",
+        "slot": "Set",
+        "note": "Increases damage and provides Shadow Step charges."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Aspect of Frozen Memories",
+        "note": "Described by the guide as the most important aspect."
+      },
+      {
+        "name": "Aspect of Imitated Imbuement",
+        "note": "Among the most crucial aspects for imbuement damage."
+      },
+      {
+        "name": "Galvanized Slasher's Aspect",
+        "note": "Solves Energy generation since Flurry itself has no mobility."
+      },
+      {
+        "name": "Aspect of Alchemical Advantage",
+        "note": "Generic damage/attack speed value."
+      }
+    ],
+    "stat_priority": [
+      "Critical Strike Chance (tempered on weapon, rolled on gloves/amulet/rings toward 100%)",
+      "Cold Damage (best amulet transfiguration affix)"
+    ],
+    "skill_bar": [
+      "Shadow Step",
+      "Shadow Clone",
+      "Cold Imbuement",
+      "Concealment",
+      "Caltrops/Dash",
+      "Smoke Grenade",
+      "Flurry (held)"
+    ]
   }
 }

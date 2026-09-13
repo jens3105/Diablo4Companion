@@ -50,5 +50,53 @@
       "Exploit"
     ],
     "note": "Resplendence/Spirit and Exploit/Outmatch are interchangeable depending on path. Board Rush under Paragon 200, then move to the Step 1 setup. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/divine-lance-paladin-guide",
+    "key_items": [
+      {
+        "name": "Light's Rebuke",
+        "slot": "Weapon",
+        "note": "Iconic Divine Lance unique; provides an incredible multiplier."
+      },
+      {
+        "name": "Tibault's Will",
+        "slot": "Chest",
+        "note": "Handles resource generation and provides a 20% damage multiplier."
+      },
+      {
+        "name": "Berú of Dauntless Faith",
+        "slot": "Set",
+        "note": "Automatically casts Rally every 6 seconds."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Embattled Aspect",
+        "note": "Substantial life regeneration through Zealot Oath synergy."
+      },
+      {
+        "name": "Aspect of the Zealot's Covenant",
+        "note": "Mandatory for Zealot builds; grants an extra Fervor stack."
+      },
+      {
+        "name": "Aspect of Redirected Force",
+        "note": "Significant multiplier once Block and Crit Chance are sufficient."
+      },
+      {
+        "name": "Aspect of Interdiction",
+        "note": "Enables Redirected Force by generating Block chance."
+      }
+    ],
+    "stat_priority": null,
+    "skill_bar": [
+      "Divine Lance",
+      "Rally (automatic)",
+      "Fanaticism Aura",
+      "Defiance Aura",
+      "Holy Light Aura",
+      "Fortress",
+      "Falling Star"
+    ]
   }
 }

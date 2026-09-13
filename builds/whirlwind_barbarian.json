@@ -45,5 +45,64 @@
       "Marshal"
     ],
     "note": "Under Paragon 200, use a Board Rush for legendary-node power before respeccing. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/whirlwind-barbarian-guide",
+    "key_items": [
+      {
+        "name": "Melted Heart of Selig",
+        "slot": "Amulet",
+        "note": "Doubles the resource pool and converts it into an extra life pool."
+      },
+      {
+        "name": "The Grandfather",
+        "slot": "Weapon (2H)",
+        "note": "Strong multiplier with significant Critical Strike Chance."
+      },
+      {
+        "name": "Gohr's Devastating Grips",
+        "slot": "Gloves",
+        "note": "Core item providing a damage multiplier and enemy grouping."
+      },
+      {
+        "name": "Tibault's Will",
+        "slot": "Chest",
+        "note": "Resource generator, activates Unstoppable every 5 seconds."
+      },
+      {
+        "name": "Ramaladni's Magnum Opus",
+        "slot": "Ring",
+        "note": "Multiplier through Maximum Fury stacking."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Aspect of Anger Management",
+        "note": "Maintains Berserking uptime easily."
+      },
+      {
+        "name": "Aspect of Channeling",
+        "note": "Incredible multiplier for any Channeling skill (Whirlwind)."
+      },
+      {
+        "name": "Crushing Aspect",
+        "note": "Good multiplier while sustaining Fortify."
+      },
+      {
+        "name": "Aspect of Heavenly Strength",
+        "note": "Defensive option for two-handed builds."
+      }
+    ],
+    "stat_priority": [
+      "Physical Damage %",
+      "Cooldown Reduction (on 2H weapon)",
+      "Resource/Fury",
+      "Core skill ranks",
+      "Critical Strike Chance",
+      "Attack Speed",
+      "Strength",
+      "All Stats"
+    ],
+    "skill_bar": null
   }
 }

@@ -19,8 +19,22 @@ class LevelingManager:
             "class_name": "...",
             "source_url": "...",
             "milestones": [{"level": int, "skill": str, "note": str}, ...],
-            "strategy": "..."
+            "strategy": "...",
+            "paragon": {"boards": [...], "glyphs": [...], "note": "..."},
+            "gear": {
+                "source_url": "...",
+                "key_items": [{"name": str, "slot": str, "note": str}, ...],
+                "key_aspects": [{"name": str, "note": str}, ...],
+                "stat_priority": [str, ...] | None,
+                "skill_bar": [str, ...] | None,
+            } | None
         }
+
+    Builds are grouped by ``class_name`` for the two-step class -> build
+    selector on the Build Guide page (``list_classes`` /
+    ``list_builds_for_class``), and each build's endgame ``gear`` section
+    (uniques/aspects/stat priority) is surfaced the same way milestones
+    and paragon data already are, via ``get_progress``.
     """
 
     DEFAULT_BUILD_NAME = "Blazing Scream Warlock"
@@ -101,6 +115,38 @@ class LevelingManager:
             for b in builds
         ]
 
+    def list_classes(self):
+        """Return the distinct class names that have at least one build,
+        sorted alphabetically. Backs the first step of the two-step
+        class -> build selector."""
+
+        classes = {
+            b.get("class_name", "") for b in self._builds.values() if b.get("class_name")
+        }
+
+        return sorted(classes)
+
+    def list_builds_for_class(self, class_name: str):
+        """Return the build names belonging to ``class_name``, sorted
+        alphabetically. Backs the second step of the class -> build
+        selector."""
+
+        builds = [
+            b["build_name"]
+            for b in self._builds.values()
+            if b.get("class_name") == class_name
+        ]
+
+        return sorted(builds)
+
+    def get_class_for_build(self, build_name: str) -> str:
+        """Return the class name a given build belongs to, or "" if the
+        build is unknown."""
+
+        build = self._builds.get(self._normalize(build_name))
+
+        return build.get("class_name", "") if build else ""
+
     def set_current_build(self, build_name: str) -> bool:
 
         key = self._normalize(build_name)
@@ -130,6 +176,7 @@ class LevelingManager:
                 "strategy": "",
                 "source_url": "",
                 "paragon": {"boards": [], "glyphs": [], "note": ""},
+                "gear": None,
             }
 
         milestones = build["milestones"]
@@ -148,4 +195,5 @@ class LevelingManager:
             "strategy": build.get("strategy", ""),
             "source_url": build.get("source_url", ""),
             "paragon": build.get("paragon", {"boards": [], "glyphs": [], "note": ""}),
+            "gear": build.get("gear"),
         }

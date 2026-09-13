@@ -39,5 +39,66 @@
     "boards": [],
     "glyphs": [],
     "note": "Glyph names aren't given in this guide's text - it recommends the optional 'Legendary Node Rush' setup for early power since glyphs matter far less than legendary nodes at low Paragon. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/dance-of-knives-rogue-guide",
+    "key_items": [
+      {
+        "name": "Etna's Lost Dagger",
+        "slot": "Weapon",
+        "note": "Activated by dealing Poison damage and by imbuements."
+      },
+      {
+        "name": "Berú of Spellbound Steel",
+        "slot": "Set",
+        "note": "Grants access to multiple imbuements with strong synergies."
+      },
+      {
+        "name": "Cowl of the Nameless",
+        "slot": "Helm",
+        "note": "Applies Cold and Shadow Imbuement in an AoE."
+      },
+      {
+        "name": "Asheara's Khanjar",
+        "slot": "Jewelry",
+        "note": "Boosts Attack Speed and damage."
+      },
+      {
+        "name": "Stone of Jordan",
+        "slot": "Ring",
+        "note": "Increases all resistances based on the highest resistance."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Berú of Spellbound Steel (set bonus)",
+        "note": "Unlocks Vulnerable, Weaken, and Buffered Battery synergies."
+      },
+      {
+        "name": "Writhing Aspect",
+        "note": "Damage-over-time multiplier."
+      },
+      {
+        "name": "Aspect of Channeling",
+        "note": "Generic multiplier for imbuement damage."
+      },
+      {
+        "name": "Aspect of Mending Obscurity",
+        "note": "Provides sustain and Fortify."
+      }
+    ],
+    "stat_priority": [
+      "Damage over Time increases",
+      "Poison Damage",
+      "Vulnerable Damage multipliers"
+    ],
+    "skill_bar": [
+      "Dark Shroud",
+      "Dance of Knives (held)",
+      "Poison Imbuement",
+      "Concealment",
+      "Shadow Step",
+      "Dash"
+    ]
   }
 }

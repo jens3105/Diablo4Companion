@@ -50,5 +50,58 @@
       "Exploit"
     ],
     "note": "Feverous is ranked first across every configuration; Resplendence/Spirit and Exploit/Outmatch vary by path. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/zeal-paladin-guide",
+    "key_items": [
+      {
+        "name": "Red Sermon",
+        "slot": "Weapon (2H Sword)",
+        "note": "Iconic Zeal unique; incredible multiplier on top of the Death or Glory passive."
+      },
+      {
+        "name": "Berú of Dauntless Faith",
+        "slot": "Set",
+        "note": "Automatically casts Rally every 6 seconds."
+      },
+      {
+        "name": "Fists of Fate",
+        "slot": "Mythic Unique (Gloves)",
+        "note": "Top mythic priority."
+      },
+      {
+        "name": "Crown of Lucion",
+        "slot": "Helm (Mythic)",
+        "note": "Procs stacks with Fanaticism Aura."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Embattled Aspect",
+        "note": "Primary survivability through life regeneration synergized with Zealot Oath."
+      },
+      {
+        "name": "Aspect of the Zealot's Covenant",
+        "note": "Must-have aspect on any Zealot build; adds an extra Fervor stack."
+      },
+      {
+        "name": "Aspect of Heavenly Strength",
+        "note": "Defensive multiplier for two-handed weapons."
+      },
+      {
+        "name": "Aspect of Jacques' Fervor",
+        "note": "Massive multiplier for Zealot builds."
+      }
+    ],
+    "stat_priority": null,
+    "skill_bar": [
+      "Zeal (spam)",
+      "Rally (automatic)",
+      "Fanaticism Aura",
+      "Defiance Aura",
+      "Holy Light Aura",
+      "Fortress",
+      "Falling Star"
+    ]
   }
 }

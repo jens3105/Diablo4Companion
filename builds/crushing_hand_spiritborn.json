@@ -80,5 +80,58 @@
       "Colossal"
     ],
     "note": "Canny is only used in steps 4-5; Outmatch replaces it later to maximize Convergence. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/crushing-hand-spiritborn-guide",
+    "key_items": [
+      {
+        "name": "Rod of Kepeleke",
+        "slot": "Weapon",
+        "note": "Ensures every cast of Crushing Hand is a guaranteed critical strike."
+      },
+      {
+        "name": "Ring of the Midnight Sun",
+        "slot": "Ring",
+        "note": "Restores Vigor when critical strikes land."
+      },
+      {
+        "name": "Harmony of Ebewaka",
+        "slot": "Charm",
+        "note": "Applies additional Spirit tags to skills."
+      },
+      {
+        "name": "Temerity",
+        "slot": "Charm",
+        "note": "Defensive utility piece."
+      },
+      {
+        "name": "Path of the Emissary",
+        "slot": "Boots",
+        "note": "Provides mobility by dashing between enemy packs."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Aspect of Supremacy",
+        "note": "Stacks up to 30 times for damage scaling via kills and ultimate casts."
+      },
+      {
+        "name": "Aspect of Plains Power",
+        "note": "Creates stationary mystic circles that boost damage and defenses."
+      },
+      {
+        "name": "Aspect of Tenacity",
+        "note": "Transfigured onto the amulet; generates Resolve for armor scaling."
+      }
+    ],
+    "stat_priority": null,
+    "skill_bar": [
+      "The Devourer",
+      "Toxic Skin",
+      "Scourge",
+      "Ravager",
+      "Counterattack (both charges)",
+      "Crushing Hand (spam)"
+    ]
   }
 }

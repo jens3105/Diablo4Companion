@@ -80,5 +80,72 @@
       "Eliminator"
     ],
     "note": "Level glyphs as high as comfortable in speedruns, push further once geared. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/lunatic-warlock-guide",
+    "key_items": [
+      {
+        "name": "Cage of Madness",
+        "slot": "Chest",
+        "note": "Massive damage boost and lets you transform into a Lunatic yourself."
+      },
+      {
+        "name": "Paingorger's Gauntlets",
+        "slot": "Gloves",
+        "note": "Amplifies and spreads Mega Lunatic explosion damage for AoE."
+      },
+      {
+        "name": "Dirge of Odium",
+        "slot": "Unique",
+        "note": "Enables gigantic damage multipliers by stacking Max Resources."
+      },
+      {
+        "name": "Seed of Horazon",
+        "slot": "Unique",
+        "note": "Works with Dirge of Odium for resource-based scaling."
+      },
+      {
+        "name": "Tibault's Will",
+        "slot": "Chest",
+        "note": "Counters the resource drain from the Dirge/Seed combo."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Chains of Horazon (talisman set)",
+        "note": "Applies Vulnerable passively and grants Dominance regeneration."
+      },
+      {
+        "name": "Aspect of Accursed Touch",
+        "note": "Applies Vulnerable early (starter variant only)."
+      },
+      {
+        "name": "Aspect of Rallying Reversal",
+        "note": "Provides Ferocity scaling."
+      },
+      {
+        "name": "Aspect of Calamity",
+        "note": "Scales Critical Strike Damage (tower-push variant)."
+      }
+    ],
+    "stat_priority": [
+      "Vulnerable Damage",
+      "Physical Damage",
+      "All Damage multipliers",
+      "Attack Speed",
+      "Skill ranks",
+      "Maximum Life",
+      "Armor",
+      "All Resistances"
+    ],
+    "skill_bar": [
+      "Command Fallen (main attack)",
+      "Metamorphosis (transform)",
+      "Command Ae'grom (summons)",
+      "Rampage (mobility)",
+      "Tortured Wretch (defense/taunt)",
+      "Sigil of Summons (extension)",
+      "Evade (transformation trigger)"
+    ]
   }
 }

@@ -39,5 +39,67 @@
     "boards": [],
     "glyphs": [],
     "note": "Both board and glyph detail are only shown via the embedded interactive planner - see source_url."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/heartseeker-rogue-specialized-guide",
+    "key_items": [
+      {
+        "name": "Scoundrel's Kiss",
+        "slot": "Gloves",
+        "note": "Synergizes with Ferocity stacks for significant damage."
+      },
+      {
+        "name": "Paingorger's Gauntlets",
+        "slot": "Gloves",
+        "note": "Primary AoE and damage source via proccing Marks."
+      },
+      {
+        "name": "Etna's Lost Dagger",
+        "slot": "Weapon",
+        "note": "Enables elemental damage conversion mechanics."
+      },
+      {
+        "name": "Harlequin Crest",
+        "slot": "Helm",
+        "note": "Utility helm allowing skill-slot flexibility."
+      },
+      {
+        "name": "Shard of Verathiel",
+        "slot": "Ring",
+        "note": "Resource management through energy spending."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Aspect of Rallying Reversal",
+        "note": "Maintains Ferocity stack upkeep."
+      },
+      {
+        "name": "Aspect of Accursed Touch",
+        "note": "Provides Vulnerable application."
+      },
+      {
+        "name": "Aspect of Frozen Memories",
+        "note": "Crowd-control damage multiplier for stunned targets."
+      },
+      {
+        "name": "High Velocity Aspect",
+        "note": "Amulet swap; generic multiplier for boss fights."
+      }
+    ],
+    "stat_priority": [
+      "Cold Damage (best amulet transfiguration affix)",
+      "Critical Strike Chance",
+      "Attack Speed",
+      "Cooldown Reduction (to 25%, for permanent Cold Imbuement uptime)"
+    ],
+    "skill_bar": [
+      "Heartseeker",
+      "Cold Imbuement",
+      "Concealment",
+      "Shadow Step",
+      "Dance of Knives",
+      "Dash"
+    ]
   }
 }

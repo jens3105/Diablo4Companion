@@ -140,5 +140,59 @@
     ],
     "glyphs": [],
     "note": "Glyph priorities aren't listed in this guide's text - see source_url."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/blight-necromancer-guide",
+    "key_items": [
+      {
+        "name": "Ring of Starless Skies",
+        "slot": "Ring (Mythic)",
+        "note": "Manages Essence resource costs."
+      },
+      {
+        "name": "Banished Lord's Talisman",
+        "slot": "Amulet (Mythic)",
+        "note": "Overpower-based damage scaling."
+      },
+      {
+        "name": "Blood Moon Breeches",
+        "slot": "Legs",
+        "note": "Automates curse application."
+      },
+      {
+        "name": "Crown of Lucion",
+        "slot": "Helm",
+        "note": "Drastically increases resource cost but offers the best damage scaling."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Aspect of Accursed Touch",
+        "note": "Helps automate Vulnerable uptime."
+      },
+      {
+        "name": "Tidal Aspect",
+        "note": "Damage enhancement, run on the amulet."
+      },
+      {
+        "name": "Aspect of Rapid Ossification",
+        "note": "Alternative option for better Bone Storm uptime."
+      }
+    ],
+    "stat_priority": [
+      "3x Lucky Hit Chance: Restore Resource (jewelry)",
+      "10-15 Essence Regeneration",
+      ">10% Resource Cost Reduction",
+      ">90% Attack Speed with Ferocity stacks",
+      "~100% Critical Strike Chance with Bone Storm active"
+    ],
+    "skill_bar": [
+      "Sever",
+      "Bone Storm",
+      "Blight",
+      "Bone Prison",
+      "Golem",
+      "Skeleton Mage"
+    ]
   }
 }

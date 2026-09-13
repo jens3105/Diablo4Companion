@@ -65,5 +65,75 @@
       "Mastermind"
     ],
     "note": "Rank glyphs progressively through Pit runs. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/dread-claws-warlock-guide",
+    "key_items": [
+      {
+        "name": "Litany of Sable",
+        "slot": "Weapon",
+        "note": "Core item for Dread Claws."
+      },
+      {
+        "name": "Footfalls of the Waning World",
+        "slot": "Boots",
+        "note": "Enables frequent teleporting and extends summon durations."
+      },
+      {
+        "name": "Chains of Horazon",
+        "slot": "Talisman Set",
+        "note": "Grants massive buffs but requires pressing Command Laalish every 20 seconds."
+      },
+      {
+        "name": "Seed of Horazon",
+        "slot": "Amulet",
+        "note": "Optional, improves further with full Chains of Horazon set completion."
+      },
+      {
+        "name": "Ring of Starless Skies",
+        "slot": "Ring",
+        "note": "Provides damage buffs and resource management."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Aspect of Calamity",
+        "note": "Provides a ton of Critical Strike Chance from the start."
+      },
+      {
+        "name": "Juggernaut's Aspect",
+        "note": "Roughly 30-35% damage reduction boost."
+      },
+      {
+        "name": "Aspect of Might",
+        "note": "Passively triggered by the mercenary."
+      },
+      {
+        "name": "Aspect of Rallying Reversal",
+        "note": "Recommended amulet transfiguration."
+      }
+    ],
+    "stat_priority": [
+      "Critical Strike Chance",
+      "Critical Strike Damage",
+      "Vulnerable Damage",
+      "Shadow Damage",
+      "All Damage multipliers",
+      "Attack Speed",
+      "Skill ranks",
+      "Life on Hit",
+      "All Resistance",
+      "Maximum Life",
+      "Armor"
+    ],
+    "skill_bar": [
+      "Dread Claws",
+      "Rampage (Abyssal Titan)",
+      "Profane Sentinel",
+      "Command Laalish",
+      "Nether Step",
+      "Metamorphosis",
+      "Sigil of Summons"
+    ]
   }
 }

@@ -1,6 +1,6 @@
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QColor, QIntValidator
-from PySide6.QtWidgets import QHBoxLayout, QSizePolicy, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QHBoxLayout, QSizePolicy, QStackedWidget, QVBoxLayout, QWidget
 
 from qfluentwidgets import (
     BodyLabel,
@@ -9,6 +9,7 @@ from qfluentwidgets import (
     FluentIcon as FIF,
     LineEdit,
     PrimaryPushButton,
+    SegmentedWidget,
     SingleDirectionScrollArea,
     StrongBodyLabel,
 )
@@ -18,24 +19,41 @@ from src.theme import ACCENT_GOLD, SURFACE_ALT, TEXT_MUTED
 
 
 class LevelingCard(BaseCard):
-    """Build-guide progress tracker.
+    """Build-guide browser: class -> build -> Leveling/Paragon/Gear.
 
-    Lets the player pick a Maxroll leveling build from a dropdown and
-    enter their current character level, then shows every milestone
-    reached so far plus the next one coming up.
+    Builds used to sit in one flat, 26-item dropdown regardless of class.
+    This card now asks for the class first (a small segmented control),
+    then only lists that class's builds in the second dropdown, and
+    presents the selected build's info as three separate sections
+    (Leveling milestones, Paragon board, Gear & Powers) instead of one
+    long scrolling wall of text.
     """
 
     level_changed = Signal(int)
     build_changed = Signal(str)
+    class_changed = Signal(str)
+
+    LEVELING_KEY = "leveling"
+    PARAGON_KEY = "paragon"
+    GEAR_KEY = "gear"
 
     def __init__(self, parent=None):
         super().__init__("BUILD GUIDE", icon=FIF.EDUCATION, parent=parent)
 
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.setMinimumSize(260, 220)
+        self.setMinimumSize(280, 260)
 
         # -------------------------
-        # Build selector
+        # Step 1: class selector
+        # -------------------------
+
+        self.class_selector = SegmentedWidget(self.content)
+        self.class_selector.currentItemChanged.connect(self._on_class_selected)
+
+        self.add_widget(self.class_selector)
+
+        # -------------------------
+        # Step 2: build selector (scoped to the chosen class)
         # -------------------------
 
         self.build_combo = ComboBox(self.content)
@@ -71,61 +89,151 @@ class LevelingCard(BaseCard):
         self.add_layout(input_row)
 
         # -------------------------
-        # Next milestone
+        # Section tabs: Leveling / Paragon / Gear & Powers
         # -------------------------
 
-        self.next_label = StrongBodyLabel(
-            "Pick a build and enter your level to see what's next.", self.content
+        self.section_selector = SegmentedWidget(self.content)
+        self.add_widget(self.section_selector)
+
+        self.section_stack = QStackedWidget(self.content)
+
+        self.leveling_page = self._build_leveling_page()
+        self.paragon_page = self._build_scroll_page("paragon_container", "paragon_layout")
+        self.gear_page = self._build_scroll_page("gear_container", "gear_layout")
+
+        self.section_stack.addWidget(self.leveling_page)
+        self.section_stack.addWidget(self.paragon_page)
+        self.section_stack.addWidget(self.gear_page)
+
+        self.section_selector.addItem(
+            routeKey=self.LEVELING_KEY,
+            text="Leveling",
+            onClick=lambda: self.section_stack.setCurrentWidget(self.leveling_page),
         )
-        self.next_label.setWordWrap(True)
-        self.next_label.setTextColor(QColor(ACCENT_GOLD), QColor(ACCENT_GOLD))
+        self.section_selector.addItem(
+            routeKey=self.PARAGON_KEY,
+            text="Paragon",
+            onClick=lambda: self.section_stack.setCurrentWidget(self.paragon_page),
+        )
+        self.section_selector.addItem(
+            routeKey=self.GEAR_KEY,
+            # "&&" so Qt renders a literal ampersand instead of treating
+            # "&P" as a mnemonic accelerator (which ate the space before).
+            text="Gear && Powers",
+            onClick=lambda: self.section_stack.setCurrentWidget(self.gear_page),
+        )
+        self.section_selector.setCurrentItem(self.LEVELING_KEY)
 
-        self.add_widget(self.next_label)
-
-        # -------------------------
-        # Milestone history (scrollable)
-        # -------------------------
-
-        scroll = SingleDirectionScrollArea(self.content, orient=Qt.Vertical)
-        scroll.setWidgetResizable(True)
-        scroll.setStyleSheet("QScrollArea{background: transparent; border: none;}")
-
-        self.progress_container = QWidget()
-        self.progress_container.setStyleSheet("background: transparent;")
-        self.progress_layout = QVBoxLayout(self.progress_container)
-        self.progress_layout.setContentsMargins(0, 0, 0, 0)
-        self.progress_layout.setSpacing(6)
-        self.progress_layout.addStretch()
-
-        scroll.setWidget(self.progress_container)
-
-        self.add_widget(scroll)
+        self.add_widget(self.section_stack)
         self.content_layout.setStretch(self.content_layout.count() - 1, 1)
 
     # ---------------------------------------------------------
-    # Build list wiring
+    # Page builders
     # ---------------------------------------------------------
 
-    def set_builds(self, builds, current_build_name: str | None = None):
-        """``builds`` is a list of {"build_name", "class_name"} dicts."""
+    def _build_leveling_page(self) -> QWidget:
+
+        page = QWidget(self.content)
+        layout = QVBoxLayout(page)
+        layout.setContentsMargins(0, 8, 0, 0)
+        layout.setSpacing(8)
+
+        self.next_label = StrongBodyLabel(
+            "Pick a build and enter your level to see what's next.", page
+        )
+        self.next_label.setWordWrap(True)
+        self.next_label.setTextColor(QColor(ACCENT_GOLD), QColor(ACCENT_GOLD))
+        layout.addWidget(self.next_label)
+
+        scroll, container, inner_layout = self._make_scroll_area(page)
+        self.progress_container = container
+        self.progress_layout = inner_layout
+
+        layout.addWidget(scroll, 1)
+
+        return page
+
+    def _build_scroll_page(self, container_attr: str, layout_attr: str) -> QWidget:
+
+        page = QWidget(self.content)
+        layout = QVBoxLayout(page)
+        layout.setContentsMargins(0, 8, 0, 0)
+        layout.setSpacing(8)
+
+        scroll, container, inner_layout = self._make_scroll_area(page)
+        setattr(self, container_attr, container)
+        setattr(self, layout_attr, inner_layout)
+
+        layout.addWidget(scroll, 1)
+
+        return page
+
+    @staticmethod
+    def _make_scroll_area(parent: QWidget):
+
+        scroll = SingleDirectionScrollArea(parent, orient=Qt.Vertical)
+        scroll.setWidgetResizable(True)
+        scroll.setStyleSheet("QScrollArea{background: transparent; border: none;}")
+
+        container = QWidget()
+        container.setStyleSheet("background: transparent;")
+        inner_layout = QVBoxLayout(container)
+        inner_layout.setContentsMargins(0, 0, 0, 0)
+        inner_layout.setSpacing(6)
+        inner_layout.addStretch()
+
+        scroll.setWidget(container)
+
+        return scroll, container, inner_layout
+
+    # ---------------------------------------------------------
+    # Class / build list wiring
+    # ---------------------------------------------------------
+
+    def set_classes(self, classes: list[str], current_class_name: str | None = None):
+        """Populate the step-1 class selector. Selecting an item fires
+        ``class_changed`` via the ``currentItemChanged`` signal wired in
+        ``__init__`` - no per-item ``onClick`` needed here."""
+
+        self.class_selector.blockSignals(True)
+        self.class_selector.clear()
+
+        for class_name in classes:
+            self.class_selector.addItem(routeKey=class_name, text=class_name)
+
+        if classes:
+            target = current_class_name if current_class_name in classes else classes[0]
+            self.class_selector.setCurrentItem(target)
+
+        self.class_selector.blockSignals(False)
+
+    def set_builds_for_class(self, builds: list[str], current_build_name: str | None = None):
+        """``builds`` is a list of build-name strings, all from the same
+        class, as returned by ``LevelingManager.list_builds_for_class``."""
 
         self.build_combo.blockSignals(True)
         self.build_combo.clear()
 
         selected_index = 0
 
-        for i, b in enumerate(builds):
-            label = f"{b['class_name']} – {b['build_name']}" if b.get("class_name") else b["build_name"]
-            self.build_combo.addItem(label, userData=b["build_name"])
+        for i, build_name in enumerate(builds):
+            self.build_combo.addItem(build_name, userData=build_name)
 
-            if current_build_name and b["build_name"] == current_build_name:
+            if current_build_name and build_name == current_build_name:
                 selected_index = i
 
         if builds:
             self.build_combo.setCurrentIndex(selected_index)
-            self.set_title(f"{builds[selected_index]['build_name'].upper()}")
+            self.set_title(builds[selected_index].upper())
 
         self.build_combo.blockSignals(False)
+
+    def _on_class_selected(self, class_name: str):
+
+        if not class_name:
+            return
+
+        self.class_changed.emit(class_name)
 
     def _on_build_selected(self, index: int):
 
@@ -137,7 +245,7 @@ class LevelingCard(BaseCard):
         if not build_name:
             return
 
-        self.set_title(f"{build_name.upper()}")
+        self.set_title(build_name.upper())
         self.build_changed.emit(build_name)
 
     # ---------------------------------------------------------
@@ -153,12 +261,25 @@ class LevelingCard(BaseCard):
 
         self.level_changed.emit(int(text))
 
-    def _insert_row(self, widget):
-        self.progress_layout.insertWidget(self.progress_layout.count() - 1, widget)
+    # ---------------------------------------------------------
+    # Shared row helpers
+    # ---------------------------------------------------------
 
-    def _add_history_row(self, text: str):
+    @staticmethod
+    def _insert_row(layout: QVBoxLayout, widget):
+        layout.insertWidget(layout.count() - 1, widget)
 
-        row = BodyLabel(text, self.progress_container)
+    @staticmethod
+    def _clear_rows(layout: QVBoxLayout):
+
+        while layout.count() > 1:
+            item = layout.takeAt(0)
+            if item.widget():
+                item.widget().setParent(None)
+
+    def _add_row(self, layout: QVBoxLayout, container: QWidget, text: str):
+
+        row = BodyLabel(text, container)
         row.setWordWrap(True)
         row.setStyleSheet(
             f"""
@@ -168,67 +289,134 @@ class LevelingCard(BaseCard):
             font-size: 12px;
             """
         )
-        self._insert_row(row)
+        self._insert_row(layout, row)
 
-    def _add_section_header(self, text: str):
+    def _add_section_header(self, layout: QVBoxLayout, container: QWidget, text: str):
 
-        header = CaptionLabel(text, self.progress_container)
+        header = CaptionLabel(text, container)
         header.setTextColor(QColor(ACCENT_GOLD), QColor(ACCENT_GOLD))
-        self._insert_row(header)
+        self._insert_row(layout, header)
+
+    # ---------------------------------------------------------
+    # Content population
+    # ---------------------------------------------------------
 
     def set_progress(self, data: dict):
 
-        while self.progress_layout.count() > 1:
-            item = self.progress_layout.takeAt(0)
-            if item.widget():
-                item.widget().setParent(None)
+        self._set_leveling(data)
+        self._set_paragon(data)
+        self._set_gear(data)
 
-        # -------------------------
-        # Leveling milestones
-        # -------------------------
+    def _set_leveling(self, data: dict):
 
-        self._add_section_header("LEVELING MILESTONES")
+        layout = self.progress_layout
+        container = self.progress_container
+
+        self._clear_rows(layout)
 
         if data["reached"]:
             for milestone in data["reached"]:
-                self._add_history_row(
-                    f"Lvl {milestone['level']} — {milestone['skill']}\n{milestone['note']}"
+                self._add_row(
+                    layout,
+                    container,
+                    f"Lvl {milestone['level']} — {milestone['skill']}\n{milestone['note']}",
                 )
         else:
-            self._add_history_row("No milestones reached yet at this level.")
+            self._add_row(layout, container, "No milestones reached yet at this level.")
 
         if data["next"]:
             nxt = data["next"]
-            self.next_label.setText(
-                f"Next: Lvl {nxt['level']} — {nxt['skill']}"
-            )
+            self.next_label.setText(f"Next: Lvl {nxt['level']} — {nxt['skill']}")
         else:
             self.next_label.setText("Build fully unlocked!")
 
-        # -------------------------
-        # Paragon board
-        # -------------------------
+    def _set_paragon(self, data: dict):
+
+        layout = self.paragon_layout
+        container = self.paragon_container
+
+        self._clear_rows(layout)
 
         paragon = data.get("paragon") or {}
         boards = paragon.get("boards") or []
         glyphs = paragon.get("glyphs") or []
         note = paragon.get("note") or ""
 
-        self._add_section_header("PARAGON BOARD")
+        self._add_section_header(layout, container, "PARAGON BOARD")
 
         if boards:
             board_text = "\n".join(
                 f"{i + 1}. {b['name']} — {b.get('note', '')}".rstrip(" —")
                 for i, b in enumerate(boards)
             )
-            self._add_history_row(board_text)
+            self._add_row(layout, container, board_text)
         else:
-            self._add_history_row(
-                "Board order not published as text by Maxroll for this build."
+            self._add_row(
+                layout, container, "Board order not published as text by Maxroll for this build."
             )
 
         if glyphs:
-            self._add_history_row("Glyphs (priority order): " + ", ".join(glyphs))
+            self._add_row(layout, container, "Glyphs (priority order): " + ", ".join(glyphs))
 
         if note:
-            self._add_history_row(note)
+            self._add_row(layout, container, note)
+
+    def _set_gear(self, data: dict):
+
+        layout = self.gear_layout
+        container = self.gear_container
+
+        self._clear_rows(layout)
+
+        gear = data.get("gear")
+
+        if not gear:
+            self._add_section_header(layout, container, "GEAR && POWERS")
+            self._add_row(
+                layout,
+                container,
+                "Maxroll has no dedicated endgame guide for this build yet - "
+                "leveling milestones and Paragon are still fully available.",
+            )
+            return
+
+        key_items = gear.get("key_items") or []
+        key_aspects = gear.get("key_aspects") or []
+        stat_priority = gear.get("stat_priority") or []
+        skill_bar = gear.get("skill_bar") or []
+
+        self._add_section_header(layout, container, "KEY / SIGNATURE ITEMS")
+
+        if key_items:
+            for item in key_items:
+                slot = item.get("slot", "")
+                header = f"{item['name']} ({slot})" if slot else item["name"]
+                note = item.get("note", "")
+                self._add_row(layout, container, f"{header}\n{note}".rstrip())
+        else:
+            self._add_row(layout, container, "No specific key items listed.")
+
+        self._add_section_header(layout, container, "KEY ASPECTS")
+
+        if key_aspects:
+            for aspect in key_aspects:
+                note = aspect.get("note", "")
+                self._add_row(layout, container, f"{aspect['name']}\n{note}".rstrip())
+        else:
+            self._add_row(layout, container, "No specific key aspects listed.")
+
+        self._add_section_header(layout, container, "STAT PRIORITY")
+
+        if stat_priority:
+            self._add_row(layout, container, " > ".join(stat_priority))
+        else:
+            self._add_row(layout, container, "Not clearly stated by the guide.")
+
+        if skill_bar:
+            self._add_section_header(layout, container, "FINAL SKILL BAR")
+            self._add_row(layout, container, " • ".join(skill_bar))
+
+        source_url = gear.get("source_url")
+
+        if source_url:
+            self._add_row(layout, container, f"Source: {source_url}")

@@ -32,8 +32,8 @@ class BuildsInterface(QWidget):
         layout = QHBoxLayout(self)
         layout.setContentsMargins(24, 24, 24, 24)
 
-        leveling_card.setMinimumWidth(420)
-        leveling_card.setMaximumWidth(680)
+        leveling_card.setMinimumWidth(460)
+        leveling_card.setMaximumWidth(760)
 
         layout.addStretch(1)
         layout.addWidget(leveling_card, 3)
@@ -123,15 +123,21 @@ class MainWindow(FluentWindow):
         self.load_upcoming_events()
         self.load_season_15()
 
-        self.leveling_card.set_builds(
-            self.leveling_manager.list_builds(),
-            self.leveling_manager.current_build_name,
+        default_build = self.leveling_manager.current_build_name
+        default_class = self.leveling_manager.get_class_for_build(default_build)
+
+        self.leveling_card.set_classes(
+            self.leveling_manager.list_classes(), default_class
+        )
+        self.leveling_card.set_builds_for_class(
+            self.leveling_manager.list_builds_for_class(default_class), default_build
         )
         # Show milestones for the default build straight away at level 1.
         self.on_level_changed(1)
 
         self.leveling_card.level_changed.connect(self.on_level_changed)
         self.leveling_card.build_changed.connect(self.on_build_changed)
+        self.leveling_card.class_changed.connect(self.on_class_changed)
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_countdown)
@@ -288,6 +294,18 @@ class MainWindow(FluentWindow):
         data = self.leveling_manager.get_progress(level)
 
         self.leveling_card.set_progress(data)
+
+    def on_class_changed(self, class_name: str):
+        """Step-1 class selector changed: rebuild the step-2 build
+        dropdown to only that class's builds, then load the first one."""
+
+        builds = self.leveling_manager.list_builds_for_class(class_name)
+
+        if not builds:
+            return
+
+        self.leveling_card.set_builds_for_class(builds, builds[0])
+        self.on_build_changed(builds[0])
 
     # ---------------------------------------------------------
     # UPCOMING EVENTS

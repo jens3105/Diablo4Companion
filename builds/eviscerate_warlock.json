@@ -70,5 +70,60 @@
       "Eliminator"
     ],
     "note": "Under Paragon 200, use a 'Board Rush' to grab multipliers early, then respec. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/eviscerate-warlock-guide",
+    "key_items": [
+      {
+        "name": "Lurid Pact",
+        "slot": "Mythic Unique",
+        "note": "Massively boosts Rampage output, shifting more damage onto that skill."
+      },
+      {
+        "name": "Seed of Horazon",
+        "slot": "Mythic Unique",
+        "note": "Sizable damage boost since the build accumulates Maximum Wrath."
+      },
+      {
+        "name": "Fists of Fate",
+        "slot": "Mythic Unique (Gloves)",
+        "note": "No special effect, but a mythic beats a regular legendary aspect."
+      },
+      {
+        "name": "Chains of Horazon",
+        "slot": "Talisman Set",
+        "note": "Synergy through Command Laalish for Vulnerable uptime."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Aspect of Mutilation",
+        "note": "Core of the build; enables consistent damage output in all situations."
+      },
+      {
+        "name": "Aspect of Accursed Touch",
+        "note": "Provides near-permanent Vulnerable uptime."
+      },
+      {
+        "name": "Ghostwalker Aspect",
+        "note": "Amulet transfiguration for movement."
+      },
+      {
+        "name": "Aspect of Rallying Reversal",
+        "note": "Amulet transfiguration providing Ferocity."
+      }
+    ],
+    "stat_priority": [
+      "Damage over Time multipliers",
+      "Vulnerable Damage",
+      "Physical Damage",
+      "All Damage multipliers",
+      "Attack Speed",
+      "Rampage/Demonology/Archfiend skill ranks",
+      "Maximum Life",
+      "Armor",
+      "All Resistance"
+    ],
+    "skill_bar": null
   }
 }

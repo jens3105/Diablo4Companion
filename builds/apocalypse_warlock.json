@@ -75,5 +75,66 @@
       "Occultist"
     ],
     "note": "Occultist is strong here since almost all skills are Occult skills. Level glyphs as high as comfortable in speedruns. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/apocalypse-warlock-guide",
+    "key_items": [
+      {
+        "name": "Hands of the Worldbreaker",
+        "slot": "Gloves",
+        "note": "Enables a large damage boost and synergizes with Sigil casting."
+      },
+      {
+        "name": "Fleshwrit Carapace",
+        "slot": "Chest",
+        "note": "Automatically activates Sigils when they are created."
+      },
+      {
+        "name": "Moloch's Beating Flame",
+        "slot": "Weapon",
+        "note": "Major damage boost while running 5 Hellfire skills."
+      },
+      {
+        "name": "The Grandfather",
+        "slot": "Weapon (2H)",
+        "note": "Eases reaching the 40% Critical Strike Chance breakpoint."
+      },
+      {
+        "name": "Ring of Starless Skies",
+        "slot": "Ring",
+        "note": "Improves Wrath resource management."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Aspect of Accursed Touch",
+        "note": "Provides near-permanent Vulnerable uptime."
+      },
+      {
+        "name": "Ritualist Shard (Soul Shard)",
+        "note": "Increases damage and radius for Occult skills."
+      },
+      {
+        "name": "Scorching Fragment (Soul Shard)",
+        "note": "Boosts damage but causes self-inflicted burning."
+      },
+      {
+        "name": "Anathema of the Primes (Talisman)",
+        "note": "Enables a faster mobility playstyle."
+      }
+    ],
+    "stat_priority": [
+      "Vulnerable Damage",
+      "Critical Strike Damage",
+      "Fire Damage",
+      "All Damage multipliers",
+      "Attack Speed",
+      "Willpower",
+      "Critical Strike Chance (up to 40%)",
+      "Maximum Life",
+      "Armor",
+      "All Resistances"
+    ],
+    "skill_bar": null
   }
 }

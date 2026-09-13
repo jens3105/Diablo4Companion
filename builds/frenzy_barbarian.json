@@ -45,5 +45,73 @@
       "Ambidextrous"
     ],
     "note": "Same glyph priority across Starter/Midgame/Endgame variants. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/frenzy-barbarian-guide",
+    "key_items": [
+      {
+        "name": "Battle Trance",
+        "slot": "Weapon",
+        "note": "Large damage multiplier plus additional skill ranks."
+      },
+      {
+        "name": "The Grandfather",
+        "slot": "Weapon (2H)",
+        "note": "Critical Strike Chance plus a 2.2x multiplier to all Critical Strike Damage."
+      },
+      {
+        "name": "Hooves of the Mountain God",
+        "slot": "Boots",
+        "note": "Large damage multiplier for Frenzy."
+      },
+      {
+        "name": "Tibault's Will",
+        "slot": "Chest",
+        "note": "Massive amount of Fury regeneration."
+      },
+      {
+        "name": "Tuskhelm of Joritz the Mighty",
+        "slot": "Helm",
+        "note": "Decent damage multiplier."
+      },
+      {
+        "name": "Shard of Verathiel",
+        "slot": "Weapon",
+        "note": "Doubles damage output."
+      },
+      {
+        "name": "Ramaladni's Magnum Opus",
+        "slot": "Ring",
+        "note": "Stacking damage multiplier based on Maximum Fury."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Aspect of the Moonrise",
+        "note": "60% damage boost plus Attack and Movement Speed."
+      },
+      {
+        "name": "Crushing Aspect",
+        "note": "Increases damage while Fortified."
+      },
+      {
+        "name": "Duelist's Aspect",
+        "note": "Multiplicative damage boost while dual-wielding."
+      },
+      {
+        "name": "Heavy Hitting Aspect",
+        "note": "Increases damage for skills that create Iron Shrapnel."
+      }
+    ],
+    "stat_priority": null,
+    "skill_bar": [
+      "Frenzy (Throwing)",
+      "Rend (Scorching)",
+      "Iron Skin (Juggernaut)",
+      "Rallying Cry",
+      "War Cry",
+      "Challenging Shout (Lacerate Rune)",
+      "Call of the Ancients (Highlander)"
+    ]
   }
 }

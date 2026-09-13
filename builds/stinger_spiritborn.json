@@ -65,5 +65,59 @@
       "Ritual"
     ],
     "note": "Start on Menagerist; switch to Ritual around 210 Paragon points spent. Talon swaps for Fitness, and Fulminate for Colossal, in the midgame variant. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/stinger-spiritborn-guide",
+    "key_items": [
+      {
+        "name": "Rod of Kepeleke",
+        "slot": "Weapon",
+        "note": "Massive damage increase via a resource-drain mechanic."
+      },
+      {
+        "name": "Ring of the Midnight Sun",
+        "slot": "Ring",
+        "note": "Refills Vigor resource when hitting enemies."
+      },
+      {
+        "name": "Harmony of Ebewaka",
+        "slot": "Charm",
+        "note": "Increases damage based on Spirit tags assigned to skills."
+      },
+      {
+        "name": "Ring of Starless Skies",
+        "slot": "Ring (Mythic)",
+        "note": "Damage boost and resource cost reduction."
+      },
+      {
+        "name": "Path of the Emissary",
+        "slot": "Boots",
+        "note": "Optional utility for dashing and periodic skill casting."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Aspect of Supremacy",
+        "note": "Stacks up to 30 times for increasing damage."
+      },
+      {
+        "name": "Aspect of Plains Power",
+        "note": "Creates stationary mystic circles for damage/defense buffs."
+      },
+      {
+        "name": "Aspect of the Moonrise",
+        "note": "Ring aspect used in the push variant for additional benefits."
+      }
+    ],
+    "stat_priority": null,
+    "skill_bar": [
+      "Stinger (spammed until out of Vigor)",
+      "The Hunter",
+      "Toxic Skin",
+      "Scourge",
+      "Ravager",
+      "Counterattack (2 charges)",
+      "The Devourer (ultimate, endgame variant)"
+    ]
   }
 }

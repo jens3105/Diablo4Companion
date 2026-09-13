@@ -76,5 +76,62 @@
       "Vanguard"
     ],
     "note": "Level glyphs first to 50, then 100, then 150. Prioritize survivability over damage early - hit minimum glyph requirements instead of maxing them out. A 'Push' variant swaps in Ritualism (large damage multiplier via Sigil of Subversion) plus Death Aura and Ichor Carapace for survivability."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/blazing-scream-warlock-guide",
+    "key_items": [
+      {
+        "name": "Moloch's Beating Flame",
+        "slot": "Weapon",
+        "note": "Requires Hellfire skills to be empowered by Volatility; core damage piece."
+      },
+      {
+        "name": "Crown of Lucion",
+        "slot": "Helm",
+        "note": "Big damage boost, paired with Ring of Starless Skies to manage the resource cost."
+      },
+      {
+        "name": "Ring of Starless Skies",
+        "slot": "Ring",
+        "note": "Offsets Crown of Lucion's resource drain."
+      },
+      {
+        "name": "Temerity",
+        "slot": "Ring",
+        "note": "Generates a Barrier from Healing."
+      },
+      {
+        "name": "Undying Aspect gear (amulet/gloves)",
+        "slot": "Amulet/Gloves",
+        "note": "Generates the Healing needed to gain Barrier from Temerity."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Aspect of Heavenly Strength",
+        "note": "Damage reduction, requires a 2-Handed weapon equipped."
+      },
+      {
+        "name": "Aspect of Accursed Touch",
+        "note": "Applies Vulnerable automatically (Boots)."
+      },
+      {
+        "name": "Aspect of Cursed Aura (Gar)",
+        "note": "Grants additional Critical Strike Chance."
+      },
+      {
+        "name": "Aspect of the Que",
+        "note": "Generates Barrier every 3 seconds."
+      }
+    ],
+    "stat_priority": [
+      ">50% Attack Speed",
+      ">50% Critical Strike Chance",
+      ">10 Wrath Regeneration",
+      "Maximum Life on nearly every piece",
+      "2x Temper of Lucky Hit: Restore Resource",
+      ">5,000 Fire Resistance"
+    ],
+    "skill_bar": null
   }
 }

@@ -45,5 +45,62 @@
       "Executioner"
     ],
     "note": "This is the Endgame (Physical) variant order. The Self-Cast (Fire) variant uses Challenger, Undaunted, Disembowel, Might, Executioner; Push (Overpower) variants use Dominate, Challenger, Crusher/Exploit, Ambidextrous/Executioner, Disembowel. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/rend-barbarian-guide",
+    "key_items": [
+      {
+        "name": "Shattered Vow",
+        "slot": "Ring",
+        "note": "Grants a ton of Damage-over-Time duration and allows executing enemies."
+      },
+      {
+        "name": "Ring of the Ravenous",
+        "slot": "Ring",
+        "note": "Dedicated Rend unique providing a very strong damage multiplier."
+      },
+      {
+        "name": "Tuskhelm of Joritz the Mighty",
+        "slot": "Helm",
+        "note": "Damage multiplier plus cooldown reduction and Fury generation."
+      },
+      {
+        "name": "Rage of Harrogath",
+        "slot": "Chest",
+        "note": "Reduces cooldowns when inflicting bleeding or burning damage."
+      },
+      {
+        "name": "Chainscourged Mail",
+        "slot": "Chest",
+        "note": "Allows permanent Leap use, which in turn constantly activates Ring of the Ravenous."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Wanton Rupture Aspect",
+        "note": "Increases both Damage-over-Time damage and duration, effectively a double multiplier."
+      },
+      {
+        "name": "Cut to the Bone Aspect",
+        "note": "Increases damage against Vulnerable enemies via Exploit."
+      },
+      {
+        "name": "Aspect of Heavenly Strength",
+        "note": "Damage reduction while wielding a two-handed weapon."
+      },
+      {
+        "name": "Battle-Mad Aspect",
+        "note": "Berserking activation and damage enhancement."
+      }
+    ],
+    "stat_priority": null,
+    "skill_bar": [
+      "Rend (main damage)",
+      "Leap",
+      "Rallying Cry",
+      "War Cry",
+      "Challenging Shout",
+      "Wrath of the Berserker"
+    ]
   }
 }

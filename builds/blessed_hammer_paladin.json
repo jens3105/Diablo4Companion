@@ -50,5 +50,63 @@
       "Arbiter"
     ],
     "note": "Under Paragon 200, use the Board Rush setup for max legendary-node power, then respec into the Step 1 setup. Glyph priorities are consistent across Endgame/Push variants. Maxroll shows this build's Paragon board pathing through an interactive planner (D4Planner) rather than as plain text, so the exact board order can't be faithfully scraped - check source_url for the visual layout."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/blessed-hammer-paladin-guide",
+    "key_items": [
+      {
+        "name": "Herald's Morningstar",
+        "slot": "Weapon",
+        "note": "Core weapon for any Blessed Hammer build."
+      },
+      {
+        "name": "Argent Veil",
+        "slot": "Ring",
+        "note": "Enables auto-casting Blessed Hammer for a mobile Evade playstyle."
+      },
+      {
+        "name": "Godslayer Crown",
+        "slot": "Helm",
+        "note": "Pulls enemies in for better grouping."
+      },
+      {
+        "name": "Ring of Starless Skies",
+        "slot": "Ring",
+        "note": "Sustains resources needed to run Crown of Lucion."
+      },
+      {
+        "name": "Fists of Fate",
+        "slot": "Mythic Unique",
+        "note": "Prioritized in the mythic upgrade order."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Aspect of the Arbiter's Zephyr",
+        "note": "Pairs with Argent Veil for the Evade-cast playstyle."
+      },
+      {
+        "name": "Aspect of Redirected Force",
+        "note": "Strong offensive option once Block and Crit are capped."
+      },
+      {
+        "name": "Aspect of Celestial Strife",
+        "note": "Damage multiplier against Vulnerable enemies."
+      },
+      {
+        "name": "Aspect of the Disciple",
+        "note": "Applies Weaken to enemies hit by Blessed Hammer."
+      }
+    ],
+    "stat_priority": null,
+    "skill_bar": [
+      "Blessed Hammer",
+      "Arbiter of Justice",
+      "Evade",
+      "Fanaticism Aura",
+      "Defiance Aura",
+      "Aegis",
+      "Falling Star"
+    ]
   }
 }

@@ -44,5 +44,57 @@
     "boards": [],
     "glyphs": [],
     "note": "Maxroll has not published a separate endgame/Paragon guide for this build - only the leveling guide exists, so no Paragon board or glyph data is available."
+  },
+  "gear": {
+    "source_url": "https://maxroll.gg/d4/build-guides/hammer-of-the-ancients-barbarian-guide",
+    "key_items": [
+      {
+        "name": "Arreat's Bearing",
+        "slot": "Charm",
+        "note": "+1 Ancient whenever casting any skill other than Call of the Ancients."
+      },
+      {
+        "name": "Bul-Kathos' Pride",
+        "slot": "Set",
+        "note": "Reduced Fury costs, Cooldown Reduction, and Ancient Skill damage."
+      },
+      {
+        "name": "The Relentless Heart",
+        "slot": "Chest",
+        "note": "Ramping damage multiplier; each HotA-summoned Ancient applies a stack."
+      },
+      {
+        "name": "Heir of Perdition",
+        "slot": "Ring",
+        "note": "Giant damage multiplier plus Core skill ranks and Critical Strike Chance."
+      }
+    ],
+    "key_aspects": [
+      {
+        "name": "Aspect of Limitless Rage",
+        "note": "2H weapon aspect; insane stacking multiplier (up to x900%) based on Fury generated."
+      },
+      {
+        "name": "Tidal Aspect",
+        "note": "2H weapon aspect; increases Overpower stacks to 12, multiplying Dominate."
+      },
+      {
+        "name": "Banished Lord's Talisman",
+        "note": "Amulet; massive Overpower-based damage multiplier and stack generator."
+      },
+      {
+        "name": "Aspect of Glynn's Anvil",
+        "note": "Increases Resolve stacks from 8 to 10 for extra Damage Reduction per stack."
+      }
+    ],
+    "stat_priority": null,
+    "skill_bar": [
+      "Hammer of the Ancients",
+      "Leap",
+      "Rallying Cry",
+      "War Cry",
+      "Challenging Shout",
+      "Call of the Ancients"
+    ]
   }
 }
