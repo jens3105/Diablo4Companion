@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import QSettings, Qt, QTimer
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 
@@ -87,6 +87,12 @@ class MainWindow(FluentWindow):
 
         self.leveling_manager = LevelingManager()
 
+        # Persists the last-selected Build Guide class/build/level across
+        # full app restarts (plain local QSettings - no server, no new
+        # dependency). Written from on_build_changed/on_level_changed,
+        # read back once at startup in _restore_leveling_selection.
+        self.settings = QSettings("Diablo4Companion", "DesktopCompanion")
+
         # ---------------------------------------------------------
         # Pages / navigation
         # ---------------------------------------------------------
@@ -123,8 +129,11 @@ class MainWindow(FluentWindow):
         self.load_upcoming_events()
         self.load_season_15()
 
-        default_build = self.leveling_manager.current_build_name
+        default_build = self._restore_leveling_selection()
         default_class = self.leveling_manager.get_class_for_build(default_build)
+
+        default_level = self.settings.value("leveling/level", 1, type=int)
+        default_level = max(1, min(100, default_level))
 
         self.leveling_card.set_classes(
             self.leveling_manager.list_classes(), default_class
@@ -132,8 +141,10 @@ class MainWindow(FluentWindow):
         self.leveling_card.set_builds_for_class(
             self.leveling_manager.list_builds_for_class(default_class), default_build
         )
-        # Show milestones for the default build straight away at level 1.
-        self.on_level_changed(1)
+        self.leveling_card.set_level_value(default_level)
+        # Show milestones for the restored (or default) build/level
+        # straight away, without re-persisting what we just loaded.
+        self.on_level_changed(default_level, persist=False)
 
         self.leveling_card.level_changed.connect(self.on_level_changed)
         self.leveling_card.build_changed.connect(self.on_build_changed)
@@ -277,11 +288,27 @@ class MainWindow(FluentWindow):
     # BUILD-GUIDE / LEVELING
     # ---------------------------------------------------------
 
-    def on_level_changed(self, level: int):
+    def _restore_leveling_selection(self) -> str:
+        """Look up the last-selected build from QSettings and make it the
+        LevelingManager's current build, if it still exists. Falls back
+        to LevelingManager's own baked-in default (unchanged) when
+        nothing was saved yet or the saved build was removed."""
+
+        saved_build = self.settings.value("leveling/build", "", type=str)
+
+        if saved_build:
+            self.leveling_manager.set_current_build(saved_build)
+
+        return self.leveling_manager.current_build_name
+
+    def on_level_changed(self, level: int, persist: bool = True):
 
         data = self.leveling_manager.get_progress(level)
 
         self.leveling_card.set_progress(data)
+
+        if persist:
+            self.settings.setValue("leveling/level", level)
 
     def on_build_changed(self, build_name: str):
 
@@ -295,6 +322,11 @@ class MainWindow(FluentWindow):
 
         self.leveling_card.set_progress(data)
 
+        self.settings.setValue("leveling/build", self.leveling_manager.current_build_name)
+        self.settings.setValue(
+            "leveling/class", self.leveling_manager.get_class_for_build(build_name)
+        )
+
     def on_class_changed(self, class_name: str):
         """Step-1 class selector changed: rebuild the step-2 build
         dropdown to only that class's builds, then load the first one."""
@@ -304,8 +336,10 @@ class MainWindow(FluentWindow):
         if not builds:
             return
 
-        self.leveling_card.set_builds_for_class(builds, builds[0])
-        self.on_build_changed(builds[0])
+        first_build_name = builds[0]["build_name"]
+
+        self.leveling_card.set_builds_for_class(builds, first_build_name)
+        self.on_build_changed(first_build_name)
 
     # ---------------------------------------------------------
     # UPCOMING EVENTS

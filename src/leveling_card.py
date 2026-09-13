@@ -17,6 +17,23 @@ from qfluentwidgets import (
 from src.base_card import BaseCard
 from src.theme import ACCENT_GOLD, SURFACE_ALT, TEXT_MUTED, TEXT_PRIMARY
 
+# Colors for the small "role" tag shown next to the card title and as a
+# suffix on every build in the dropdown, so it's obvious at a glance
+# what each build is actually for (leveling vs. which flavor of
+# endgame). Keyed on the role string with the "Endgame - " prefix
+# stripped (see LevelingCard._short_role) so e.g. both a build tagged
+# exactly "Endgame - Bossing" and one with a custom multi-role string
+# still get a sensible, distinct color.
+ROLE_COLORS = {
+    "Speed Farm": "#5fbf7d",
+    "Bossing": "#e0655f",
+    "Pushing/DPS": "#a481d1",
+    "All-Purpose": "#6fa8d8",
+    "Speed Farm / Bossing": "#e0a458",
+    "Leveling / Early Endgame": "#4fb3bf",
+}
+DEFAULT_ROLE_COLOR = TEXT_MUTED
+
 
 class LevelingCard(BaseCard):
     """Build-guide browser: class -> build -> Leveling/Paragon/Gear.
@@ -42,6 +59,14 @@ class LevelingCard(BaseCard):
 
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.setMinimumSize(280, 260)
+
+        # Small colored role tag ("SPEED FARM", "BOSSING", ...) pinned to
+        # the right of the card title, so the currently selected build's
+        # purpose is visible without opening the build dropdown.
+        self.role_tag = CaptionLabel("", self)
+        self.role_tag.setVisible(False)
+        self.title_row.addStretch(1)
+        self.title_row.addWidget(self.role_tag)
 
         # -------------------------
         # Step 1: class selector
@@ -207,24 +232,57 @@ class LevelingCard(BaseCard):
 
         self.class_selector.blockSignals(False)
 
-    def set_builds_for_class(self, builds: list[str], current_build_name: str | None = None):
-        """``builds`` is a list of build-name strings, all from the same
-        class, as returned by ``LevelingManager.list_builds_for_class``."""
+    @staticmethod
+    def _short_role(role: str) -> str:
+        """Strip the repeated "Endgame - " prefix for compact display -
+        e.g. "Endgame - Speed Farm" -> "Speed Farm". Roles that don't use
+        that prefix (like "Leveling / Early Endgame") pass through as-is."""
+
+        if not role:
+            return ""
+
+        prefix = "Endgame — "
+
+        return role[len(prefix):] if role.startswith(prefix) else role
+
+    def _set_role_tag(self, role: str):
+
+        short = self._short_role(role)
+
+        if not short:
+            self.role_tag.setVisible(False)
+            return
+
+        color = QColor(ROLE_COLORS.get(short, DEFAULT_ROLE_COLOR))
+        self.role_tag.setText(short.upper())
+        self.role_tag.setTextColor(color, color)
+        self.role_tag.setVisible(True)
+
+    def set_builds_for_class(self, builds: list[dict], current_build_name: str | None = None):
+        """``builds`` is a list of ``{"build_name": str, "role": str}``
+        dicts, all from the same class, as returned by
+        ``LevelingManager.list_builds_for_class``."""
 
         self.build_combo.blockSignals(True)
         self.build_combo.clear()
 
         selected_index = 0
 
-        for i, build_name in enumerate(builds):
-            self.build_combo.addItem(build_name, userData=build_name)
+        for i, build in enumerate(builds):
+            build_name = build["build_name"]
+            short_role = self._short_role(build.get("role", ""))
+            display = f"{build_name} — {short_role}" if short_role else build_name
+
+            self.build_combo.addItem(display, userData=build)
 
             if current_build_name and build_name == current_build_name:
                 selected_index = i
 
         if builds:
             self.build_combo.setCurrentIndex(selected_index)
-            self.set_title(builds[selected_index].upper())
+            selected = builds[selected_index]
+            self.set_title(selected["build_name"].upper())
+            self._set_role_tag(selected.get("role", ""))
 
         self.build_combo.blockSignals(False)
 
@@ -240,12 +298,15 @@ class LevelingCard(BaseCard):
         if index < 0:
             return
 
-        build_name = self.build_combo.itemData(index)
+        build = self.build_combo.itemData(index)
 
-        if not build_name:
+        if not build:
             return
 
+        build_name = build["build_name"]
+
         self.set_title(build_name.upper())
+        self._set_role_tag(build.get("role", ""))
         self.build_changed.emit(build_name)
 
     # ---------------------------------------------------------
@@ -260,6 +321,13 @@ class LevelingCard(BaseCard):
             return
 
         self.level_changed.emit(int(text))
+
+    def set_level_value(self, level: int):
+        """Populate the level field without emitting ``level_changed`` -
+        used to restore a saved level on startup/class-switch instead of
+        always showing the empty placeholder."""
+
+        self.level_input.setText(str(level))
 
     # ---------------------------------------------------------
     # Shared row helpers

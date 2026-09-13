@@ -17,6 +17,7 @@ class LevelingManager:
         {
             "build_name": "...",
             "class_name": "...",
+            "role": "...",
             "source_url": "...",
             "milestones": [{"level": int, "skill": str, "note": str}, ...],
             "strategy": "...",
@@ -35,6 +36,13 @@ class LevelingManager:
     ``list_builds_for_class``), and each build's endgame ``gear`` section
     (uniques/aspects/stat priority) is surfaced the same way milestones
     and paragon data already are, via ``get_progress``.
+
+    Each build also carries a short ``role`` tag (e.g. "Endgame - Speed
+    Farm", "Endgame - Bossing") sourced from Maxroll's own build-guide/
+    tier-list characterization, so the UI can show at a glance what a
+    build is actually *for* without opening a full progress view.
+    ``list_builds_for_class`` returns this alongside each build name;
+    ``get_progress`` includes it too.
     """
 
     DEFAULT_BUILD_NAME = "Blazing Scream Warlock"
@@ -104,14 +112,18 @@ class LevelingManager:
     # ---------------------------------------------------------
 
     def list_builds(self):
-        """Return list of {"build_name", "class_name"} dicts, sorted by
-        class then build name."""
+        """Return list of {"build_name", "class_name", "role"} dicts,
+        sorted by class then build name."""
 
         builds = list(self._builds.values())
         builds.sort(key=lambda b: (b.get("class_name", ""), b["build_name"]))
 
         return [
-            {"build_name": b["build_name"], "class_name": b.get("class_name", "")}
+            {
+                "build_name": b["build_name"],
+                "class_name": b.get("class_name", ""),
+                "role": b.get("role", ""),
+            }
             for b in builds
         ]
 
@@ -127,17 +139,19 @@ class LevelingManager:
         return sorted(classes)
 
     def list_builds_for_class(self, class_name: str):
-        """Return the build names belonging to ``class_name``, sorted
-        alphabetically. Backs the second step of the class -> build
-        selector."""
+        """Return {"build_name", "role"} dicts for every build belonging
+        to ``class_name``, sorted alphabetically by build name. Backs the
+        second step of the class -> build selector - callers that only
+        need the role tag (e.g. to render the dropdown) don't have to go
+        through a full ``get_progress()`` call for it."""
 
         builds = [
-            b["build_name"]
+            {"build_name": b["build_name"], "role": b.get("role", "")}
             for b in self._builds.values()
             if b.get("class_name") == class_name
         ]
 
-        return sorted(builds)
+        return sorted(builds, key=lambda b: b["build_name"])
 
     def get_class_for_build(self, build_name: str) -> str:
         """Return the class name a given build belongs to, or "" if the
@@ -146,6 +160,14 @@ class LevelingManager:
         build = self._builds.get(self._normalize(build_name))
 
         return build.get("class_name", "") if build else ""
+
+    def get_role_for_build(self, build_name: str) -> str:
+        """Return the short role tag (e.g. "Endgame - Speed Farm") for a
+        given build, or "" if the build is unknown."""
+
+        build = self._builds.get(self._normalize(build_name))
+
+        return build.get("role", "") if build else ""
 
     def set_current_build(self, build_name: str) -> bool:
 
@@ -170,6 +192,7 @@ class LevelingManager:
             return {
                 "build_name": build_name or self.current_build_name or "?",
                 "class_name": "",
+                "role": "",
                 "level": level,
                 "reached": [],
                 "next": None,
@@ -189,6 +212,7 @@ class LevelingManager:
         return {
             "build_name": build["build_name"],
             "class_name": build.get("class_name", ""),
+            "role": build.get("role", ""),
             "level": level,
             "reached": reached,
             "next": next_milestone,
