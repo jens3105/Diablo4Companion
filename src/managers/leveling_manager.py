@@ -220,6 +220,23 @@ class LevelingManager:
             "skill_bar_is_fallback": is_fallback,
         }
 
+    def get_paragon_data(self, build_name: str | None = None) -> dict:
+        """Return ``{"boards", "glyphs", "note"}`` for the Paragon tab.
+        Like ``get_skills_data`` this isn't level-scoped - board
+        completion is tracked via explicit checkboxes (persisted in
+        QSettings by the caller), not derived from the level field."""
+
+        key = self._normalize(build_name) if build_name else self._normalize(
+            self.current_build_name or ""
+        )
+
+        build = self._builds.get(key)
+
+        if build is None:
+            return {"boards": [], "glyphs": [], "note": ""}
+
+        return build.get("paragon") or {"boards": [], "glyphs": [], "note": ""}
+
     def get_progress(self, level: int, build_name: str | None = None):
 
         key = self._normalize(build_name) if build_name else self._normalize(

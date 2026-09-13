@@ -52,6 +52,7 @@ class LevelingCard(BaseCard):
     build_changed = Signal(str)
     class_changed = Signal(str)
     mark_done = Signal(int)
+    mark_board_done = Signal(int)
 
     LEVELING_KEY = "leveling"
     SKILLS_KEY = "skills"
@@ -412,7 +413,6 @@ class LevelingCard(BaseCard):
 
     def set_progress(self, data: dict):
 
-        self._set_paragon(data)
         self._set_gear(data)
 
     def set_leveling(self, level: int, milestones: list[dict], completed_levels: set[int]):
@@ -445,33 +445,35 @@ class LevelingCard(BaseCard):
         else:
             self.next_label.setText("Build fully unlocked!")
 
-    def _set_paragon(self, data: dict):
+    def set_paragon(
+        self, boards: list[dict], glyphs: list[str], note: str, completed_boards: set[int]
+    ):
+        """Populate the Paragon tab as the same kind of ✓/→/○ checklist
+        used by Leveling/Skills, one row per board in ``paragon.boards``
+        (see ``_render_board_checklist``). Completion is tracked at
+        board granularity via ``completed_boards`` (persisted by the
+        caller in its own QSettings key, separate from the milestone
+        completed-levels key) - Maxroll mostly only publishes board
+        *names* + a free-text note, not node-by-node data, so this is
+        the honest level of detail for a first version."""
 
         layout = self.paragon_layout
         container = self.paragon_container
 
         self._clear_rows(layout)
 
-        paragon = data.get("paragon") or {}
-        boards = paragon.get("boards") or []
-        glyphs = paragon.get("glyphs") or []
-        note = paragon.get("note") or ""
-
-        self._add_section_header(layout, container, "PARAGON BOARD")
+        self._add_section_header(layout, container, "PARAGON BOARDS")
 
         if boards:
-            board_text = "\n".join(
-                f"{i + 1}. {b['name']} — {b.get('note', '')}".rstrip(" —")
-                for i, b in enumerate(boards)
-            )
-            self._add_row(layout, container, board_text)
+            self._render_board_checklist(layout, container, boards, completed_boards)
         else:
             self._add_row(
                 layout, container, "Board order not published as text by Maxroll for this build."
             )
 
         if glyphs:
-            self._add_row(layout, container, "Glyphs (priority order): " + ", ".join(glyphs))
+            self._add_section_header(layout, container, "GLYPHS (PRIORITY ORDER)")
+            self._add_row(layout, container, ", ".join(glyphs))
 
         if note:
             self._add_row(layout, container, note)
@@ -611,6 +613,87 @@ class LevelingCard(BaseCard):
         self, layout: QVBoxLayout, container: QWidget, milestone: dict, is_done: bool, is_next: bool
     ):
 
+        skill_label = milestone["skill"]
+        points = milestone.get("points")
+
+        if points is not None:
+            plural = "" if points == 1 else "s"
+            skill_label += f" ({points} point{plural})"
+
+        title = f"Lvl {milestone['level']} — {skill_label}"
+
+        notes = []
+
+        note = milestone.get("note", "")
+        if note:
+            notes.append(note)
+
+        points_note = milestone.get("points_note", "")
+        if points_note:
+            notes.append(f"★ {points_note}")
+
+        self._add_checklist_row(
+            layout, container, title, notes, is_done, is_next, self.mark_done, milestone["level"]
+        )
+
+    # ---------------------------------------------------------
+    # Paragon tab
+    # ---------------------------------------------------------
+
+    def _render_board_checklist(
+        self,
+        layout: QVBoxLayout,
+        container: QWidget,
+        boards: list[dict],
+        completed_boards: set[int],
+    ):
+        """Same ✓/→/○ pattern as ``_render_milestone_checklist``, but
+        driven by a board's position in the list (there's no natural
+        "level" key for a Paragon board) instead of a milestone level."""
+
+        next_index = next(
+            (i for i in range(len(boards)) if i not in completed_boards), None
+        )
+
+        for i, board in enumerate(boards):
+            is_done = i in completed_boards
+            is_next = i == next_index
+            self._add_board_row(layout, container, i, board, is_done, is_next)
+
+        return next_index
+
+    def _add_board_row(
+        self, layout: QVBoxLayout, container: QWidget, index: int, board: dict, is_done: bool, is_next: bool
+    ):
+
+        title = f"{index + 1}. {board['name']}"
+
+        notes = []
+        note = board.get("note", "")
+        if note:
+            notes.append(note)
+
+        self._add_checklist_row(
+            layout, container, title, notes, is_done, is_next, self.mark_board_done, index
+        )
+
+    # ---------------------------------------------------------
+    # Shared checklist row renderer (Leveling/Skills milestones and
+    # Paragon boards all funnel through this one row style).
+    # ---------------------------------------------------------
+
+    def _add_checklist_row(
+        self,
+        layout: QVBoxLayout,
+        container: QWidget,
+        title: str,
+        notes: list[str],
+        is_done: bool,
+        is_next: bool,
+        signal: Signal,
+        key,
+    ):
+
         row = QWidget(container)
         row.setObjectName("milestoneRow")
         row_layout = QHBoxLayout(row)
@@ -624,23 +707,7 @@ class LevelingCard(BaseCard):
         else:
             status = "○ Future"
 
-        skill_label = milestone["skill"]
-        points = milestone.get("points")
-
-        if points is not None:
-            plural = "" if points == 1 else "s"
-            skill_label += f" ({points} point{plural})"
-
-        lines = [f"{status} — Lvl {milestone['level']} — {skill_label}"]
-
-        note = milestone.get("note", "")
-        if note:
-            lines.append(note)
-
-        points_note = milestone.get("points_note", "")
-        if points_note:
-            lines.append(f"★ {points_note}")
-
+        lines = [f"{status} — {title}"] + notes
         text = "\n".join(lines)
 
         label = BodyLabel(text, row)
@@ -652,7 +719,7 @@ class LevelingCard(BaseCard):
         if not is_done:
             done_button = PushButton("Mark as Done", row)
             done_button.clicked.connect(
-                lambda _checked=False, lvl=milestone["level"]: self.mark_done.emit(lvl)
+                lambda _checked=False, k=key: signal.emit(k)
             )
             row_layout.addWidget(done_button, 0)
 

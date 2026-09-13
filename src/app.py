@@ -146,11 +146,13 @@ class MainWindow(FluentWindow):
         # straight away, without re-persisting what we just loaded.
         self.on_level_changed(default_level, persist=False)
         self._refresh_skills()
+        self._refresh_paragon()
 
         self.leveling_card.level_changed.connect(self.on_level_changed)
         self.leveling_card.build_changed.connect(self.on_build_changed)
         self.leveling_card.class_changed.connect(self.on_class_changed)
         self.leveling_card.mark_done.connect(self.on_mark_done)
+        self.leveling_card.mark_board_done.connect(self.on_mark_board_done)
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_countdown)
@@ -347,6 +349,7 @@ class MainWindow(FluentWindow):
         self.leveling_card.set_progress(data)
         self._refresh_leveling(level)
         self._refresh_skills()
+        self._refresh_paragon()
 
         self.settings.setValue("leveling/build", self.leveling_manager.current_build_name)
         self.settings.setValue(
@@ -411,6 +414,67 @@ class MainWindow(FluentWindow):
 
         self._refresh_skills()
         self._refresh_leveling(self._current_level())
+
+    # ---------------------------------------------------------
+    # BUILD-GUIDE / PARAGON TAB
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def _completed_boards_key(build_name: str) -> str:
+        # Its own QSettings key - Paragon boards and skill milestones are
+        # different lists/units, so completion state is never conflated
+        # into the shared "skills/.../completed_levels" key.
+        return f"paragon/{build_name}/completed_boards"
+
+    def _load_completed_boards(self, build_name: str) -> set[int]:
+
+        raw = self.settings.value(self._completed_boards_key(build_name), [], type=list)
+        completed = set()
+
+        for value in raw:
+            try:
+                completed.add(int(value))
+            except (TypeError, ValueError):
+                continue
+
+        return completed
+
+    def _save_completed_boards(self, build_name: str, completed: set[int]):
+
+        self.settings.setValue(self._completed_boards_key(build_name), sorted(completed))
+
+    def _refresh_paragon(self):
+        """Rebuild the Paragon tab's board checklist for the current
+        build, combining its (level-independent) board/glyph data with
+        the persisted set of completed board indices."""
+
+        build_name = self.leveling_manager.current_build_name
+
+        if not build_name:
+            return
+
+        paragon = self.leveling_manager.get_paragon_data(build_name)
+        completed = self._load_completed_boards(build_name)
+
+        self.leveling_card.set_paragon(
+            paragon.get("boards") or [],
+            paragon.get("glyphs") or [],
+            paragon.get("note") or "",
+            completed,
+        )
+
+    def on_mark_board_done(self, index: int):
+
+        build_name = self.leveling_manager.current_build_name
+
+        if not build_name:
+            return
+
+        completed = self._load_completed_boards(build_name)
+        completed.add(index)
+        self._save_completed_boards(build_name, completed)
+
+        self._refresh_paragon()
 
     def on_class_changed(self, class_name: str):
         """Step-1 class selector changed: rebuild the step-2 build
