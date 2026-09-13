@@ -12,7 +12,9 @@
     {
       "level": 3,
       "skill": "Crushing Hand",
-      "note": "Primary damage focus; grants Barrier and Resolve."
+      "note": "Primary damage focus; grants Barrier and Resolve.",
+      "points": 15,
+      "points_note": "Guide: ranks up to a base max of 15 ranks over the leveling arc."
     },
     {
       "level": 3,
@@ -22,7 +24,9 @@
     {
       "level": 3,
       "skill": "Ravager",
-      "note": "Passive attack speed and vigor generation."
+      "note": "Passive attack speed and vigor generation.",
+      "points": 5,
+      "points_note": "Guide: ranks up to Rank 5."
     },
     {
       "level": 3,

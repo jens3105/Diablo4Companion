@@ -303,11 +303,34 @@ class MainWindow(FluentWindow):
 
         return self.leveling_manager.current_build_name
 
+    def _current_level(self) -> int:
+
+        text = self.leveling_card.level_input.text().strip()
+
+        return int(text) if text.isdigit() else 1
+
+    def _refresh_leveling(self, level: int):
+        """Rebuild the Leveling tab's checklist for the current build,
+        using the exact same milestones + persisted completed-levels
+        state as the Skills tab (see ``_refresh_skills``) - only the
+        current level shown up top differs between the two views."""
+
+        build_name = self.leveling_manager.current_build_name
+
+        if not build_name:
+            return
+
+        milestones = self.leveling_manager.get_skills_data(build_name)["milestones"]
+        completed = self._load_completed_levels(build_name)
+
+        self.leveling_card.set_leveling(level, milestones, completed)
+
     def on_level_changed(self, level: int, persist: bool = True):
 
         data = self.leveling_manager.get_progress(level)
 
         self.leveling_card.set_progress(data)
+        self._refresh_leveling(level)
 
         if persist:
             self.settings.setValue("leveling/level", level)
@@ -317,12 +340,12 @@ class MainWindow(FluentWindow):
         if not self.leveling_manager.set_current_build(build_name):
             return
 
-        text = self.leveling_card.level_input.text().strip()
-        level = int(text) if text.isdigit() else 1
+        level = self._current_level()
 
         data = self.leveling_manager.get_progress(level)
 
         self.leveling_card.set_progress(data)
+        self._refresh_leveling(level)
         self._refresh_skills()
 
         self.settings.setValue("leveling/build", self.leveling_manager.current_build_name)
@@ -387,6 +410,7 @@ class MainWindow(FluentWindow):
         self._save_completed_levels(build_name, completed)
 
         self._refresh_skills()
+        self._refresh_leveling(self._current_level())
 
     def on_class_changed(self, class_name: str):
         """Step-1 class selector changed: rebuild the step-2 build

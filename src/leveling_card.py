@@ -13,6 +13,7 @@ from qfluentwidgets import (
     SegmentedWidget,
     SingleDirectionScrollArea,
     StrongBodyLabel,
+    SubtitleLabel,
 )
 
 from src.base_card import BaseCard
@@ -56,6 +57,10 @@ class LevelingCard(BaseCard):
     SKILLS_KEY = "skills"
     PARAGON_KEY = "paragon"
     GEAR_KEY = "gear"
+
+    # Diablo IV's actual level cap - hardcoded since it hasn't changed in
+    # a way that needs to be data-driven for this app's purposes.
+    LEVEL_CAP = 70
 
     def __init__(self, parent=None):
         super().__init__("BUILD GUIDE", icon=FIF.EDUCATION, parent=parent)
@@ -172,6 +177,9 @@ class LevelingCard(BaseCard):
         layout = QVBoxLayout(page)
         layout.setContentsMargins(0, 8, 0, 0)
         layout.setSpacing(8)
+
+        self.level_label = SubtitleLabel(f"LEVEL — / {self.LEVEL_CAP}", page)
+        layout.addWidget(self.level_label)
 
         self.next_label = StrongBodyLabel(
             "Pick a build and enter your level to see what's next.", page
@@ -404,30 +412,36 @@ class LevelingCard(BaseCard):
 
     def set_progress(self, data: dict):
 
-        self._set_leveling(data)
         self._set_paragon(data)
         self._set_gear(data)
 
-    def _set_leveling(self, data: dict):
+    def set_leveling(self, level: int, milestones: list[dict], completed_levels: set[int]):
+        """Populate the Leveling tab as the same kind of checklist the
+        Skills tab shows - ``milestones``/``completed_levels`` are the
+        exact same shared progression data (see ``set_skills``); this
+        tab just frames it around the player's current level instead of
+        the skill bar."""
 
         layout = self.progress_layout
         container = self.progress_container
 
         self._clear_rows(layout)
 
-        if data["reached"]:
-            for milestone in data["reached"]:
-                self._add_row(
-                    layout,
-                    container,
-                    f"Lvl {milestone['level']} — {milestone['skill']}\n{milestone['note']}",
-                )
-        else:
-            self._add_row(layout, container, "No milestones reached yet at this level.")
+        self.level_label.setText(f"LEVEL {level} / {self.LEVEL_CAP}")
 
-        if data["next"]:
-            nxt = data["next"]
-            self.next_label.setText(f"Next: Lvl {nxt['level']} — {nxt['skill']}")
+        if not milestones:
+            self._add_row(layout, container, "No milestones defined for this build.")
+            self.next_label.setText("Pick a build and enter your level to see what's next.")
+            return
+
+        next_milestone = self._render_milestone_checklist(
+            layout, container, milestones, completed_levels
+        )
+
+        if next_milestone:
+            self.next_label.setText(
+                f"Next: Lvl {next_milestone['level']} — {next_milestone['skill']}"
+            )
         else:
             self.next_label.setText("Build fully unlocked!")
 
@@ -558,8 +572,8 @@ class LevelingCard(BaseCard):
             self.skills_next_label.setText("Pick a build to see your next skill point.")
             return
 
-        next_milestone = next(
-            (m for m in milestones if m["level"] not in completed_levels), None
+        next_milestone = self._render_milestone_checklist(
+            layout, container, milestones, completed_levels
         )
 
         if next_milestone:
@@ -569,10 +583,29 @@ class LevelingCard(BaseCard):
         else:
             self.skills_next_label.setText("All skill milestones completed!")
 
+    def _render_milestone_checklist(
+        self,
+        layout: QVBoxLayout,
+        container: QWidget,
+        milestones: list[dict],
+        completed_levels: set[int],
+    ):
+        """Render ``milestones`` as ✓ Completed / → Next / ○ Future rows
+        (via ``_add_milestone_row``), driven by the shared per-build
+        ``completed_levels`` state. Used by both the Leveling and Skills
+        tabs so the two views never fall out of sync. Returns the next
+        incomplete milestone, or ``None`` if everything is done."""
+
+        next_milestone = next(
+            (m for m in milestones if m["level"] not in completed_levels), None
+        )
+
         for milestone in milestones:
             is_done = milestone["level"] in completed_levels
             is_next = milestone is next_milestone
             self._add_milestone_row(layout, container, milestone, is_done, is_next)
+
+        return next_milestone
 
     def _add_milestone_row(
         self, layout: QVBoxLayout, container: QWidget, milestone: dict, is_done: bool, is_next: bool
@@ -591,8 +624,24 @@ class LevelingCard(BaseCard):
         else:
             status = "○ Future"
 
+        skill_label = milestone["skill"]
+        points = milestone.get("points")
+
+        if points is not None:
+            plural = "" if points == 1 else "s"
+            skill_label += f" ({points} point{plural})"
+
+        lines = [f"{status} — Lvl {milestone['level']} — {skill_label}"]
+
         note = milestone.get("note", "")
-        text = f"{status} — Lvl {milestone['level']} — {milestone['skill']}\n{note}".rstrip()
+        if note:
+            lines.append(note)
+
+        points_note = milestone.get("points_note", "")
+        if points_note:
+            lines.append(f"★ {points_note}")
+
+        text = "\n".join(lines)
 
         label = BodyLabel(text, row)
         label.setWordWrap(True)

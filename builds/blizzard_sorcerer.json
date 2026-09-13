@@ -27,7 +27,8 @@
     {
       "level": 13,
       "skill": "Blizzard",
-      "note": "Main skill - reallocate points here once unlocked."
+      "note": "Main skill - reallocate points here once unlocked.",
+      "points_note": "Guide: remove points from interim skills and put everything into Blizzard once unlocked."
     },
     {
       "level": 16,

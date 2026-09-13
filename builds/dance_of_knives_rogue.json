@@ -12,7 +12,9 @@
     {
       "level": 5,
       "skill": "Energy node swap",
-      "note": "Addresses early resource constraints."
+      "note": "Addresses early resource constraints.",
+      "points": 1,
+      "points_note": "Guide: move one existing point onto the Energy node once you hit level 5."
     },
     {
       "level": 10,
