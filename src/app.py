@@ -148,6 +148,7 @@ class MainWindow(FluentWindow):
         self._refresh_skills()
         self._refresh_paragon()
         self._refresh_gear()
+        self._refresh_build_status()
 
         self.leveling_card.level_changed.connect(self.on_level_changed)
         self.leveling_card.build_changed.connect(self.on_build_changed)
@@ -347,6 +348,7 @@ class MainWindow(FluentWindow):
         self._refresh_skills()
         self._refresh_paragon()
         self._refresh_gear()
+        self._refresh_build_status()
 
         self.settings.setValue("leveling/build", self.leveling_manager.current_build_name)
         self.settings.setValue(
@@ -411,6 +413,7 @@ class MainWindow(FluentWindow):
 
         self._refresh_skills()
         self._refresh_leveling(self._current_level())
+        self._refresh_build_status()
 
     # ---------------------------------------------------------
     # BUILD-GUIDE / PARAGON TAB
@@ -472,6 +475,7 @@ class MainWindow(FluentWindow):
         self._save_completed_boards(build_name, completed)
 
         self._refresh_paragon()
+        self._refresh_build_status()
 
     # ---------------------------------------------------------
     # BUILD-GUIDE / GEAR & POWERS TAB
@@ -526,6 +530,92 @@ class MainWindow(FluentWindow):
         self._save_owned_items(build_name, owned_names)
 
         self._refresh_gear()
+        self._refresh_build_status()
+
+    # ---------------------------------------------------------
+    # BUILD-GUIDE / BUILD STATUS SUMMARY (Phase 6)
+    #
+    # Pure aggregation over the completion state the four tabs above
+    # already persist - no new tracking, no new QSettings keys. Recomputed
+    # (cheaply - it's a handful of len()/set operations) on every event
+    # that could move the needle: build/class switch and any checkbox/
+    # toggle in any of the four tabs.
+    # ---------------------------------------------------------
+
+    @staticmethod
+    def _pct(done: int, total: int) -> int | None:
+        """Percent complete, or ``None`` when ``total`` is 0 - i.e. this
+        build has no trackable data for that category at all, which is
+        a "not applicable" state, not a 0%/red one."""
+
+        return None if total <= 0 else round(100 * done / total)
+
+    @staticmethod
+    def _status_emoji(pct: int | None) -> str:
+
+        if pct is None:
+            return "⚪"
+        if pct >= 90:
+            return "🟢"
+        if pct > 0:
+            return "🟡"
+        return "🔴"
+
+    @staticmethod
+    def _pct_text(pct: int | None) -> str:
+        return "N/A" if pct is None else f"{pct}%"
+
+    def _refresh_build_status(self):
+        """Recompute and redraw the Build Status summary for the current
+        build from the same persisted state each tab already reads:
+        ``skills/<build>/completed_levels`` (Skills + Leveling, they
+        share one set), ``paragon/<build>/completed_boards`` and
+        ``gear/<build>/owned_items``."""
+
+        build_name = self.leveling_manager.current_build_name
+
+        if not build_name:
+            return
+
+        milestones = self.leveling_manager.get_skills_data(build_name)["milestones"]
+        completed_levels = self._load_completed_levels(build_name)
+        skills_pct = self._pct(len(completed_levels), len(milestones))
+
+        boards = self.leveling_manager.get_paragon_data(build_name).get("boards") or []
+        completed_boards = self._load_completed_boards(build_name)
+        paragon_pct = self._pct(len(completed_boards), len(boards))
+
+        gear = self.leveling_manager.get_gear_data(build_name) or {}
+        checkable_gear = (gear.get("key_items") or []) + (gear.get("key_aspects") or [])
+        gear_names = {entry["name"] for entry in checkable_gear}
+        owned = self._load_owned_items(build_name) & gear_names
+        gear_pct = self._pct(len(owned), len(gear_names))
+        missing_gear = len(gear_names) - len(owned)
+
+        rows = [
+            (self._status_emoji(skills_pct), "Skills", self._pct_text(skills_pct)),
+            (self._status_emoji(skills_pct), "Leveling", self._pct_text(skills_pct)),
+            (self._status_emoji(paragon_pct), "Paragon", self._pct_text(paragon_pct)),
+            (self._status_emoji(gear_pct), "Gear", self._pct_text(gear_pct)),
+        ]
+
+        # Ready when every category with actual data is fully complete -
+        # a category with no trackable data (N/A) can't block readiness.
+        ready = (
+            (skills_pct is None or skills_pct == 100)
+            and (paragon_pct is None or paragon_pct == 100)
+            and (gear_pct is None or gear_pct == 100)
+        )
+
+        if ready:
+            footer_text = "BUILD READY ✓"
+        elif gear_names:
+            plural = "" if missing_gear == 1 else "S"
+            footer_text = f"{missing_gear} ITEM{plural} MISSING" if missing_gear else ""
+        else:
+            footer_text = ""
+
+        self.leveling_card.set_build_status(rows, footer_text, ready)
 
     def on_class_changed(self, class_name: str):
         """Step-1 class selector changed: rebuild the step-2 build

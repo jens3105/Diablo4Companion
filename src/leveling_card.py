@@ -80,6 +80,18 @@ class LevelingCard(BaseCard):
         self.title_row.addWidget(self.role_tag)
 
         # -------------------------
+        # Build Status summary (Phase 6) - a compact, always-visible
+        # rollup of all 4 tabs' completion state, sitting above the
+        # class/build selector so it's visible regardless of which tab
+        # is active. Purely a read-out of state owned by MainWindow
+        # (QSettings completed_levels/completed_boards/owned_items) -
+        # this widget has no state of its own, just a setter.
+        # -------------------------
+
+        self.status_widget = self._build_status_widget()
+        self.add_widget(self.status_widget)
+
+        # -------------------------
         # Step 1: class selector
         # -------------------------
 
@@ -246,6 +258,43 @@ class LevelingCard(BaseCard):
         layout.addWidget(scroll, 1)
 
         return page
+
+    def _build_status_widget(self) -> QWidget:
+        """Build the compact Build Status card (see ``set_build_status``
+        for what actually populates it). Just a header, a monospace-ish
+        block of one line per category, and a single "footer" line that
+        holds either the missing-gear count or the "BUILD READY" badge -
+        kept to a handful of lines total, not a dashboard of its own."""
+
+        widget = QWidget(self.content)
+        widget.setObjectName("buildStatusWidget")
+
+        layout = QVBoxLayout(widget)
+        layout.setContentsMargins(12, 10, 12, 10)
+        layout.setSpacing(4)
+
+        header = CaptionLabel("BUILD STATUS", widget)
+        header.setTextColor(QColor(ACCENT_GOLD), QColor(ACCENT_GOLD))
+        layout.addWidget(header)
+
+        self.status_rows_label = BodyLabel("", widget)
+        self.status_rows_label.setWordWrap(True)
+        self.status_rows_label.setStyleSheet("font-family: monospace; font-size: 12px;")
+        layout.addWidget(self.status_rows_label)
+
+        self.status_footer_label = CaptionLabel("", widget)
+        layout.addWidget(self.status_footer_label)
+
+        widget.setStyleSheet(
+            f"""
+            QWidget#buildStatusWidget {{
+                background-color: {SURFACE_ALT};
+                border-radius: 8px;
+            }}
+            """
+        )
+
+        return widget
 
     def _build_scroll_page(self, container_attr: str, layout_attr: str) -> QWidget:
 
@@ -468,6 +517,23 @@ class LevelingCard(BaseCard):
             )
         else:
             self.next_label.setText("Build fully unlocked!")
+
+    def set_build_status(self, rows: list[tuple[str, str, str]], footer_text: str, footer_is_ready: bool):
+        """Render the Build Status summary. ``rows`` is a list of
+        ``(emoji, label, pct_text)`` tuples, one per category, in
+        display order (Skills/Leveling/Paragon/Gear) - the caller (
+        ``MainWindow._refresh_build_status``) does all the aggregation
+        over the existing per-tab QSettings state; this just draws it.
+        ``footer_text`` is either an "N items missing" line, a
+        "BUILD READY" badge, or empty (nothing left to say)."""
+
+        lines = [f"{emoji} {label:<9}{pct}" for emoji, label, pct in rows]
+        self.status_rows_label.setText("\n".join(lines))
+
+        self.status_footer_label.setText(footer_text)
+        color = QColor(ACCENT_GOLD) if footer_is_ready else QColor(TEXT_MUTED)
+        self.status_footer_label.setTextColor(color, color)
+        self.status_footer_label.setVisible(bool(footer_text))
 
     def set_paragon(
         self, boards: list[dict], glyphs: list[str], note: str, completed_boards: set[int]
