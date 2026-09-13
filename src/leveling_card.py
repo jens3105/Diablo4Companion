@@ -15,7 +15,7 @@ from qfluentwidgets import (
 )
 
 from src.base_card import BaseCard
-from src.theme import ACCENT_GOLD, SURFACE_ALT, TEXT_MUTED
+from src.theme import ACCENT_GOLD, SURFACE_ALT, TEXT_MUTED, TEXT_PRIMARY
 
 
 class LevelingCard(BaseCard):
@@ -284,6 +284,7 @@ class LevelingCard(BaseCard):
         row.setStyleSheet(
             f"""
             background-color: {SURFACE_ALT};
+            color: {TEXT_PRIMARY};
             border-radius: 8px;
             padding: 8px;
             font-size: 12px;
