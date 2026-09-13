@@ -114,5 +114,158 @@
       "Challenging Shout (Lacerate Rune)",
       "Call of the Ancients (Highlander)"
     ]
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "n74lal0u",
+    "profile_name": "Endgame",
+    "class_name": "Barbarian",
+    "skill_bar": [
+      "Rend",
+      "Frenzy",
+      "Rallying Cry",
+      "War Cry",
+      "Iron Skin",
+      "Call of the Ancients"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Challenging Shout",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Bawl",
+          "Damage Bonus",
+          "Weaken"
+        ]
+      },
+      {
+        "skill": "Frenzy",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Throwing",
+          "Frenzy Stacks",
+          "Ferocity"
+        ]
+      },
+      {
+        "skill": "Rallying Cry",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Booming",
+          "Fortify",
+          "Potency"
+        ]
+      },
+      {
+        "skill": "War Cry",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Mighty Roar",
+          "Slow",
+          "Duration Increase"
+        ]
+      },
+      {
+        "skill": "Call of the Ancients",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Highlander",
+          "Damage Bonus",
+          "Attack Speed and Damage Bonus"
+        ]
+      },
+      {
+        "skill": "Iron Skin",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Juggernaut",
+          "Movement Speed",
+          "Resolve"
+        ]
+      },
+      {
+        "skill": "Rend",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Scorching",
+          "Healing"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Barb_00",
+        "glyph": "Undaunted",
+        "glyph_level": 150,
+        "nodes": [
+          "Raw Power",
+          "Iron Strength",
+          "Tenacity",
+          "Brawn"
+        ]
+      },
+      {
+        "board": "Paragon_Barb_07",
+        "glyph": "Wrath",
+        "glyph_level": 150,
+        "nodes": [
+          "Fire Resilience",
+          "Hungering Fury",
+          "Conditioned",
+          "Warbringer",
+          "Core Reserve",
+          "Raw Power",
+          "Brute Force"
+        ]
+      },
+      {
+        "board": "Paragon_Barb_06",
+        "glyph": "Exploit",
+        "glyph_level": 150,
+        "nodes": [
+          "Defensive Stance",
+          "Brash",
+          "Flawless Technique",
+          "Nimble",
+          "Slayer",
+          "Heavy Blows",
+          "Wild Force"
+        ]
+      },
+      {
+        "board": "Paragon_Barb_03",
+        "glyph": "Ambidextrous",
+        "glyph_level": 150,
+        "nodes": [
+          "Tenacity",
+          "Brash",
+          "Fierce",
+          "Carnage",
+          "Berserker",
+          "Recuperate",
+          "Enraged"
+        ]
+      },
+      {
+        "board": "Paragon_Barb_02",
+        "glyph": "Challenger",
+        "glyph_level": 150,
+        "nodes": [
+          "Restorative",
+          "Blood Rage",
+          "Wrath",
+          "Revel",
+          "Bloodless",
+          "Craving"
+        ]
+      }
+    ]
   }
 }

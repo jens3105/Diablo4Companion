@@ -114,5 +114,150 @@
       "Defiance Aura",
       "Fortress"
     ]
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "fciqow0w",
+    "profile_name": "Endgame",
+    "class_name": "Paladin",
+    "skill_bar": [
+      "Defiance Aura",
+      "Fortress",
+      "Clash",
+      "Condemn",
+      "Fanaticism Aura",
+      "Blessed Shield"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Defiance Aura",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Potency",
+          "Rite of Thorns",
+          "Maximum Life"
+        ]
+      },
+      {
+        "skill": "Fanaticism Aura",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Extra Passive Stack",
+          "Rite of Vengeance",
+          "Resource Generation"
+        ]
+      },
+      {
+        "skill": "Holy Light Aura",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Potency",
+          "Rite of Mercy",
+          "Additional Targets"
+        ]
+      },
+      {
+        "skill": "Rally",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Words of Sacrifice",
+          "Critical Strike Chance",
+          "Cost Reduction"
+        ]
+      },
+      {
+        "skill": "Clash",
+        "rank": 4,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Punishment",
+          "Resolve",
+          "Crusader's March Effectiveness"
+        ]
+      },
+      {
+        "skill": "Blessed Shield",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Armor and Block Chance Bonus",
+          "Shield of Retribution",
+          "Cast Speed"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Paladin_00",
+        "glyph": "Revenge",
+        "glyph_level": 150,
+        "nodes": [
+          "Raw Power",
+          "Iron Strength",
+          "Tenacity",
+          "Brawn"
+        ]
+      },
+      {
+        "board": "Paragon_Paladin_06",
+        "glyph": "Spirit",
+        "glyph_level": 150,
+        "nodes": [
+          "Battering Ram",
+          "Cull",
+          "Relentless",
+          "Inured",
+          "Defiance",
+          "Endure",
+          "Dervish"
+        ]
+      },
+      {
+        "board": "Paragon_Paladin_01",
+        "glyph": "Sentinel",
+        "glyph_level": 150,
+        "nodes": [
+          "Knight",
+          "Ironclad",
+          "Insulate",
+          "Stalwart",
+          "Castle",
+          "Grappler",
+          "Defiance"
+        ]
+      },
+      {
+        "board": "Paragon_Paladin_02",
+        "glyph": "Outmatch",
+        "glyph_level": 150,
+        "nodes": [
+          "Stalwart",
+          "Shieldbearer",
+          "Shield Bearer",
+          "Knight",
+          "Constrict",
+          "Bludgeoning",
+          "Growth"
+        ]
+      },
+      {
+        "board": "Paragon_Paladin_09",
+        "glyph": "Chip",
+        "glyph_level": 150,
+        "nodes": [
+          "Champion",
+          "Fortitude",
+          "Constitution",
+          "Blurring",
+          "Beacon",
+          "Spiked Shield",
+          "Sturdy"
+        ]
+      }
+    ]
   }
 }

@@ -96,5 +96,168 @@
       "Attack Speed (target 100% Attack Speed, 100% Crit Chance, 30k+ Life)"
     ],
     "skill_bar": null
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "nvhpww0w",
+    "profile_name": "Endgame",
+    "class_name": "Necromancer",
+    "skill_bar": [
+      "Skeleton Warrior",
+      "Bone Spear",
+      "Golem",
+      "Skeleton Mage",
+      "Sever",
+      "Bone Storm"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Bone Spear",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Resolve",
+          "Bone Spikes",
+          "First Hit Damage Bonus"
+        ]
+      },
+      {
+        "skill": "Bone Storm",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Duration Increase",
+          "Roll The Bones",
+          "Barrier"
+        ]
+      },
+      {
+        "skill": "Skeleton Mage",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Critical Strike Chance",
+          "Gift of Death",
+          "Ferocity, Resolve, or Overpower"
+        ]
+      },
+      {
+        "skill": "Skeleton Warrior",
+        "rank": 11,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Healing",
+          "Litany of Death",
+          "Vulnerable"
+        ]
+      },
+      {
+        "skill": "Decrepify",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Resolve",
+          "Life Tap",
+          "Critical Strike Chance"
+        ]
+      },
+      {
+        "skill": "Golem",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Unstoppable",
+          "Gravebloom",
+          "Resolve, Overpower, or Ferocity"
+        ]
+      },
+      {
+        "skill": "Iron Maiden",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Ferocity and Overpower",
+          "Blood Maiden",
+          "Execute and Fortify"
+        ]
+      },
+      {
+        "skill": "Sever",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Inexorable Reaper",
+          "Crowd Control and Corpse Generation"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Necro_00",
+        "glyph": "Corporeal",
+        "glyph_level": 150,
+        "nodes": [
+          "Knowledge",
+          "Grasp",
+          "Resilience",
+          "Prime"
+        ]
+      },
+      {
+        "board": "Paragon_Necro_04",
+        "glyph": "Amplify",
+        "glyph_level": 150,
+        "nodes": [
+          "Deathmarked",
+          "Seethe",
+          "Deathbringer",
+          "Restorative",
+          "Scent of Death",
+          "Suffused Resilience",
+          "Shrouded"
+        ]
+      },
+      {
+        "board": "Paragon_Necro_03",
+        "glyph": "Gravekeeper",
+        "glyph_level": 150,
+        "nodes": [
+          "Blood Clotting",
+          "Targeted",
+          "Flesh-eater",
+          "Rend",
+          "Recuperate",
+          "Erudite"
+        ]
+      },
+      {
+        "board": "Paragon_Necro_10",
+        "glyph": "Eliminator",
+        "glyph_level": 150,
+        "nodes": [
+          "Eradicate",
+          "Preservation",
+          "Relentless",
+          "Lingering Shadows",
+          "Frailty",
+          "Meticulous",
+          "Shrouded"
+        ]
+      },
+      {
+        "board": "Paragon_Necro_05",
+        "glyph": "Essence",
+        "glyph_level": 150,
+        "nodes": [
+          "Bone Graft",
+          "Entomb",
+          "Erudite",
+          "Suffused Resilience",
+          "Reinvigorate",
+          "Shaper of Bone",
+          "Splinter"
+        ]
+      }
+    ]
   }
 }

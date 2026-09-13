@@ -121,5 +121,168 @@
       "Smoke Grenade",
       "Flurry (held)"
     ]
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "5lbyoc0h",
+    "profile_name": "Endgame",
+    "class_name": "Rogue",
+    "skill_bar": [
+      "Shadow Clone",
+      "Flurry",
+      "Shadow Step",
+      "Caltrops",
+      "Smoke Grenade",
+      "Cold Imbuement"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Cold Imbuement",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Frozen Heart",
+          "Overpower",
+          "Cooldown"
+        ]
+      },
+      {
+        "skill": "Flurry",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Transporter",
+          "Cast Speed",
+          "Damage Increase"
+        ]
+      },
+      {
+        "skill": "Shadow Clone",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Relentless",
+          "Resolve",
+          "Unstoppable"
+        ]
+      },
+      {
+        "skill": "Concealment",
+        "rank": 12,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Calculation"
+        ]
+      },
+      {
+        "skill": "Caltrops",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Mired Sharpshooter",
+          "Duration",
+          "Critical Strike"
+        ]
+      },
+      {
+        "skill": "Dark Shroud",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Shadow Dancer",
+          "Consume Chance",
+          "Critical Strike"
+        ]
+      },
+      {
+        "skill": "Shadow Step",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Artifice",
+          "Cooldown",
+          "Unstoppable"
+        ]
+      },
+      {
+        "skill": "Smoke Grenade",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Silhouette",
+          "Charge or Energy Cost Reduction",
+          "Increased Duration and Damage"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Rogue_00",
+        "glyph": "Canny",
+        "glyph_level": 150,
+        "nodes": [
+          "Skillful",
+          "Outlaw",
+          "Resilience",
+          "Prime"
+        ]
+      },
+      {
+        "board": "Paragon_Rogue_03",
+        "glyph": "Versatility",
+        "glyph_level": 150,
+        "nodes": [
+          "Calculated",
+          "Deviant",
+          "Devious",
+          "Cheap Shot",
+          "Artifice",
+          "Safeguard",
+          "Spearhead"
+        ]
+      },
+      {
+        "board": "Paragon_Rogue_07",
+        "glyph": "Control",
+        "glyph_level": 150,
+        "nodes": [
+          "Defensive Stance",
+          "Toughened",
+          "Unassailable",
+          "Exploit Weakness",
+          "Exploit",
+          "Artifice",
+          "Misery"
+        ]
+      },
+      {
+        "board": "Paragon_Rogue_01",
+        "glyph": "Devious",
+        "glyph_level": 150,
+        "nodes": [
+          "Potent",
+          "Concoction",
+          "Suffused Resilience",
+          "Ready Supply",
+          "Eldritch Bounty",
+          "Restorative",
+          "Imbuer"
+        ]
+      },
+      {
+        "board": "Paragon_Rogue_05",
+        "glyph": "Fluidity",
+        "glyph_level": 150,
+        "nodes": [
+          "Leyrana's Instinct",
+          "Suffused Resilience",
+          "Immunization",
+          "Nimble",
+          "Restorative",
+          "Essential",
+          "Punishment"
+        ]
+      }
+    ]
   }
 }

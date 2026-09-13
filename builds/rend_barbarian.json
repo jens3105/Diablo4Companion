@@ -103,5 +103,157 @@
       "Challenging Shout",
       "Wrath of the Berserker"
     ]
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "7ubms0u4",
+    "profile_name": "Endgame (Physical)",
+    "class_name": "Barbarian",
+    "skill_bar": [
+      "Rend",
+      "Leap",
+      "Rallying Cry",
+      "Challenging Shout",
+      "Iron Skin",
+      "Wrath of the Berserker"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Challenging Shout",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Bawl",
+          "Damage Bonus",
+          "Duration Bonus"
+        ]
+      },
+      {
+        "skill": "Rend",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Blood Sworn",
+          "Healing",
+          "Vulnerable Damage Bonus"
+        ]
+      },
+      {
+        "skill": "War Cry",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Mighty Roar",
+          "Slow",
+          "Duration Increase"
+        ]
+      },
+      {
+        "skill": "Wrath of the Berserker",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Maximum Carnage",
+          "Duration Bonus",
+          "Berserking"
+        ]
+      },
+      {
+        "skill": "Iron Skin",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Retaliation",
+          "Weaken",
+          "Maximum Life"
+        ]
+      },
+      {
+        "skill": "Leap",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Mosh",
+          "Arsenal Bonus",
+          "Damage Bonus and Crowd Control"
+        ]
+      },
+      {
+        "skill": "Rallying Cry",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Fortify",
+          "Potency"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Barb_00",
+        "glyph": "Executioner",
+        "glyph_level": 150,
+        "nodes": [
+          "Raw Power",
+          "Iron Strength",
+          "Tenacity",
+          "Brawn"
+        ]
+      },
+      {
+        "board": "Paragon_Barb_03",
+        "glyph": "Challenger",
+        "glyph_level": 150,
+        "nodes": [
+          "Tenacity",
+          "Brash",
+          "Fierce",
+          "Carnage",
+          "Berserker",
+          "Recuperate",
+          "Enraged"
+        ]
+      },
+      {
+        "board": "Paragon_Barb_07",
+        "glyph": "Exploit",
+        "glyph_level": 150,
+        "nodes": [
+          "Fire Resilience",
+          "Hungering Fury",
+          "Conditioned",
+          "Warbringer",
+          "Core Reserve",
+          "Raw Power",
+          "Brute Force"
+        ]
+      },
+      {
+        "board": "Paragon_Barb_02",
+        "glyph": "Disembowel",
+        "glyph_level": 150,
+        "nodes": [
+          "Restorative",
+          "Blood Rage",
+          "Wrath",
+          "Revel",
+          "Bloodless",
+          "Craving"
+        ]
+      },
+      {
+        "board": "Paragon_Barb_01",
+        "glyph": "Might",
+        "glyph_level": 150,
+        "nodes": [
+          "Butcher",
+          "Flayer",
+          "Blood Clotting",
+          "Bloodbathed",
+          "Hemorrhage",
+          "Lacerator"
+        ]
+      }
+    ]
   }
 }

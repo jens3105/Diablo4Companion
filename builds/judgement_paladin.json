@@ -94,5 +94,150 @@
       "Defiance Aura",
       "Purify"
     ]
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "yvhkyh0h",
+    "profile_name": "Endgame",
+    "class_name": "Paladin",
+    "skill_bar": [
+      "Defiance Aura",
+      "Arbiter of Justice",
+      "Spear of the Heavens",
+      "Purify",
+      "Fanaticism Aura",
+      "Blessed Hammer"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Arbiter of Justice",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Cooldown Reduction",
+          "Duration",
+          "Reach of the Law"
+        ]
+      },
+      {
+        "skill": "Defiance Aura",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Bonus Healing",
+          "Rite of Prayer",
+          "Maximum Life"
+        ]
+      },
+      {
+        "skill": "Fanaticism Aura",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Extra Passive Stack",
+          "Rite of Vengeance",
+          "Resource Generation"
+        ]
+      },
+      {
+        "skill": "Purify",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Faith Generation",
+          "Echo",
+          "Sentence"
+        ]
+      },
+      {
+        "skill": "Spear of the Heavens",
+        "rank": 4,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Cooldown Reduction",
+          "Projectiles",
+          "Pronouncement of Heaven"
+        ]
+      },
+      {
+        "skill": "Blessed Hammer",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Cast Speed",
+          "Shattering Blow",
+          "Cost Reduction"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Paladin_00",
+        "glyph": "Sentinel",
+        "glyph_level": 150,
+        "nodes": [
+          "Raw Power",
+          "Iron Strength",
+          "Tenacity",
+          "Brawn"
+        ]
+      },
+      {
+        "board": "Paragon_Paladin_06",
+        "glyph": "Resplendence",
+        "glyph_level": 150,
+        "nodes": [
+          "Battering Ram",
+          "Cull",
+          "Relentless",
+          "Inured",
+          "Defiance",
+          "Endure",
+          "Dervish"
+        ]
+      },
+      {
+        "board": "Paragon_Paladin_07",
+        "glyph": "Spirit",
+        "glyph_level": 150,
+        "nodes": [
+          "Benediction",
+          "Restorative",
+          "Sturdy",
+          "Sentencing",
+          "Luminous",
+          "Grace",
+          "Endure"
+        ]
+      },
+      {
+        "board": "Paragon_Paladin_01",
+        "glyph": "Law",
+        "glyph_level": 150,
+        "nodes": [
+          "Knight",
+          "Ironclad",
+          "Insulate",
+          "Stalwart",
+          "Castle",
+          "Grappler",
+          "Defiance"
+        ]
+      },
+      {
+        "board": "Paragon_Paladin_09",
+        "glyph": "Judicator",
+        "glyph_level": 150,
+        "nodes": [
+          "Champion",
+          "Fortitude",
+          "Constitution",
+          "Blurring",
+          "Beacon",
+          "Spiked Shield",
+          "Sturdy"
+        ]
+      }
+    ]
   }
 }

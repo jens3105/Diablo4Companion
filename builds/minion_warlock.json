@@ -119,5 +119,160 @@
       "Command Fallen",
       "Nether Step (or Jah rune teleport)"
     ]
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "wfd4010h",
+    "profile_name": "Endgame",
+    "class_name": "Warlock",
+    "skill_bar": [
+      "Tortured Wretch",
+      "Sigil of Summons",
+      "Command Ae'grom",
+      "Metamorphosis",
+      "Bombardment",
+      "Command Fallen"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Command Fallen",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Wrath",
+          "Dominance",
+          "Mega Lunatic"
+        ]
+      },
+      {
+        "skill": "Sigil of Summons",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Cooldown",
+          "Damage",
+          "Summon Hellwyrm"
+        ]
+      },
+      {
+        "skill": "Tortured Wretch",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Duration",
+          "Cost Reduction",
+          "Punching Bag"
+        ]
+      },
+      {
+        "skill": "Bombardment",
+        "rank": 14,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Damage",
+          "Focused Target",
+          "Endless Barrage"
+        ]
+      },
+      {
+        "skill": "Dark Prison",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Fortify",
+          "Weaken",
+          "Chain Aura"
+        ]
+      },
+      {
+        "skill": "Metamorphosis",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Damage Scaling",
+          "Dominance",
+          "Destruction Demon"
+        ]
+      },
+      {
+        "skill": "Nether Step",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Extra Charge",
+          "Movement Speed",
+          "Shadow Recall"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Warlock_00",
+        "glyph": "Eliminator",
+        "glyph_level": 150,
+        "nodes": [
+          "Warped",
+          "Domination",
+          "Resilience",
+          "Prime"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_10",
+        "glyph": "Eldritch Sight",
+        "glyph_level": 150,
+        "nodes": [
+          "Rune Charged",
+          "Jagged Claws",
+          "Auxiliary Flesh",
+          "Mortal Lock",
+          "Dominion",
+          "Armored Summons",
+          "Eye of Newt"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_02",
+        "glyph": "Demonologist",
+        "glyph_level": 150,
+        "nodes": [
+          "Hellish Recovery",
+          "Demon Wall",
+          "Demonic Spicules",
+          "Advantage",
+          "Spined",
+          "Blood Ward",
+          "Void Amplifier"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_03",
+        "glyph": "Unbound",
+        "glyph_level": 150,
+        "nodes": [
+          "Fiendish Renewal",
+          "Tortured",
+          "Bolster",
+          "Dynamism",
+          "Augmented",
+          "Demonskin",
+          "Eldrich Carapace"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_01",
+        "glyph": "Vanguard",
+        "glyph_level": 150,
+        "nodes": [
+          "Pact Sign",
+          "Chaining",
+          "Recovery Seal",
+          "Shielding Sigil",
+          "Fathomless",
+          "Binding",
+          "Flesh Guard"
+        ]
+      }
+    ]
   }
 }

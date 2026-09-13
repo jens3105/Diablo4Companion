@@ -120,5 +120,178 @@
       "Counterattack (2 charges)",
       "The Devourer (ultimate, endgame variant)"
     ]
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "pnghh206",
+    "profile_name": "Endgame",
+    "class_name": "Spiritborn",
+    "skill_bar": [
+      "Stinger",
+      "The Hunter",
+      "Scourge",
+      "Counterattack",
+      "Ravager",
+      "Toxic Skin"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Ravager",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Flurry of Claws",
+          "Vigor Generation",
+          "Ferocity Maximum"
+        ]
+      },
+      {
+        "skill": "Stinger",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Potent Sting",
+          "Healing and Vulnerable",
+          "Weakened Damage Bonus"
+        ]
+      },
+      {
+        "skill": "Toxic Skin",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Skuttle Bug",
+          "Healing",
+          "Vigor Generation"
+        ]
+      },
+      {
+        "skill": "Concussive Stomp",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Debilitate",
+          "Barrier Generation",
+          "Resolve Generation"
+        ]
+      },
+      {
+        "skill": "Counterattack",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Asymmetrical Warfare",
+          "Damage Over Time Reduction",
+          "Duration Increase"
+        ]
+      },
+      {
+        "skill": "Crushing Hand",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "100 Crushing Hands",
+          "Barrier",
+          "Resolve"
+        ]
+      },
+      {
+        "skill": "Scourge",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Hive Mind",
+          "Healing",
+          "Weaken"
+        ]
+      },
+      {
+        "skill": "The Hunter",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Relentless Pursuit",
+          "Vigor Generation",
+          "Healing"
+        ]
+      },
+      {
+        "skill": "Vortex",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "1000 Year Storm",
+          "Knock Down",
+          "Vigor Generation"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Spirit_0",
+        "glyph": "Ritual",
+        "glyph_level": 150,
+        "nodes": [
+          "Skillful",
+          "Spiritual",
+          "Tenacity",
+          "Prime"
+        ]
+      },
+      {
+        "board": "Paragon_Spirit_08",
+        "glyph": "Colossal",
+        "glyph_level": 150,
+        "nodes": [
+          "Concentrated",
+          "Eager Prey",
+          "Sprightful",
+          "Denial",
+          "Resilience",
+          "Opportunist",
+          "Prodigy's Tempo"
+        ]
+      },
+      {
+        "board": "Paragon_Spirit_03",
+        "glyph": "Spirit",
+        "glyph_level": 150,
+        "nodes": [
+          "Primal Ward",
+          "Slayer",
+          "Raptor",
+          "Viscous Shield",
+          "Fearless",
+          "Bristle",
+          "Sentinel"
+        ]
+      },
+      {
+        "board": "Paragon_Spirit_07",
+        "glyph": "Fitness",
+        "glyph_level": 150,
+        "nodes": [
+          "Elementalist",
+          "Training",
+          "Ruinous",
+          "Convergence",
+          "Denial",
+          "Spearhead",
+          "Skillful"
+        ]
+      },
+      {
+        "board": "Paragon_Spirit_01",
+        "glyph": "Canny",
+        "glyph_level": 150,
+        "nodes": [
+          "Rampage",
+          "Master",
+          "Training",
+          "In-Fighter",
+          "Incombustible"
+        ]
+      }
+    ]
   }
 }

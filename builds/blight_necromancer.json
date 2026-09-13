@@ -195,5 +195,169 @@
       "Golem",
       "Skeleton Mage"
     ]
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "36dlbr0w",
+    "profile_name": "Endgame",
+    "class_name": "Necromancer",
+    "skill_bar": [
+      "Bone Prison",
+      "Skeleton Mage",
+      "Sever",
+      "Bone Storm",
+      "Golem",
+      "Blight"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Blight",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Lucky Hit Chance",
+          "Volatile Blood",
+          "Area Damage Bonus"
+        ]
+      },
+      {
+        "skill": "Bone Prison",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Essence Generation",
+          "Life Imprisonment",
+          "Vulnerable"
+        ]
+      },
+      {
+        "skill": "Bone Storm",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Duration Increase",
+          "Roll The Bones",
+          "Vulnerable"
+        ]
+      },
+      {
+        "skill": "Skeleton Mage",
+        "rank": 10,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Critical Strike Chance",
+          "Gift of Death",
+          "Ferocity, Resolve, or Overpower"
+        ]
+      },
+      {
+        "skill": "Decrepify",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Resolve",
+          "Life Tap",
+          "Cooldown Reduction"
+        ]
+      },
+      {
+        "skill": "Golem",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Unstoppable",
+          "Gravebloom",
+          "Resolve, Overpower, or Ferocity"
+        ]
+      },
+      {
+        "skill": "Iron Maiden",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Ferocity and Overpower",
+          "Blood Maiden",
+          "Execute and Fortify"
+        ]
+      },
+      {
+        "skill": "Sever",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Cost Reduction",
+          "Inexorable Reaper",
+          "Crowd Control and Corpse Generation"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Necro_00",
+        "glyph": "Exploit",
+        "glyph_level": 150,
+        "nodes": [
+          "Knowledge",
+          "Grasp",
+          "Resilience",
+          "Prime"
+        ]
+      },
+      {
+        "board": "Paragon_Necro_07",
+        "glyph": "Corporeal",
+        "glyph_level": 150,
+        "nodes": [
+          "Guarded Advance",
+          "Powerhouse",
+          "Suffused Resilience",
+          "Bloodbath",
+          "Thick Hide",
+          "Hardened",
+          "Remedy"
+        ]
+      },
+      {
+        "board": "Paragon_Necro_10",
+        "glyph": "Dominate",
+        "glyph_level": 150,
+        "nodes": [
+          "Eradicate",
+          "Preservation",
+          "Relentless",
+          "Frailty",
+          "Meticulous",
+          "Shrouded"
+        ]
+      },
+      {
+        "board": "Paragon_Necro_04",
+        "glyph": "Amplify",
+        "glyph_level": 150,
+        "nodes": [
+          "Deathmarked",
+          "Seethe",
+          "Deathbringer",
+          "Restorative",
+          "Scent of Death",
+          "Suffused Resilience",
+          "Shrouded"
+        ]
+      },
+      {
+        "board": "Paragon_Necro_03",
+        "glyph": "Essence",
+        "glyph_level": 150,
+        "nodes": [
+          "Blood Clotting",
+          "Stifle",
+          "Targeted",
+          "Flesh-eater",
+          "Rend",
+          "Recuperate",
+          "Erudite"
+        ]
+      }
+    ]
   }
 }

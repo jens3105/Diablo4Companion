@@ -109,5 +109,175 @@
       "Blood Mist/Sever",
       "Army of the Dead"
     ]
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "7xf3kf0h",
+    "profile_name": "Mages",
+    "class_name": "Necromancer",
+    "skill_bar": [
+      "Skeleton Warrior",
+      "Blight",
+      "Golem",
+      "Sever",
+      "Skeleton Mage",
+      "Army of the Dead"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Golem",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Unstoppable",
+          "Gargantua",
+          "Resolve, Overpower, or Ferocity"
+        ]
+      },
+      {
+        "skill": "Skeleton Mage",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Duration Damage Bonus",
+          "Coven",
+          "Crowd Control Damage Bonus"
+        ]
+      },
+      {
+        "skill": "Skeleton Warrior",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Damage Bonus",
+          "Litany of Death",
+          "Vulnerable"
+        ]
+      },
+      {
+        "skill": "Blood Mist",
+        "rank": 8,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Critical Strike",
+          "Blood Transfusion",
+          "Vulnerable and Slow"
+        ]
+      },
+      {
+        "skill": "Army of the Dead",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Cooldown Reduction",
+          "Unyielding Commander",
+          "Passive Bonus"
+        ]
+      },
+      {
+        "skill": "Blight",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Whirlpool"
+        ]
+      },
+      {
+        "skill": "Decrepify",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Resolve",
+          "Dizzying Curse",
+          "Critical Strike Chance"
+        ]
+      },
+      {
+        "skill": "Iron Maiden",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Ferocity and Overpower",
+          "Blood Maiden",
+          "Execute and Fortify"
+        ]
+      },
+      {
+        "skill": "Sever",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Cost Reduction",
+          "Inexorable Reaper",
+          "Crowd Control and Corpse Generation"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Necro_00",
+        "glyph": "Abyssal",
+        "glyph_level": 150,
+        "nodes": [
+          "Knowledge",
+          "Grasp",
+          "Resilience",
+          "Prime"
+        ]
+      },
+      {
+        "board": "Paragon_Necro_08",
+        "glyph": "Mage",
+        "glyph_level": 150,
+        "nodes": [
+          "Malediction",
+          "Gnawing Darkness",
+          "Gloom",
+          "Dragging Shadows",
+          "Restorative",
+          "Wither"
+        ]
+      },
+      {
+        "board": "Paragon_Necro_04",
+        "glyph": "Essence",
+        "glyph_level": 150,
+        "nodes": [
+          "Deathmarked",
+          "Seethe",
+          "Deathbringer",
+          "Restorative",
+          "Scent of Death",
+          "Suffused Resilience",
+          "Shrouded"
+        ]
+      },
+      {
+        "board": "Paragon_Necro_01",
+        "glyph": "Deadraiser",
+        "glyph_level": 150,
+        "nodes": [
+          "Overlord",
+          "Custody",
+          "Infused Caster",
+          "Puppeteer",
+          "Cult Leader",
+          "Erudite"
+        ]
+      },
+      {
+        "board": "Paragon_Necro_10",
+        "glyph": "Eliminator",
+        "glyph_level": 150,
+        "nodes": [
+          "Eradicate",
+          "Preservation",
+          "Relentless",
+          "Frailty",
+          "Meticulous",
+          "Shrouded"
+        ]
+      }
+    ]
   }
 }

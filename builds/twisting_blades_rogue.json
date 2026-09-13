@@ -86,5 +86,173 @@
       "Dash/Shadow Step",
       "Blade Shift"
     ]
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "zjewes0w",
+    "profile_name": "Endgame",
+    "class_name": "Rogue",
+    "skill_bar": [
+      "Puncture",
+      "Twisting Blades",
+      "Shadow Step",
+      "Dash",
+      "Poison Imbuement",
+      "Shadow Clone"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Poison Imbuement",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Toxic Touch"
+        ]
+      },
+      {
+        "skill": "Shadow Clone",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Relentless",
+          "Cooldown",
+          "Unstoppable"
+        ]
+      },
+      {
+        "skill": "Twisting Blades",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Bladedancer",
+          "Resolve",
+          "Damage Increase and Execute"
+        ]
+      },
+      {
+        "skill": "Dark Shroud",
+        "rank": 9,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Overflow",
+          "Consume Chance",
+          "Movement Speed"
+        ]
+      },
+      {
+        "skill": "Cold Imbuement",
+        "rank": 5,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Buffered Battery"
+        ]
+      },
+      {
+        "skill": "Dash",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Detonation",
+          "Charges and Cooldown Reduction"
+        ]
+      },
+      {
+        "skill": "Puncture",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Blight Burst",
+          "Crowd Control",
+          "Overpower"
+        ]
+      },
+      {
+        "skill": "Shadow Imbuement",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Endemic"
+        ]
+      },
+      {
+        "skill": "Shadow Step",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Artifice",
+          "Cooldown",
+          "Unstoppable"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Rogue_00",
+        "glyph": "Versatility",
+        "glyph_level": 150,
+        "nodes": [
+          "Skillful",
+          "Outlaw",
+          "Resilience",
+          "Prime"
+        ]
+      },
+      {
+        "board": "Paragon_Rogue_03",
+        "glyph": "Fluidity",
+        "glyph_level": 150,
+        "nodes": [
+          "Calculated",
+          "Deviant",
+          "Devious",
+          "Cheap Shot",
+          "Artifice",
+          "Safeguard",
+          "Spearhead"
+        ]
+      },
+      {
+        "board": "Paragon_Rogue_01",
+        "glyph": "Tracker",
+        "glyph_level": 150,
+        "nodes": [
+          "Potent",
+          "Concoction",
+          "Suffused Resilience",
+          "Ready Supply",
+          "Eldritch Bounty",
+          "Restorative",
+          "Imbuer"
+        ]
+      },
+      {
+        "board": "Paragon_Rogue_07",
+        "glyph": "Canny",
+        "glyph_level": 150,
+        "nodes": [
+          "Defensive Stance",
+          "Toughened",
+          "Unassailable",
+          "Exploit Weakness",
+          "Exploit",
+          "Artifice",
+          "Misery"
+        ]
+      },
+      {
+        "board": "Paragon_Rogue_10",
+        "glyph": "Bane",
+        "glyph_level": 150,
+        "nodes": [
+          "Giant Killer",
+          "Assassin",
+          "Ranger",
+          "Brawler",
+          "Danse Macabre",
+          "Acrobat",
+          "Skulker"
+        ]
+      }
+    ]
   }
 }

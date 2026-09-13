@@ -148,5 +148,139 @@
       "Sigil of Summons (extension)",
       "Evade (transformation trigger)"
     ]
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "4if62z0h",
+    "profile_name": "Endgame ",
+    "class_name": "Warlock",
+    "skill_bar": [
+      "Command Ae'grom",
+      "Command Fallen",
+      "Sigil of Summons",
+      "Tortured Wretch",
+      "Rampage",
+      "Metamorphosis"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Command Fallen",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Damage Per Demon",
+          "Dominance",
+          "Mega Lunatic"
+        ]
+      },
+      {
+        "skill": "Metamorphosis",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Damage Scaling",
+          "Dominance",
+          "Destruction Demon"
+        ]
+      },
+      {
+        "skill": "Sigil of Summons",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Stronger Summons",
+          "Damage",
+          "Summon Hellwyrm"
+        ]
+      },
+      {
+        "skill": "Tortured Wretch",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Duration",
+          "Cost Reduction",
+          "Punching Bag"
+        ]
+      },
+      {
+        "skill": "Rampage",
+        "rank": 8,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Lesser Demon Wrath",
+          "Elite Hit Chance",
+          "Demonic Smash"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Warlock_00",
+        "glyph": "Vanguard",
+        "glyph_level": 150,
+        "nodes": [
+          "Warped",
+          "Domination",
+          "Resilience",
+          "Prime"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_02",
+        "glyph": "Death Aura",
+        "glyph_level": 150,
+        "nodes": [
+          "Hellish Recovery",
+          "Demon Wall",
+          "Demonic Spicules",
+          "Advantage",
+          "Spined",
+          "Blood Ward",
+          "Void Amplifier"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_01",
+        "glyph": "Demonologist",
+        "glyph_level": 150,
+        "nodes": [
+          "Pact Sign",
+          "Chaining",
+          "Recovery Seal",
+          "Shielding Sigil",
+          "Fathomless",
+          "Binding",
+          "Flesh Guard"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_10",
+        "glyph": "Eliminator",
+        "glyph_level": 150,
+        "nodes": [
+          "Jagged Claws",
+          "Auxiliary Flesh",
+          "Mortal Lock",
+          "Dominion",
+          "Armored Summons",
+          "Eye of Newt"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_03",
+        "glyph": "Eldritch Sight",
+        "glyph_level": 150,
+        "nodes": [
+          "Fiendish Renewal",
+          "Tortured",
+          "Bolster",
+          "Dynamism",
+          "Augmented",
+          "Demonskin",
+          "Eldrich Carapace"
+        ]
+      }
+    ]
   }
 }

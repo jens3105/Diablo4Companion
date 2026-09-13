@@ -97,5 +97,132 @@
       "Challenging Shout",
       "Call of the Ancients"
     ]
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "cdjg3p03",
+    "profile_name": "Endgame",
+    "class_name": "Barbarian",
+    "skill_bar": [
+      "Leap",
+      "Hammer of the Ancients",
+      "Rallying Cry",
+      "War Cry",
+      "Challenging Shout",
+      "Call of the Ancients"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Challenging Shout",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Talic",
+          "Fury Generation",
+          "Weaken"
+        ]
+      },
+      {
+        "skill": "Hammer of the Ancients",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Ancestral",
+          "Size and Damage Bonus",
+          "Overpower"
+        ]
+      },
+      {
+        "skill": "Rallying Cry",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Madawc",
+          "Fortify",
+          "Fury Gain"
+        ]
+      },
+      {
+        "skill": "War Cry",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Korlic",
+          "Ferocity",
+          "Duration Increase"
+        ]
+      },
+      {
+        "skill": "Call of the Ancients",
+        "rank": 4,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Empowered",
+          "Damage Bonus",
+          "Attack Speed and Damage Bonus"
+        ]
+      },
+      {
+        "skill": "Leap",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Mosh",
+          "Arsenal Bonus",
+          "Pull"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Barb_00",
+        "glyph": "Imbiber",
+        "glyph_level": 25,
+        "nodes": [
+          "Iron Strength",
+          "Brawn"
+        ]
+      },
+      {
+        "board": "Paragon_Barb_04",
+        "glyph": "Dominate",
+        "glyph_level": 25,
+        "nodes": [
+          "Destroyer",
+          "Decimator"
+        ]
+      },
+      {
+        "board": "Paragon_Barb_06",
+        "glyph": "Wrath",
+        "glyph_level": 25,
+        "nodes": [
+          "Brash",
+          "Flawless Technique",
+          "Slayer",
+          "Heavy Blows"
+        ]
+      },
+      {
+        "board": "Paragon_Barb_02",
+        "glyph": "Challenger",
+        "glyph_level": 25,
+        "nodes": [
+          "Blood Rage",
+          "Wrath"
+        ]
+      },
+      {
+        "board": "Paragon_Barb_03",
+        "glyph": "Might",
+        "glyph_level": 25,
+        "nodes": [
+          "Tenacity",
+          "Fierce",
+          "Carnage",
+          "Berserker"
+        ]
+      }
+    ]
   }
 }

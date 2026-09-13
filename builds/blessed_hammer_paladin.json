@@ -109,5 +109,147 @@
       "Aegis",
       "Falling Star"
     ]
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "ykct5706",
+    "profile_name": "Endgame",
+    "class_name": "Paladin",
+    "skill_bar": [
+      "Aegis",
+      "Blessed Hammer",
+      "Fanaticism Aura",
+      "Defiance Aura",
+      "Falling Star",
+      "Arbiter of Justice"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Arbiter of Justice",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Cooldown Reduction",
+          "Duration",
+          "Seraph's Wings"
+        ]
+      },
+      {
+        "skill": "Blessed Hammer",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Cast Speed",
+          "Disciple's Halo",
+          "Damage Bonus"
+        ]
+      },
+      {
+        "skill": "Defiance Aura",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Bonus Healing",
+          "Rite of Prayer",
+          "Maximum Life"
+        ]
+      },
+      {
+        "skill": "Fanaticism Aura",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Extra Passive Stack",
+          "Rite of Humility",
+          "Resource Generation"
+        ]
+      },
+      {
+        "skill": "Aegis",
+        "rank": 5,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Duration",
+          "Stay Resolute",
+          "Cooldown Reduction"
+        ]
+      },
+      {
+        "skill": "Falling Star",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Cooldown Reduction",
+          "Additional Charge"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Paladin_00",
+        "glyph": "Spirit",
+        "glyph_level": 150,
+        "nodes": [
+          "Raw Power",
+          "Iron Strength",
+          "Tenacity",
+          "Brawn"
+        ]
+      },
+      {
+        "board": "Paragon_Paladin_09",
+        "glyph": "Canny",
+        "glyph_level": 150,
+        "nodes": [
+          "Champion",
+          "Fortitude",
+          "Constitution",
+          "Blurring",
+          "Beacon",
+          "Spiked Shield",
+          "Sturdy"
+        ]
+      },
+      {
+        "board": "Paragon_Paladin_02",
+        "glyph": "Apostle",
+        "glyph_level": 150,
+        "nodes": [
+          "Stalwart",
+          "Shieldbearer",
+          "Shield Bearer",
+          "Knight",
+          "Constrict",
+          "Bludgeoning",
+          "Growth"
+        ]
+      },
+      {
+        "board": "Paragon_Paladin_06",
+        "glyph": "Exploit",
+        "glyph_level": 150,
+        "nodes": [
+          "Cull",
+          "Relentless",
+          "Inured",
+          "Defiance",
+          "Endure",
+          "Dervish"
+        ]
+      },
+      {
+        "board": "Paragon_Paladin_01",
+        "glyph": "Arbiter",
+        "glyph_level": 150,
+        "nodes": [
+          "Knight",
+          "Ironclad",
+          "Insulate",
+          "Stalwart",
+          "Castle",
+          "Defiance"
+        ]
+      }
+    ]
   }
 }

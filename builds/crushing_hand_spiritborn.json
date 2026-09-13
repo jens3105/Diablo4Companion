@@ -138,5 +138,179 @@
       "Counterattack (both charges)",
       "Crushing Hand (spam)"
     ]
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "49cgs20w",
+    "profile_name": "Endgame",
+    "class_name": "Spiritborn",
+    "skill_bar": [
+      "Crushing Hand",
+      "The Devourer",
+      "Scourge",
+      "Ravager",
+      "Counterattack",
+      "Toxic Skin"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Crushing Hand",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Unrelenting Assault",
+          "Barrier",
+          "Increased Cost and Damage"
+        ]
+      },
+      {
+        "skill": "Ravager",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Flurry of Claws",
+          "Vigor Generation",
+          "Ferocity Maximum"
+        ]
+      },
+      {
+        "skill": "Toxic Skin",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Skuttle Bug",
+          "Healing",
+          "Vigor Generation"
+        ]
+      },
+      {
+        "skill": "Concussive Stomp",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Crushing Blow",
+          "Barrier Generation",
+          "Resolve Generation"
+        ]
+      },
+      {
+        "skill": "Counterattack",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Asymmetrical Warfare",
+          "Damage Over Time Reduction",
+          "Duration Increase"
+        ]
+      },
+      {
+        "skill": "Quill Volley",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Claw Volley",
+          "Bonus Feathers",
+          "Returning Feathers"
+        ]
+      },
+      {
+        "skill": "Scourge",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Hive Mind",
+          "Healing",
+          "Weaken"
+        ]
+      },
+      {
+        "skill": "The Devourer",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Sky and Soil",
+          "Healing",
+          "Instant Kill"
+        ]
+      },
+      {
+        "skill": "Vortex",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "1000 Year Storm",
+          "Knock Down",
+          "Vigor Generation"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Spirit_0",
+        "glyph": "Ritual",
+        "glyph_level": 150,
+        "nodes": [
+          "Skillful",
+          "Spiritual",
+          "Tenacity",
+          "Prime"
+        ]
+      },
+      {
+        "board": "Paragon_Spirit_08",
+        "glyph": "Hubris",
+        "glyph_level": 150,
+        "nodes": [
+          "Concentrated",
+          "Eager Prey",
+          "Sprightful",
+          "Denial",
+          "Resilience",
+          "Opportunist",
+          "Prodigy's Tempo"
+        ]
+      },
+      {
+        "board": "Paragon_Spirit_03",
+        "glyph": "Spirit",
+        "glyph_level": 150,
+        "nodes": [
+          "Primal Ward",
+          "Slayer",
+          "Raptor",
+          "Viscous Shield",
+          "Fearless",
+          "Bristle",
+          "Sentinel"
+        ]
+      },
+      {
+        "board": "Paragon_Spirit_07",
+        "glyph": "Colossal",
+        "glyph_level": 150,
+        "nodes": [
+          "Elementalist",
+          "Training",
+          "Ruinous",
+          "Convergence",
+          "Denial",
+          "Spearhead",
+          "Skillful"
+        ]
+      },
+      {
+        "board": "Paragon_Spirit_05",
+        "glyph": "Outmatch",
+        "glyph_level": 150,
+        "nodes": [
+          "Revealing",
+          "Haven",
+          "Patience",
+          "Grounded",
+          "Artifice",
+          "Venom Weaver"
+        ]
+      }
+    ]
   }
 }

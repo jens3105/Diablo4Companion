@@ -137,5 +137,157 @@
       "All Resistances"
     ],
     "skill_bar": null
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "qnfk040h",
+    "profile_name": "Endgame",
+    "class_name": "Warlock",
+    "skill_bar": [
+      "Bombardment",
+      "Umbral Chains",
+      "Command Valloch",
+      "Dark Prison",
+      "Rampage",
+      "Apocalypse"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Apocalypse",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Double Blast",
+          "Shared Damage",
+          "Annihilation"
+        ]
+      },
+      {
+        "skill": "Dark Prison",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Fortify",
+          "Weaken",
+          "Chain Aura"
+        ]
+      },
+      {
+        "skill": "Sigil of Chaos",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Volatility Casts",
+          "Volatility Duration",
+          "Hellfire Aura"
+        ]
+      },
+      {
+        "skill": "Umbral Chains",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Wrath Refund",
+          "Long Range Slow",
+          "Chain Whips"
+        ]
+      },
+      {
+        "skill": "Bombardment",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Additional Demon",
+          "Focused Target",
+          "Endless Barrage"
+        ]
+      },
+      {
+        "skill": "Rampage",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Lesser Demon Wrath",
+          "Demonic Smash"
+        ]
+      },
+      {
+        "skill": "Sigil of Subversion",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Movement Speed",
+          "Slow",
+          "Infiltration Trails"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Warlock_00",
+        "glyph": "Wrath",
+        "glyph_level": 150,
+        "nodes": [
+          "Warped",
+          "Domination",
+          "Resilience",
+          "Prime"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_04",
+        "glyph": "Empowered",
+        "glyph_level": 150,
+        "nodes": [
+          "Burn",
+          "Blaze",
+          "Flames Devour",
+          "Charred Flesh",
+          "Pyrosis",
+          "Infernal Ward",
+          "Heat Shield"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_07",
+        "glyph": "Unbound",
+        "glyph_level": 150,
+        "nodes": [
+          "Descent",
+          "Dark Sign",
+          "Patient Violence",
+          "Ritualism",
+          "Gethsemane",
+          "Emergence",
+          "Vicious Cycle"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_06",
+        "glyph": "Hellforge",
+        "glyph_level": 150,
+        "nodes": [
+          "Death Mark",
+          "Greater Hex",
+          "Hexguard",
+          "Mending Ward",
+          "Perilous Depths",
+          "Forbidden Contact"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_08",
+        "glyph": "Occultist",
+        "glyph_level": 150,
+        "nodes": [
+          "Overload",
+          "Control",
+          "Mutation",
+          "Distortion Wave",
+          "Entropy Collapse",
+          "Chaos"
+        ]
+      }
+    ]
   }
 }

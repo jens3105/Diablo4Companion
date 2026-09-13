@@ -17,6 +17,9 @@ Desktop.ini
 # Logs
 *.log
 
+# Maxroll data-decoder cache (large downloaded/fetched JSON, regenerable)
+.cache/
+
 # Build
 build/
 dist/

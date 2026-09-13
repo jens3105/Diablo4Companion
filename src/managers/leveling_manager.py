@@ -28,7 +28,16 @@ class LevelingManager:
                 "key_aspects": [{"name": str, "note": str}, ...],
                 "stat_priority": [str, ...] | None,
                 "skill_bar": [str, ...] | None,
-            } | None
+            } | None,
+            "verified_build": {
+                "source": "maxroll_planner", "profile_id": str, "profile_name": str,
+                "skill_bar": [str, ...],
+                "skill_allocation": [{"skill": str, "rank": int, "max_rank": int,
+                                       "upgrades_chosen": [str, ...]}, ...],
+                "paragon_boards": [{"board": str, "glyph": str, "glyph_level": int,
+                                     "nodes": [str, ...]}, ...],
+            } | None  (only present for builds with a genuine decoded Maxroll
+                       Planner profile - see scripts/maxroll_data_decoder.py)
         }
 
     Builds are grouped by ``class_name`` for the two-step class -> build
@@ -236,6 +245,28 @@ class LevelingManager:
             return {"boards": [], "glyphs": [], "note": ""}
 
         return build.get("paragon") or {"boards": [], "glyphs": [], "note": ""}
+
+    def get_verified_build(self, build_name: str | None = None) -> dict | None:
+        """Return the ``verified_build`` dict for a build, or ``None`` when
+        it has none. Unlike ``milestones``/``paragon``/``gear`` (all
+        derived from Maxroll's guide *prose*, which never states exact
+        skill-tree ranks or paragon node placements), this is decoded
+        straight from a real, public Maxroll Planner profile - see
+        ``scripts/maxroll_data_decoder.py``. Only present for builds where
+        a genuine profile ID was found and cross-checked; absent
+        (``None``) for the rest, so callers should skip the UI section
+        entirely rather than show a placeholder."""
+
+        key = self._normalize(build_name) if build_name else self._normalize(
+            self.current_build_name or ""
+        )
+
+        build = self._builds.get(key)
+
+        if build is None:
+            return None
+
+        return build.get("verified_build")
 
     def get_gear_data(self, build_name: str | None = None) -> dict | None:
         """Return the raw ``gear`` dict for the Gear & Powers tab, or

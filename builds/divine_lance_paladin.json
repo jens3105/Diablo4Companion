@@ -99,5 +99,158 @@
       "Fortress",
       "Falling Star"
     ]
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "5lhrtl0w",
+    "profile_name": "Endgame",
+    "class_name": "Paladin",
+    "skill_bar": [
+      "Falling Star",
+      "Divine Lance",
+      "Fanaticism Aura",
+      "Defiance Aura",
+      "Holy Light Aura",
+      "Fortress"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Defiance Aura",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Bonus Healing",
+          "Rite of Prayer",
+          "Maximum Life"
+        ]
+      },
+      {
+        "skill": "Divine Lance",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Stacking Damage",
+          "Zealous Joust",
+          "Damage Bonus"
+        ]
+      },
+      {
+        "skill": "Fanaticism Aura",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Extra Passive Stack",
+          "Rite of Humility",
+          "Potency"
+        ]
+      },
+      {
+        "skill": "Fortress",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Resolve Damage Bonus",
+          "Unstoppable",
+          "Barricade"
+        ]
+      },
+      {
+        "skill": "Falling Star",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Cooldown Reduction",
+          "Fanatic Descent",
+          "Additional Charge"
+        ]
+      },
+      {
+        "skill": "Holy Light Aura",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Rite of Mercy",
+          "Additional Bounce"
+        ]
+      },
+      {
+        "skill": "Rally",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Words of Inspiration",
+          "Critical Strike Chance",
+          "Unhindered and Movement Speed"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Paladin_00",
+        "glyph": "Spirit",
+        "glyph_level": 150,
+        "nodes": [
+          "Raw Power",
+          "Iron Strength",
+          "Tenacity",
+          "Brawn"
+        ]
+      },
+      {
+        "board": "Paragon_Paladin_01",
+        "glyph": "Chip",
+        "glyph_level": 150,
+        "nodes": [
+          "Knight",
+          "Ironclad",
+          "Insulate",
+          "Stalwart",
+          "Castle",
+          "Grappler",
+          "Defiance"
+        ]
+      },
+      {
+        "board": "Paragon_Paladin_06",
+        "glyph": "Resplendence",
+        "glyph_level": 150,
+        "nodes": [
+          "Cull",
+          "Relentless",
+          "Inured",
+          "Defiance",
+          "Endure",
+          "Dervish"
+        ]
+      },
+      {
+        "board": "Paragon_Paladin_09",
+        "glyph": "Exploit",
+        "glyph_level": 150,
+        "nodes": [
+          "Champion",
+          "Fortitude",
+          "Constitution",
+          "Blurring",
+          "Beacon",
+          "Spiked Shield",
+          "Sturdy"
+        ]
+      },
+      {
+        "board": "Paragon_Paladin_03",
+        "glyph": "Feverous",
+        "glyph_level": 150,
+        "nodes": [
+          "Constitution",
+          "Sturdy",
+          "Knight",
+          "Fervent",
+          "Fencing",
+          "Surgical",
+          "Skirmish"
+        ]
+      }
+    ]
   }
 }

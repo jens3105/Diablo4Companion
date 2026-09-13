@@ -126,5 +126,147 @@
       "All Resistance"
     ],
     "skill_bar": null
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "jygr6t0h",
+    "profile_name": "Endgame",
+    "class_name": "Warlock",
+    "skill_bar": [
+      "Metamorphosis",
+      "Command Fallen",
+      "Command Ae'grom",
+      "Sigil of Summons",
+      "Nether Step",
+      "Rampage"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Bombardment",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Additional Demon",
+          "Telekinesis ",
+          "Brutality"
+        ]
+      },
+      {
+        "skill": "Hellion Sting",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Eviscerate",
+          "Damage",
+          "Tail Spikes"
+        ]
+      },
+      {
+        "skill": "Nether Step",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Damage Reduction",
+          "Movement Speed"
+        ]
+      },
+      {
+        "skill": "Rampage",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Lesser Demon Wrath",
+          "Elite Hit Chance",
+          "Shockwave"
+        ]
+      },
+      {
+        "skill": "Sigil of Subversion",
+        "rank": 5,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Movement Speed",
+          "Cast Range",
+          "Seekers"
+        ]
+      },
+      {
+        "skill": "Sigil of Summons",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Cooldown",
+          "Damage",
+          "Summon Hellwyrm"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Warlock_00",
+        "glyph": "Ichor Carapace",
+        "glyph_level": 150,
+        "nodes": [
+          "Warped",
+          "Domination",
+          "Resilience",
+          "Prime"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_01",
+        "glyph": "Death Aura",
+        "glyph_level": 150,
+        "nodes": [
+          "Pact Sign",
+          "Chaining",
+          "Recovery Seal",
+          "Shielding Sigil",
+          "Fathomless",
+          "Binding",
+          "Flesh Guard"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_02",
+        "glyph": "Demonologist",
+        "glyph_level": 150,
+        "nodes": [
+          "Hellish Recovery",
+          "Demon Wall",
+          "Demonic Spicules",
+          "Advantage",
+          "Spined",
+          "Blood Ward",
+          "Void Amplifier"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_10",
+        "glyph": "Eliminator",
+        "glyph_level": 150,
+        "nodes": [
+          "Jagged Claws",
+          "Auxiliary Flesh",
+          "Mortal Lock",
+          "Dominion",
+          "Armored Summons",
+          "Eye of Newt"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_06",
+        "glyph": "Blood Frenzy",
+        "glyph_level": 150,
+        "nodes": [
+          "Death Mark",
+          "Greater Hex",
+          "Hexguard",
+          "Mending Ward",
+          "Perilous Depths",
+          "Forbidden Contact"
+        ]
+      }
+    ]
   }
 }

@@ -136,5 +136,157 @@
       "Metamorphosis",
       "Sigil of Summons"
     ]
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "h0gp030h",
+    "profile_name": "Endgame",
+    "class_name": "Warlock",
+    "skill_bar": [
+      "Profane Sentinel",
+      "Dread Claws",
+      "Command Laalish",
+      "Rampage",
+      "Sigil of Summons",
+      "Metamorphosis"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Dread Claws",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Ambush",
+          "Damage",
+          "Enveloping Terror"
+        ]
+      },
+      {
+        "skill": "Metamorphosis",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Damage Scaling",
+          "Dominance",
+          "Terror Demon"
+        ]
+      },
+      {
+        "skill": "Nether Step",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Damage Reduction",
+          "Movement Speed",
+          "Shadow Recall"
+        ]
+      },
+      {
+        "skill": "Profane Sentinel",
+        "rank": 8,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Single Target Damage",
+          "Wide Beam",
+          "Sentry"
+        ]
+      },
+      {
+        "skill": "Rampage",
+        "rank": 8,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Killstreak Damage",
+          "Elite Hit Chance",
+          "Abyssal Titan"
+        ]
+      },
+      {
+        "skill": "Dark Prison",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Fortify",
+          "Weaken",
+          "Chain Aura"
+        ]
+      },
+      {
+        "skill": "Sigil of Summons",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Cooldown",
+          "Summon Hellwyrm"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Warlock_00",
+        "glyph": "Abyssal",
+        "glyph_level": 150,
+        "nodes": [
+          "Warped",
+          "Domination",
+          "Resilience",
+          "Prime"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_06",
+        "glyph": "Unbound",
+        "glyph_level": 150,
+        "nodes": [
+          "Resist",
+          "Death Mark",
+          "Greater Hex",
+          "Hexguard",
+          "Mending Ward",
+          "Perilous Depths",
+          "Forbidden Contact"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_05",
+        "glyph": "Demonologist",
+        "glyph_level": 150,
+        "nodes": [
+          "Overmind",
+          "Coercion",
+          "Manipulation",
+          "Mental Barrier",
+          "Influence",
+          "Cycle",
+          "Voodoo"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_02",
+        "glyph": "Destruction",
+        "glyph_level": 150,
+        "nodes": [
+          "Hellish Recovery",
+          "Demon Wall",
+          "Demonic Spicules",
+          "Advantage",
+          "Spined",
+          "Blood Ward",
+          "Void Amplifier"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_10",
+        "glyph": "Mastermind",
+        "glyph_level": 150,
+        "nodes": [
+          "Jagged Claws",
+          "Auxiliary Flesh",
+          "Mortal Lock",
+          "Dominion",
+          "Eye of Newt"
+        ]
+      }
+    ]
   }
 }

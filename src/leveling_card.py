@@ -624,7 +624,12 @@ class LevelingCard(BaseCard):
         self.status_footer_label.setVisible(bool(footer_text))
 
     def set_paragon(
-        self, boards: list[dict], glyphs: list[str], note: str, completed_boards: set[int]
+        self,
+        boards: list[dict],
+        glyphs: list[str],
+        note: str,
+        completed_boards: set[int],
+        verified_build: dict | None = None,
     ):
         """Populate the Paragon tab as the same kind of ✓/→/○ checklist
         used by Leveling/Skills, one row per board in ``paragon.boards``
@@ -633,7 +638,12 @@ class LevelingCard(BaseCard):
         caller in its own QSettings key, separate from the milestone
         completed-levels key) - Maxroll mostly only publishes board
         *names* + a free-text note, not node-by-node data, so this is
-        the honest level of detail for a first version."""
+        the honest level of detail for a first version.
+
+        ``verified_build`` (see ``LevelingManager.get_verified_build``) -
+        when present, appends a real, decoded glyph-per-board +
+        Rare/Legendary-node list below the usual prose-derived section;
+        omitted entirely (no placeholder) when ``None``."""
 
         layout = self.paragon_layout
         container = self.paragon_container
@@ -655,6 +665,45 @@ class LevelingCard(BaseCard):
 
         if note:
             self._add_row(layout, container, note)
+
+        self._render_verified_paragon(layout, container, verified_build)
+
+    def _render_verified_paragon(
+        self, layout: QVBoxLayout, container: QWidget, verified_build: dict | None
+    ):
+        """Append the "Verified Build (Maxroll Planner)" paragon section -
+        real glyph-per-board placement plus each board's Rare/Legendary
+        nodes, decoded from a real Maxroll Planner profile (see
+        ``scripts/maxroll_data_decoder.py``). Does nothing when
+        ``verified_build`` is ``None`` (most builds)."""
+
+        if not verified_build:
+            return
+
+        boards = verified_build.get("paragon_boards") or []
+        if not boards:
+            return
+
+        self._add_section_header(
+            layout, container, "VERIFIED BUILD (MAXROLL PLANNER)"
+        )
+        self._add_row(
+            layout,
+            container,
+            f"Real glyph placement + node picks decoded from Maxroll's "
+            f"\"{verified_build.get('profile_name', '?')}\" planner profile.",
+        )
+
+        for board in boards:
+            glyph = board.get("glyph") or "?"
+            glyph_level = board.get("glyph_level")
+            title = f"{glyph} (Lvl {glyph_level})" if glyph_level else glyph
+
+            nodes = board.get("nodes") or []
+            if nodes:
+                title += f"\n   {', '.join(nodes)}"
+
+            self._add_row(layout, container, title)
 
     def set_gear(self, gear: dict | None, owned_names: set[str]):
         """Populate the Gear & Powers tab as a toggle checklist over
@@ -740,11 +789,18 @@ class LevelingCard(BaseCard):
         skill_bar: list[str],
         skill_bar_is_fallback: bool,
         completed_levels: set[int],
+        verified_build: dict | None = None,
     ):
         """Populate the Skills tab. ``milestones`` is the same data the
         Leveling tab reads (unfiltered by the level field) - completion
         here is tracked separately via ``completed_levels`` (persisted by
-        the caller in QSettings), not derived from the level input."""
+        the caller in QSettings), not derived from the level input.
+
+        ``verified_build`` (see ``LevelingManager.get_verified_build``) is
+        real, decoded Maxroll Planner data - only present for a handful of
+        builds. When given, an extra "VERIFIED BUILD" section is appended
+        below the usual (prose-derived) skill-tree progression checklist;
+        when ``None`` the section is simply omitted, no placeholder."""
 
         layout = self.skills_layout
         container = self.skills_container
@@ -764,6 +820,7 @@ class LevelingCard(BaseCard):
         if not milestones:
             self._add_row(layout, container, "No milestones defined for this build.")
             self.skills_next_label.setText("Pick a build to see your next skill point.")
+            self._render_verified_skills(layout, container, verified_build)
             return
 
         next_milestone = self._render_milestone_checklist(
@@ -776,6 +833,42 @@ class LevelingCard(BaseCard):
             )
         else:
             self.skills_next_label.setText("All skill milestones completed!")
+
+        self._render_verified_skills(layout, container, verified_build)
+
+    def _render_verified_skills(
+        self, layout: QVBoxLayout, container: QWidget, verified_build: dict | None
+    ):
+        """Append the "Verified Build (Maxroll Planner)" skill-allocation
+        section - real skill ranks + upgrade choices decoded from a real
+        Maxroll Planner profile (see ``scripts/maxroll_data_decoder.py``),
+        as opposed to the guide-prose-derived milestones above. Does
+        nothing when ``verified_build`` is ``None`` (most builds)."""
+
+        if not verified_build:
+            return
+
+        self._add_section_header(
+            layout, container, "VERIFIED BUILD (MAXROLL PLANNER)"
+        )
+        self._add_row(
+            layout,
+            container,
+            f"Real skill ranks decoded from Maxroll's \"{verified_build.get('profile_name', '?')}\" "
+            "planner profile - not guessed from guide text.",
+        )
+
+        for entry in verified_build.get("skill_allocation") or []:
+            rank = entry.get("rank")
+            max_rank = entry.get("max_rank")
+            rank_text = f"{rank}/{max_rank}" if max_rank else str(rank)
+            title = f"{entry['skill']} — {rank_text}"
+
+            upgrades = entry.get("upgrades_chosen") or []
+            if upgrades:
+                title += f"\n   Upgrades: {', '.join(upgrades)}"
+
+            self._add_row(layout, container, title)
 
     def _render_milestone_checklist(
         self,

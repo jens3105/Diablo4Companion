@@ -134,5 +134,138 @@
       ">5,000 Fire Resistance"
     ],
     "skill_bar": null
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "oohxnu0w",
+    "profile_name": "Endgame",
+    "class_name": "Warlock",
+    "skill_bar": [
+      "Rampage",
+      "Dark Prison",
+      "Metamorphosis",
+      "Command Abodian",
+      "Command Fallen",
+      "Blazing Scream"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Blazing Scream",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Impact Velocity",
+          "Damage",
+          "Skull Splitter"
+        ]
+      },
+      {
+        "skill": "Dark Prison",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Fortify",
+          "Cooldown Reduction",
+          "Chain Aura"
+        ]
+      },
+      {
+        "skill": "Metamorphosis",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Damage Scaling",
+          "Dominance",
+          "Destruction Demon"
+        ]
+      },
+      {
+        "skill": "Rampage",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Lesser Demon Wrath",
+          "Elite Hit Chance",
+          "Demonic Smash"
+        ]
+      },
+      {
+        "skill": "Command Fallen",
+        "rank": 8,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Wrath",
+          "Dominance",
+          "Meat Shields"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Warlock_00",
+        "glyph": "Eliminator",
+        "glyph_level": 150,
+        "nodes": [
+          "Warped",
+          "Domination",
+          "Resilience",
+          "Prime"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_04",
+        "glyph": "Vanguard",
+        "glyph_level": 150,
+        "nodes": [
+          "Burn",
+          "Blaze",
+          "Flames Devour",
+          "Charred Flesh",
+          "Pyrosis",
+          "Infernal Ward"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_01",
+        "glyph": "Demonologist",
+        "glyph_level": 150,
+        "nodes": [
+          "Pact Sign",
+          "Chaining",
+          "Recovery Seal",
+          "Shielding Sigil",
+          "Fathomless",
+          "Binding",
+          "Flesh Guard"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_02",
+        "glyph": "Hellforge",
+        "glyph_level": 150,
+        "nodes": [
+          "Hellish Recovery",
+          "Demon Wall",
+          "Demonic Spicules",
+          "Advantage",
+          "Spined",
+          "Blood Ward",
+          "Void Amplifier"
+        ]
+      },
+      {
+        "board": "Paragon_Warlock_03",
+        "glyph": "Unbound",
+        "glyph_level": 150,
+        "nodes": [
+          "Tortured",
+          "Bolster",
+          "Dynamism",
+          "Augmented",
+          "Demonskin",
+          "Eldrich Carapace"
+        ]
+      }
+    ]
   }
 }

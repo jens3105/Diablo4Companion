@@ -706,12 +706,14 @@ class MainWindow(FluentWindow):
 
         skills_data = self.leveling_manager.get_skills_data(build_name)
         completed = self._load_completed_levels(build_name)
+        verified_build = self.leveling_manager.get_verified_build(build_name)
 
         self.leveling_card.set_skills(
             skills_data["milestones"],
             skills_data["skill_bar"],
             skills_data["skill_bar_is_fallback"],
             completed,
+            verified_build,
         )
 
     def on_mark_done(self, index: int):
@@ -771,12 +773,14 @@ class MainWindow(FluentWindow):
 
         paragon = self.leveling_manager.get_paragon_data(build_name)
         completed = self._load_completed_boards(build_name)
+        verified_build = self.leveling_manager.get_verified_build(build_name)
 
         self.leveling_card.set_paragon(
             paragon.get("boards") or [],
             paragon.get("glyphs") or [],
             paragon.get("note") or "",
             completed,
+            verified_build,
         )
 
     def on_mark_board_done(self, index: int):

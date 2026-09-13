@@ -105,5 +105,142 @@
       "All Stats"
     ],
     "skill_bar": null
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "ce9zox0y",
+    "profile_name": "Endgame",
+    "class_name": "Barbarian",
+    "skill_bar": [
+      "Leap",
+      "Whirlwind",
+      "Rallying Cry",
+      "Challenging Shout",
+      "War Cry",
+      "Wrath of the Berserker"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Challenging Shout",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Raging",
+          "Damage Bonus",
+          "Weaken"
+        ]
+      },
+      {
+        "skill": "War Cry",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Mighty Roar",
+          "Ferocity",
+          "Duration Increase"
+        ]
+      },
+      {
+        "skill": "Whirlwind",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Tornado",
+          "Channel Damage Bonus",
+          "Cost Damage Bonus"
+        ]
+      },
+      {
+        "skill": "Wrath of the Berserker",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Maximum Carnage",
+          "Duration Bonus",
+          "Berserking"
+        ]
+      },
+      {
+        "skill": "Rallying Cry",
+        "rank": 5,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Booming",
+          "Fortify",
+          "Potency"
+        ]
+      },
+      {
+        "skill": "Leap",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Earthshatter",
+          "Fury Generation"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Barb_00",
+        "glyph": "Challenger",
+        "glyph_level": 150,
+        "nodes": [
+          "Raw Power",
+          "Iron Strength",
+          "Brawn"
+        ]
+      },
+      {
+        "board": "Paragon_Barb_07",
+        "glyph": "Wrath",
+        "glyph_level": 150,
+        "nodes": [
+          "Hungering Fury",
+          "Conditioned",
+          "Warbringer",
+          "Raw Power",
+          "Brute Force"
+        ]
+      },
+      {
+        "board": "Paragon_Barb_03",
+        "glyph": "Exploit",
+        "glyph_level": 150,
+        "nodes": [
+          "Tenacity",
+          "Brash",
+          "Fierce",
+          "Carnage",
+          "Berserker",
+          "Enraged"
+        ]
+      },
+      {
+        "board": "Paragon_Barb_06",
+        "glyph": "Marshal",
+        "glyph_level": 150,
+        "nodes": [
+          "Brash",
+          "Flawless Technique",
+          "Nimble",
+          "Heavy Blows",
+          "Wild Force"
+        ]
+      },
+      {
+        "board": "Paragon_Barb_02",
+        "glyph": "Twister",
+        "glyph_level": 150,
+        "nodes": [
+          "Grit",
+          "Blood Rage",
+          "Wrath",
+          "Revel",
+          "Bloodless",
+          "Craving"
+        ]
+      }
+    ]
   }
 }

@@ -127,5 +127,157 @@
       "Familiar",
       "Fire Bolt"
     ]
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "sjeyt70h",
+    "profile_name": "Endgame",
+    "class_name": "Sorcerer",
+    "skill_bar": [
+      "Hydra",
+      "Blizzard",
+      "Familiar",
+      "Fire Bolt",
+      "Ice Armor",
+      "Unstable Currents"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Blizzard",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Static Field",
+          "Seek and Duration Bonus",
+          "Damage Bonus"
+        ]
+      },
+      {
+        "skill": "Frost Nova",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Vulnerable",
+          "Size Bonus",
+          "Shatter"
+        ]
+      },
+      {
+        "skill": "Ice Armor",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Permafrost",
+          "Cooldown Reduction",
+          "Duration Bonus and Barrier"
+        ]
+      },
+      {
+        "skill": "Unstable Currents",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Cooldown Reduction",
+          "Damage Bonus",
+          "Thunder God"
+        ]
+      },
+      {
+        "skill": "Familiar",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Size Bonus",
+          "Duration Bonus",
+          "Healing Flames"
+        ]
+      },
+      {
+        "skill": "Hydra",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Cooldown Reduction",
+          "Healing",
+          "Frigid Hydra"
+        ]
+      },
+      {
+        "skill": "Teleport",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Ferocity",
+          "Movement Speed"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Sorc_00",
+        "glyph": "Tactician",
+        "glyph_level": 150,
+        "nodes": [
+          "Elemental Balance",
+          "Studied",
+          "Resilience",
+          "Elementalist"
+        ]
+      },
+      {
+        "board": "Paragon_Sorc_03",
+        "glyph": "Exploit",
+        "glyph_level": 150,
+        "nodes": [
+          "Insulated",
+          "Blessing",
+          "Incapacitate",
+          "Static Surge",
+          "Restorative",
+          "Paralyzing"
+        ]
+      },
+      {
+        "board": "Paragon_Sorc_08",
+        "glyph": "Reinforced",
+        "glyph_level": 150,
+        "nodes": [
+          "Elemental Balance",
+          "Tactical",
+          "Toughened",
+          "Ruinous",
+          "Suffused Resilience",
+          "Blessing",
+          "Enchantment Master"
+        ]
+      },
+      {
+        "board": "Paragon_Sorc_10",
+        "glyph": "Elementalist",
+        "glyph_level": 150,
+        "nodes": [
+          "Lightning Cutter",
+          "Elemental Balance",
+          "Overdrive",
+          "Electromagnetism",
+          "Fundamental Release",
+          "Suffused Resilience"
+        ]
+      },
+      {
+        "board": "Paragon_Sorc_02",
+        "glyph": "Adept",
+        "glyph_level": 150,
+        "nodes": [
+          "Restorative",
+          "Advantage",
+          "Frigid Fate",
+          "Elemental Favor",
+          "Weakness",
+          "Guarded",
+          "Oppressive"
+        ]
+      }
+    ]
   }
 }

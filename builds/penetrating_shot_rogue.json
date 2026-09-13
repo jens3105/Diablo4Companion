@@ -105,5 +105,157 @@
     ],
     "stat_priority": null,
     "skill_bar": null
+  },
+  "verified_build": {
+    "source": "maxroll_planner",
+    "profile_id": "9sexj40w",
+    "profile_name": "Poison Endgame",
+    "class_name": "Rogue",
+    "skill_bar": [
+      "Shadow Clone",
+      "Penetrating Shot",
+      "Shadow Step",
+      "Dash",
+      "Concealment",
+      "Poison Imbuement"
+    ],
+    "skill_allocation": [
+      {
+        "skill": "Dark Shroud",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Overflow",
+          "Consume Chance",
+          "Movement Speed"
+        ]
+      },
+      {
+        "skill": "Penetrating Shot",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Ballista",
+          "Damage Increase",
+          "Ferocity"
+        ]
+      },
+      {
+        "skill": "Poison Imbuement",
+        "rank": 15,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Toxic Touch",
+          "Duration",
+          "Cooldown"
+        ]
+      },
+      {
+        "skill": "Concealment",
+        "rank": 13,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Recuperate"
+        ]
+      },
+      {
+        "skill": "Dash",
+        "rank": 5,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Primer",
+          "Charges and Cooldown Reduction"
+        ]
+      },
+      {
+        "skill": "Shadow Clone",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Sentry",
+          "Cooldown",
+          "Weaken & Vulnerable"
+        ]
+      },
+      {
+        "skill": "Shadow Step",
+        "rank": 1,
+        "max_rank": 15,
+        "upgrades_chosen": [
+          "Artifice",
+          "Cooldown",
+          "Unstoppable"
+        ]
+      }
+    ],
+    "paragon_boards": [
+      {
+        "board": "Paragon_Rogue_00",
+        "glyph": "Versatility",
+        "glyph_level": 150,
+        "nodes": [
+          "Skillful",
+          "Outlaw",
+          "Resilience",
+          "Prime"
+        ]
+      },
+      {
+        "board": "Paragon_Rogue_03",
+        "glyph": "Fluidity",
+        "glyph_level": 150,
+        "nodes": [
+          "Calculated",
+          "Deviant",
+          "Devious",
+          "Cheap Shot",
+          "Artifice",
+          "Safeguard",
+          "Spearhead"
+        ]
+      },
+      {
+        "board": "Paragon_Rogue_01",
+        "glyph": "Tracker",
+        "glyph_level": 150,
+        "nodes": [
+          "Potent",
+          "Concoction",
+          "Suffused Resilience",
+          "Ready Supply",
+          "Eldritch Bounty",
+          "Restorative",
+          "Imbuer"
+        ]
+      },
+      {
+        "board": "Paragon_Rogue_07",
+        "glyph": "Canny",
+        "glyph_level": 150,
+        "nodes": [
+          "Defensive Stance",
+          "Toughened",
+          "Unassailable",
+          "Exploit Weakness",
+          "Exploit",
+          "Artifice",
+          "Misery"
+        ]
+      },
+      {
+        "board": "Paragon_Rogue_10",
+        "glyph": "Bane",
+        "glyph_level": 150,
+        "nodes": [
+          "Giant Killer",
+          "Assassin",
+          "Ranger",
+          "Brawler",
+          "Danse Macabre",
+          "Acrobat",
+          "Skulker"
+        ]
+      }
+    ]
   }
 }
