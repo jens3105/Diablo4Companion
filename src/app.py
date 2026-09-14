@@ -227,7 +227,8 @@ class MainWindow(FluentWindow):
         # (set back to None) when the user closes it, so re-opening it
         # always starts from a clean, freshly-synced window.
         self.compact_window = None
-        self._compact_done_level = None
+        self._compact_action_kind = None
+        self._compact_action_key = None
         self.dashboard.build_card.compact_mode_requested.connect(
             self.open_compact_mode
         )
@@ -1096,37 +1097,164 @@ class MainWindow(FluentWindow):
     # DASHBOARD / CURRENT BUILD CARD (Phase 7)
     # ---------------------------------------------------------
 
-    def _pending_milestones(self, build_name: str) -> list[tuple[int, dict]]:
-        """``(index, milestone)`` pairs for ``build_name`` that aren't
-        completed yet, in order - the single source of truth for "what's
-        next", same data + completion state as the Leveling/Skills tabs
-        (``get_skills_data``/``_load_completed_levels``). Shared by
-        ``_next_action_text`` (Dashboard's Current Build card) and
-        ``_compact_next_action`` (Phase 9's Compact Mode window) so both
-        surfaces always agree on the next action. The index (not the
-        milestone's ``level``) is what completion is keyed on - see
-        ``on_mark_done``."""
+    # -----------------------------------------------------------
+    # Build Advisor (Phase 10)
+    #
+    # Unifies the three tabs' independent "what's next" checks (Skills,
+    # Paragon, Gear) into a single ordered action list, so the Dashboard's
+    # Current Build card and Compact Mode always show/act on the exact
+    # same "one concrete next action" instead of two different partial
+    # views (previously Compact Mode and the Dashboard card both only
+    # ever looked at Skills/Leveling milestones).
+    #
+    # Priority order - deliberate, not arbitrary:
+    #   1. Skills   - usually the actual blocker while leveling: a build
+    #                 simply doesn't work yet without its core skill
+    #                 allocation, so this is "what do I do right now".
+    #   2. Paragon  - the next endgame power spike once skills are
+    #                 sorted, and (unlike Gear) it's a one-way checklist
+    #                 the player fully controls at their own pace, not
+    #                 gated on a drop.
+    #   3. Gear     - drop-gated ("equip Crown of Lucion") and the one
+    #                 category that can regress (an item sold/replaced),
+    #                 so it's the least "do this next" and most "keep an
+    #                 eye out for this" of the three - last in priority.
+    #
+    # Each per-category helper below mirrors exactly what that tab
+    # itself tracks (verified Maxroll Planner data when present, else
+    # the older guide-prose-derived list) and the exact same persisted
+    # completion state (``_load_completed_levels``/``_load_completed_
+    # boards``/``_load_owned_items``) - no new tracking, no parallel
+    # validation engine.
+    # -----------------------------------------------------------
+
+    def _pending_skill_actions(self, build_name: str) -> list[tuple[str, str, object]]:
+        """Every not-yet-completed Skills entry, in order, as ``(kind,
+        text, key)`` - ``kind`` is always ``"skill"`` here (see
+        ``_advisor_pending_actions``), ``key`` is whatever ``on_mark_done``
+        expects (a verified skill name, or a milestone index for builds
+        with no verified data). Mirrors exactly what ``LevelingCard.
+        set_skills``/``_render_verified_skill_checklist`` tracks - verified
+        ``skill_allocation`` when present, else the prose ``milestones``
+        list - and the same shared ``completed_levels`` set."""
+
+        completed = self._load_completed_levels(build_name)
+        verified_build = self.leveling_manager.get_verified_build(build_name)
+        verified_skills = (verified_build or {}).get("skill_allocation") or []
+
+        if verified_skills:
+            return [
+                ("skill", f"Add 1 point to {entry['skill']}", entry["skill"])
+                for entry in verified_skills
+                if entry["skill"] not in completed
+            ]
 
         milestones = self.leveling_manager.get_skills_data(build_name)["milestones"]
-        completed = self._load_completed_levels(build_name)
 
-        return [(i, m) for i, m in enumerate(milestones) if i not in completed]
+        return [
+            ("skill", f"Add 1 point to {m['skill']} (Lvl {m['level']})", i)
+            for i, m in enumerate(milestones)
+            if i not in completed
+        ]
 
-    def _next_action_text(self, build_name: str) -> str:
-        """Pick the single simplest "next thing to do": the next
-        not-yet-completed Leveling/Skills milestone for ``build_name``.
-        Deliberately not a cross-category prioritizer over Paragon/Gear
-        too - Dashboard 2.0 is meant to stay simple, not become a second
-        Build Guide."""
+    def _pending_paragon_actions(self, build_name: str) -> list[tuple[str, str, object]]:
+        """Every not-yet-completed Paragon board, in order, as ``(kind,
+        text, key)`` - ``key`` is whatever ``on_mark_board_done`` expects
+        (a verified board id, or a board index for builds with no
+        verified data). Mirrors ``LevelingCard.set_paragon``/
+        ``_render_verified_board_checklist`` - verified ``paragon_boards``
+        when present, else the prose ``paragon.boards`` list - and the
+        same shared ``completed_boards`` set."""
 
-        pending = self._pending_milestones(build_name)
+        completed = self._load_completed_boards(build_name)
+        verified_build = self.leveling_manager.get_verified_build(build_name)
+        verified_boards = (verified_build or {}).get("paragon_boards") or []
+
+        if verified_boards:
+            actions = []
+            for i, board in enumerate(verified_boards):
+                # Fallback format must match LevelingCard._board_id.
+                board_id = board.get("board") or f"verified_board_{i}"
+                if board_id in completed:
+                    continue
+                glyph = board.get("glyph") or "?"
+                actions.append(("paragon", f"Slot {glyph} glyph on {board_id}", board_id))
+            return actions
+
+        boards = self.leveling_manager.get_paragon_data(build_name).get("boards") or []
+
+        return [
+            ("paragon", f"Unlock {board['name']} board", i)
+            for i, board in enumerate(boards)
+            if i not in completed
+        ]
+
+    def _pending_gear_actions(self, build_name: str) -> list[tuple[str, str, object]]:
+        """Every not-yet-owned Gear entry, in order, as ``(kind, text,
+        key)`` - ``key`` is the item/aspect name ``on_gear_owned_changed``
+        expects. Mirrors ``LevelingCard.set_gear``/
+        ``build_entries_from_verified_gear`` - verified ``gear`` when
+        present, else the prose ``key_items``/``key_aspects`` lists - and
+        the same shared ``owned_items`` set."""
+
+        owned = self._load_owned_items(build_name)
+        verified_build = self.leveling_manager.get_verified_build(build_name)
+        verified_gear = (verified_build or {}).get("gear") or []
+
+        if verified_gear:
+            actions = []
+            for item in verified_gear:
+                name = item["item_name"]
+                if name in owned:
+                    continue
+                actions.append(("gear", f"Equip {name} ({item.get('slot') or '?'})", name))
+            return actions
+
+        gear = self.leveling_manager.get_gear_data(build_name) or {}
+        actions = []
+
+        for item in gear.get("key_items") or []:
+            name = item["name"]
+            if name in owned:
+                continue
+            actions.append(("gear", f"Equip {name} ({item.get('slot') or '?'})", name))
+
+        for item in gear.get("key_aspects") or []:
+            name = item["name"]
+            if name in owned:
+                continue
+            actions.append(("gear", f"Acquire {name} aspect", name))
+
+        return actions
+
+    def _advisor_pending_actions(self, build_name: str) -> list[tuple[str, str, object]]:
+        """The full unified Build Advisor list for ``build_name``: every
+        pending Skills action, then every pending Paragon action, then
+        every pending Gear action (see the priority-order comment above)
+        - each item ``(kind, text, key)``. The single source of truth for
+        "what's next" shared by ``_advisor_next_action`` (Dashboard's
+        Current Build card) and ``_compact_next_action`` (Compact Mode),
+        so both surfaces always agree."""
+
+        return (
+            self._pending_skill_actions(build_name)
+            + self._pending_paragon_actions(build_name)
+            + self._pending_gear_actions(build_name)
+        )
+
+    def _advisor_next_action(self, build_name: str) -> str:
+        """Pick the single concrete "next thing to do" across Skills,
+        Paragon and Gear for ``build_name`` - the Dashboard Current Build
+        card's one-line summary. Never fabricates an action when nothing
+        is left."""
+
+        pending = self._advisor_pending_actions(build_name)
 
         if pending:
-            _index, m = pending[0]
-            return f"Lvl {m['level']} — {m['skill']}"
+            _kind, text, _key = pending[0]
+            return text
 
-        milestones = self.leveling_manager.get_skills_data(build_name)["milestones"]
-        return "Build fully unlocked!" if milestones else "—"
+        return "Build complete!"
 
     def _refresh_dashboard_build_card(self):
         """Push the current build/level/status/next-action onto the
@@ -1143,7 +1271,7 @@ class MainWindow(FluentWindow):
             return
 
         rows, _footer_text, _ready = self._compute_build_status(build_name)
-        next_action = self._next_action_text(build_name)
+        next_action = self._advisor_next_action(build_name)
 
         self.dashboard.build_card.set_build(
             build_name, self._current_level(), rows, next_action
@@ -1170,34 +1298,29 @@ class MainWindow(FluentWindow):
     # ---------------------------------------------------------
 
     def _compact_next_action(self, build_name: str):
-        """Like ``_next_action_text`` but also returns the milestone
+        """Like ``_advisor_next_action`` but also returns the action
         *after* the next one (for Compact Mode's "Next: ..." preview
-        line) and the level number Done should mark, built on the same
-        ``_pending_milestones`` list so Compact Mode and the Dashboard
-        card can never disagree about what's next.
+        line) and how the Done button should mark the current one, built
+        on the same ``_advisor_pending_actions`` list so Compact Mode and
+        the Dashboard card can never disagree about what's next - across
+        Skills, Paragon AND Gear now, not just Skills/Leveling.
 
-        Returns ``(current_text, preview_text, done_index)`` -
-        ``done_index`` is ``None`` when there is nothing left to mark,
-        otherwise the milestone's position in its build's list (what
-        completion is actually keyed on - see ``on_mark_done``)."""
+        Returns ``(current_text, preview_text, kind, key)`` - ``kind`` is
+        ``None`` when there is nothing left to mark, otherwise one of
+        ``"skill"``/``"paragon"``/``"gear"`` telling ``on_compact_done``
+        which existing handler (``on_mark_done``/``on_mark_board_done``/
+        ``on_gear_owned_changed``) to route the Done button through, with
+        ``key`` as that handler's argument."""
 
-        pending = self._pending_milestones(build_name)
+        pending = self._advisor_pending_actions(build_name)
 
         if not pending:
-            milestones = self.leveling_manager.get_skills_data(build_name)["milestones"]
-            current_text = "Build fully unlocked!" if milestones else "—"
-            return current_text, "", None
+            return "Build complete!", "", None, None
 
-        current_index, current = pending[0]
-        current_text = f"Lvl {current['level']} — {current['skill']}"
+        kind, current_text, key = pending[0]
+        preview_text = pending[1][1] if len(pending) > 1 else ""
 
-        if len(pending) > 1:
-            _next_index, nxt = pending[1]
-            preview_text = f"Lvl {nxt['level']} — {nxt['skill']}"
-        else:
-            preview_text = ""
-
-        return current_text, preview_text, current_index
+        return current_text, preview_text, kind, key
 
     def open_compact_mode(self):
         """Create (once) and show the Compact Mode window."""
@@ -1231,7 +1354,8 @@ class MainWindow(FluentWindow):
         build_name = self.leveling_manager.current_build_name
 
         if not build_name:
-            self._compact_done_level = None
+            self._compact_action_kind = None
+            self._compact_action_key = None
             self.compact_window.set_content("", 0, "", "", False)
             return
 
@@ -1241,23 +1365,32 @@ class MainWindow(FluentWindow):
         )
         title = f"{char_name} — {build_name}" if char_name else build_name
 
-        current_text, preview_text, done_level = self._compact_next_action(build_name)
-        self._compact_done_level = done_level
+        current_text, preview_text, kind, key = self._compact_next_action(build_name)
+        self._compact_action_kind = kind
+        self._compact_action_key = key
 
         self.compact_window.set_content(
-            title, self._current_level(), current_text, preview_text, done_level is not None
+            title, self._current_level(), current_text, preview_text, kind is not None
         )
 
     def on_compact_done(self):
-        """Compact window's Done button - routes through the exact same
-        ``on_mark_done`` the Build Guide's own Done buttons use, so the
-        main window's Skills/Leveling tabs and Build Status update
-        immediately too, not just Compact Mode's own view."""
+        """Compact window's Done button - routes through whichever
+        existing handler (``on_mark_done``/``on_mark_board_done``/
+        ``on_gear_owned_changed``) owns the advisor's current action, so
+        the main window's Skills/Paragon/Gear tabs and Build Status
+        update immediately too, not just Compact Mode's own view. Marking
+        a Gear action "done" here means "equip it" - it flips the same
+        one-way toggle a "Have it" switch in the Gear planner would."""
 
-        if self._compact_done_level is None:
+        if self._compact_action_kind is None:
             return
 
-        self.on_mark_done(self._compact_done_level)
+        if self._compact_action_kind == "skill":
+            self.on_mark_done(self._compact_action_key)
+        elif self._compact_action_kind == "paragon":
+            self.on_mark_board_done(self._compact_action_key)
+        elif self._compact_action_kind == "gear":
+            self.on_gear_owned_changed(self._compact_action_key, True)
 
     def on_class_changed(self, class_name: str):
         """Step-1 class selector changed: rebuild the step-2 build
