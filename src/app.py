@@ -18,6 +18,8 @@ from qfluentwidgets import (
 
 from src import theme
 from src.api import DiabloAPI
+from src.build_advisor_interface import BuildAdvisorCard, BuildAdvisorInterface
+from src.character_interface import CharacterCard, CharacterInterface
 from src.compact_window import CompactWindow
 from src.dashboard import DashboardWidget
 from src.leveling_card import LevelingCard
@@ -204,11 +206,29 @@ class MainWindow(FluentWindow):
         self.builds_interface = BuildsInterface(self.leveling_card)
         self.builds_interface.setObjectName("buildsInterface")
 
+        # Character page (Phase - nav reorg): hosts the Equipment Planner
+        # that used to be the Build Guide's 4th tab. It owns no selector
+        # of its own - see src/character_interface.py's module docstring.
+        self.character_card = CharacterCard()
+
+        self.character_interface = CharacterInterface(self.character_card)
+        self.character_interface.setObjectName("characterInterface")
+
+        # Build Advisor page: a bigger, standalone read-out of the exact
+        # same Build Status + next-action + pending-actions data the
+        # Dashboard's Current Build card and Compact Mode already use.
+        self.advisor_card = BuildAdvisorCard()
+
+        self.advisor_interface = BuildAdvisorInterface(self.advisor_card)
+        self.advisor_interface.setObjectName("buildAdvisorInterface")
+
         self.settings_interface = SettingsInterface(self.settings)
         self.settings_interface.setObjectName("settingsInterface")
 
         self.addSubInterface(self.dashboard, FIF.HOME, "Dashboard")
         self.addSubInterface(self.builds_interface, FIF.GAME, "Build Guide")
+        self.addSubInterface(self.character_interface, FIF.FINGERPRINT, "Character")
+        self.addSubInterface(self.advisor_interface, FIF.ROBOT, "Build Advisor")
         self.addSubInterface(
             self.settings_interface,
             FIF.SETTING,
@@ -255,7 +275,7 @@ class MainWindow(FluentWindow):
         self.leveling_card.class_changed.connect(self.on_class_changed)
         self.leveling_card.mark_done.connect(self.on_mark_done)
         self.leveling_card.mark_board_done.connect(self.on_mark_board_done)
-        self.leveling_card.gear_owned_changed.connect(self.on_gear_owned_changed)
+        self.character_card.gear_owned_changed.connect(self.on_gear_owned_changed)
         self.leveling_card.character_changed.connect(self.on_character_changed)
         self.leveling_card.add_character_requested.connect(self.on_add_character)
         self.leveling_card.rename_character_requested.connect(self.on_rename_character)
@@ -292,6 +312,8 @@ class MainWindow(FluentWindow):
             self.dashboard.build_card,
             self.dashboard.upcoming_card,
             self.leveling_card,
+            self.character_card,
+            self.advisor_card,
         ):
             card.refresh_theme()
 
@@ -914,7 +936,7 @@ class MainWindow(FluentWindow):
         self.settings.setValue(self._owned_items_key(build_name), sorted(owned))
 
     def _refresh_gear(self):
-        """Rebuild the Gear & Powers tab's toggle checklist for the
+        """Rebuild the Character page's equipment planner for the
         current build, combining its (level-independent) key items/
         aspects data with the persisted set of owned item/aspect names."""
 
@@ -927,7 +949,7 @@ class MainWindow(FluentWindow):
         owned = self._load_owned_items(build_name)
         verified_build = self.leveling_manager.get_verified_build(build_name)
 
-        self.leveling_card.set_gear(gear, owned, verified_build)
+        self.character_card.set_gear(gear, owned, verified_build)
 
     def on_gear_owned_changed(self, name: str, owned: bool):
 
@@ -951,11 +973,11 @@ class MainWindow(FluentWindow):
     # ---------------------------------------------------------
     # BUILD-GUIDE / BUILD STATUS SUMMARY (Phase 6)
     #
-    # Pure aggregation over the completion state the four tabs above
-    # already persist - no new tracking, no new QSettings keys. Recomputed
-    # (cheaply - it's a handful of len()/set operations) on every event
-    # that could move the needle: build/class switch and any checkbox/
-    # toggle in any of the four tabs.
+    # Pure aggregation over the completion state the Build Guide's three
+    # tabs and the Character page's gear planner already persist - no new
+    # tracking, no new QSettings keys. Recomputed (cheaply - it's a
+    # handful of len()/set operations) on every event that could move the
+    # needle: build/class switch and any checkbox/toggle anywhere above.
     # ---------------------------------------------------------
 
     @staticmethod
@@ -1192,7 +1214,7 @@ class MainWindow(FluentWindow):
     def _pending_gear_actions(self, build_name: str) -> list[tuple[str, str, object]]:
         """Every not-yet-owned Gear entry, in order, as ``(kind, text,
         key)`` - ``key`` is the item/aspect name ``on_gear_owned_changed``
-        expects. Mirrors ``LevelingCard.set_gear``/
+        expects. Mirrors ``CharacterCard.set_gear``/
         ``build_entries_from_verified_gear`` - verified ``gear`` when
         present, else the prose ``key_items``/``key_aspects`` lists - and
         the same shared ``owned_items`` set."""
@@ -1258,32 +1280,72 @@ class MainWindow(FluentWindow):
 
     def _refresh_dashboard_build_card(self):
         """Push the current build/level/status/next-action onto the
-        Dashboard's Current Build card. Called whenever anything that
-        could move the needle changes: build/class switch, level input,
-        or any checkbox/toggle in the Build Guide's four tabs (via
-        ``_refresh_build_status``)."""
+        Dashboard's Current Build card, the Character page's header, and
+        the Build Advisor page. Called whenever anything that could move
+        the needle changes: build/class switch, level input, or any
+        checkbox/toggle in the Build Guide's three tabs or the Character
+        page's gear planner (via ``_refresh_build_status``)."""
 
         build_name = self.leveling_manager.current_build_name
+        char_name = next(
+            (c["name"] for c in self.characters if c["id"] == self.active_character_id),
+            "",
+        )
 
         if not build_name:
             self.dashboard.build_card.set_build("", 0, [], "")
+            self.character_card.set_header(char_name, "", 0)
+            self.advisor_card.set_advisor("", 0, [], "", False, "", {})
             self._refresh_compact_window()
             return
 
-        rows, _footer_text, _ready = self._compute_build_status(build_name)
+        level = self._current_level()
+        rows, footer_text, ready = self._compute_build_status(build_name)
         next_action = self._advisor_next_action(build_name)
 
-        self.dashboard.build_card.set_build(
-            build_name, self._current_level(), rows, next_action
+        self.dashboard.build_card.set_build(build_name, level, rows, next_action)
+        self.character_card.set_header(char_name, build_name, level)
+        self.advisor_card.set_advisor(
+            build_name,
+            level,
+            rows,
+            footer_text,
+            ready,
+            next_action,
+            self._advisor_missing_summary(build_name),
         )
 
         # Everything that can move the Dashboard card's needle (build/
-        # class/level/character switch, or any mark-done in the four
-        # Build Guide tabs, all of which route through here already) also
-        # moves Compact Mode's - so pushing it from this one spot is
-        # enough to keep an already-open Compact window live-synced
-        # without a second signal wiring.
+        # class/level/character switch, or any mark-done in the Build
+        # Guide's tabs or the Character page, all of which route through
+        # here already) also moves Compact Mode's, the Character header's
+        # and the Build Advisor page's - so pushing it from this one spot
+        # is enough to keep everything live-synced without extra signal
+        # wiring.
         self._refresh_compact_window()
+
+    def _advisor_missing_summary(
+        self, build_name: str, cap: int = 5
+    ) -> dict[str, tuple[list[str], int]]:
+        """The Build Advisor page's "what's missing" data: for each of
+        Skills/Paragon/Gear, the first ``cap`` pending-action texts (see
+        ``_pending_skill_actions``/``_pending_paragon_actions``/
+        ``_pending_gear_actions``) plus the true total pending count, so
+        the page can show "(+N more)" instead of an unbounded wall of
+        text - matching the roadmap's "low visual noise, scannable"
+        principle. Pure formatting over the exact same helpers the
+        unified next-action already uses - no new validation logic."""
+
+        per_category = {
+            "Skills": self._pending_skill_actions(build_name),
+            "Paragon": self._pending_paragon_actions(build_name),
+            "Gear": self._pending_gear_actions(build_name),
+        }
+
+        return {
+            category: ([text for _kind, text, _key in actions[:cap]], len(actions))
+            for category, actions in per_category.items()
+        }
 
     # ---------------------------------------------------------
     # COMPACT MODE (Phase 9)
