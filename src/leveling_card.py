@@ -14,11 +14,16 @@ from qfluentwidgets import (
     SingleDirectionScrollArea,
     StrongBodyLabel,
     SubtitleLabel,
-    SwitchButton,
 )
 
 from src import theme
 from src.base_card import BaseCard
+from src.gear_planner import (
+    GearPlannerWidget,
+    build_entries_from_legacy_gear,
+    build_entries_from_verified_gear,
+    build_unslotted_entries,
+)
 
 # Colors for the small "role" tag shown next to the card title and as a
 # suffix on every build in the dropdown, so it's obvious at a glance
@@ -278,7 +283,15 @@ class LevelingCard(BaseCard):
         """Like ``_build_leveling_page``/``_build_skills_page``, but the
         strong label up top is a build-readiness rollup ("X / Y key items
         equipped") instead of a "next" pointer - gear has no natural
-        order, so there's nothing to point at, only a count."""
+        order, so there's nothing to point at, only a count.
+
+        The Character Equipment Planner (``GearPlannerWidget``) sits at
+        the top of the scrollable area, pinned there permanently (see
+        ``_clear_rows_after`` - unlike every other row in this tab it's
+        never torn down and rebuilt on each ``set_gear`` call, just
+        repopulated via ``set_entries``); reference text (stat priority,
+        final skill bar, source link) still scrolls below it using the
+        same row helpers as the other tabs."""
 
         page = QWidget(self.content)
         layout = QVBoxLayout(page)
@@ -295,6 +308,10 @@ class LevelingCard(BaseCard):
         scroll, container, inner_layout = self._make_scroll_area(page)
         self.gear_container = container
         self.gear_layout = inner_layout
+
+        self.gear_planner = GearPlannerWidget(container)
+        self.gear_planner.item_owned_changed.connect(self.gear_owned_changed)
+        self.gear_layout.insertWidget(0, self.gear_planner)
 
         layout.addWidget(scroll, 1)
 
@@ -559,6 +576,18 @@ class LevelingCard(BaseCard):
             if item.widget():
                 item.widget().setParent(None)
 
+    @staticmethod
+    def _clear_rows_after(layout: QVBoxLayout, keep_from_start: int):
+        """Like ``_clear_rows``, but preserves the first ``keep_from_start``
+        widgets instead of only the trailing stretch - used by the Gear tab
+        to keep ``self.gear_planner`` (index 0) alive across repopulates
+        instead of destroying/recreating it every time ``set_gear`` runs."""
+
+        while layout.count() > keep_from_start + 1:
+            item = layout.takeAt(keep_from_start)
+            if item.widget():
+                item.widget().setParent(None)
+
     def _add_row(self, layout: QVBoxLayout, container: QWidget, text: str):
 
         row = BodyLabel(text, container)
@@ -758,30 +787,37 @@ class LevelingCard(BaseCard):
         owned_names: set[str],
         verified_build: dict | None = None,
     ):
-        """Populate the Gear & Powers tab as a toggle checklist.
+        """Populate the Gear & Powers tab as the Character Equipment
+        Planner (``self.gear_planner`` - see ``src/gear_planner.py``): a
+        body-centric diagram of clickable slot chips, replacing the old
+        flat toggle checklist.
 
         When ``verified_build`` has a real, decoded ``gear`` list (see
         ``LevelingManager.get_verified_build`` /
         ``scripts/maxroll_data_decoder.py``'s ``decode_gear``) - the
         actual equipped loadout (real item name + slot + rarity, and the
-        real socketed Aspect name where one applies) - THAT list is what
-        gets tracked (``_render_verified_gear_checklist``), not the
+        real socketed Aspect name where one applies) - THAT list drives
+        the planner (``build_entries_from_verified_gear``), not the
         older, prose-derived ``key_items``/``key_aspects`` lists. Each
-        row is keyed by the item's real name (a stable identifier - two
+        slot is keyed by the item's real name (a stable identifier - two
         equipped items sharing a name within one build is not a
         realistic case).
 
         Only when a build has no verified gear data does this fall back
-        to the original ``key_items``/``key_aspects`` toggle checklist
-        (``_render_gear_checklist``) - unchanged for the one build
-        (Heartseeker Rogue) with no verified data at all.
+        to the original ``key_items``/``key_aspects`` data
+        (``build_entries_from_legacy_gear``/``build_unslotted_entries``)
+        - unchanged source data for the one build (Heartseeker Rogue)
+        with no verified data at all; its aspects have no ``slot`` field
+        so they render in their own "Key Aspects" tray instead of on the
+        body diagram (see that function's docstring).
 
-        Unlike the one-way Leveling/Skills/Paragon checklists, gear
-        ownership can be lost (an item sold/replaced), so each row gets
-        a two-way "Have it"/"Missing" toggle (see ``_add_toggle_row``)
-        instead of a one-way "Mark as Done" button, and there's a
-        rollup ("X / Y items equipped") up top instead of a "next"
-        pointer so build-readiness is visible at a glance.
+        Gear ownership can be lost (an item sold/replaced), so each chip
+        opens a detail dialog with a two-way "Have it"/"Missing" toggle
+        (``GearPlannerWidget.item_owned_changed`` -> this card's own
+        ``gear_owned_changed`` signal, connected 1:1 in ``__init__`` -
+        exactly the signal/QSettings path the old per-row toggles used),
+        and there's a rollup ("X / Y items equipped") up top instead of a
+        "next" pointer so build-readiness is visible at a glance.
         ``stat_priority``/``skill_bar`` stay plain reference text either
         way - they aren't checkable items and have no verified
         equivalent."""
@@ -789,12 +825,13 @@ class LevelingCard(BaseCard):
         layout = self.gear_layout
         container = self.gear_container
 
-        self._clear_rows(layout)
+        self._clear_rows_after(layout, 1)
 
         if not gear and not verified_build:
             self.gear_rollup_label.setText(
                 "No endgame gear guide available for this build."
             )
+            self.gear_planner.set_entries([], [])
             self._add_section_header(layout, container, "GEAR && POWERS")
             self._add_row(
                 layout,
@@ -820,9 +857,19 @@ class LevelingCard(BaseCard):
                 layout,
                 container,
                 f"Real item names, slots and socketed Aspects decoded from Maxroll's "
-                f"\"{verified_build.get('profile_name', '?')}\" planner profile.",
+                f"\"{verified_build.get('profile_name', '?')}\" planner profile. "
+                "Tap a slot above for details.",
             )
-            self._render_verified_gear_checklist(layout, container, verified_gear, owned_names)
+
+            entries = build_entries_from_verified_gear(verified_gear, owned_names)
+            body_entries = [e for e in entries if e.bucket not in ("TALISMAN", "OTHER")]
+            talisman_entries = [e for e in entries if e.bucket == "TALISMAN"]
+            other_entries = [e for e in entries if e.bucket == "OTHER"]
+
+            self.gear_planner.set_entries(
+                body_entries,
+                [("Talismans", talisman_entries), ("Other", other_entries)],
+            )
         else:
             key_items = gear.get("key_items") or []
             key_aspects = gear.get("key_aspects") or []
@@ -840,16 +887,24 @@ class LevelingCard(BaseCard):
             self._add_section_header(layout, container, "KEY / SIGNATURE ITEMS")
 
             if key_items:
-                self._render_gear_checklist(layout, container, key_items, owned_names)
+                self._add_row(
+                    layout,
+                    container,
+                    "No dedicated Maxroll endgame gear planner for this build yet - "
+                    "slots without a specific item call-out show as \"not required\". "
+                    "Tap a slot above for details.",
+                )
             else:
                 self._add_row(layout, container, "No specific key items listed.")
 
-            self._add_section_header(layout, container, "KEY ASPECTS")
-
-            if key_aspects:
-                self._render_gear_checklist(layout, container, key_aspects, owned_names)
-            else:
+            if not key_aspects:
+                self._add_section_header(layout, container, "KEY ASPECTS")
                 self._add_row(layout, container, "No specific key aspects listed.")
+
+            body_entries = build_entries_from_legacy_gear(key_items, owned_names)
+            aspect_entries = build_unslotted_entries(key_aspects, owned_names)
+
+            self.gear_planner.set_entries(body_entries, [("Key Aspects", aspect_entries)])
 
         stat_priority = gear.get("stat_priority") or []
         skill_bar = gear.get("skill_bar") or []
@@ -1179,93 +1234,6 @@ class LevelingCard(BaseCard):
         self._insert_row(layout, row)
 
     # ---------------------------------------------------------
-    # Gear tab
-    # ---------------------------------------------------------
-
-    def _render_gear_checklist(
-        self,
-        layout: QVBoxLayout,
-        container: QWidget,
-        entries: list[dict],
-        owned_names: set[str],
-    ):
-        """Render ``entries`` (``key_items`` or ``key_aspects``) as
-        toggle rows via ``_add_toggle_row``. Both lists share the same
-        ``{"name", "note"}`` shape (items also carry a ``slot``), and
-        both toggle the same ``gear_owned_changed`` signal/QSettings set
-        keyed by name - Maxroll item and aspect names don't collide, so
-        one flat "owned names" set is enough for both."""
-
-        for entry in entries:
-            slot = entry.get("slot", "")
-            title = f"{entry['name']} ({slot})" if slot else entry["name"]
-
-            notes = []
-            note = entry.get("note", "")
-            if note:
-                notes.append(note)
-
-            is_owned = entry["name"] in owned_names
-            self._add_toggle_row(
-                layout, container, title, notes, is_owned, entry["name"]
-            )
-
-    def _render_verified_gear_checklist(
-        self,
-        layout: QVBoxLayout,
-        container: QWidget,
-        gear_items: list[dict],
-        owned_names: set[str],
-    ):
-        """Render ``verified_build["gear"]`` (real slot + item name +
-        rarity, and a socketed Aspect name where decoded) as toggle rows
-        via ``_add_toggle_row``, keyed by each item's real name."""
-
-        for entry in gear_items:
-            name = entry["item_name"]
-            rarity = entry.get("rarity") or "?"
-            slot = entry.get("slot", "?")
-            # "—" throughout (not "(slot)") since a slot label can itself
-            # contain punctuation (e.g. "Weapon — Sword (Two-Handed)"),
-            # which would otherwise nest awkwardly inside parens.
-            title = f"{name} — {slot} — {rarity}"
-
-            notes = []
-            aspect = entry.get("aspect")
-            if aspect:
-                notes.append(f"Aspect: {aspect}")
-
-            is_owned = name in owned_names
-            self._add_toggle_row(layout, container, title, notes, is_owned, name)
-
-    def _add_toggle_row(
-        self,
-        layout: QVBoxLayout,
-        container: QWidget,
-        title: str,
-        notes: list[str],
-        is_owned: bool,
-        key: str,
-    ):
-
-        status = "✓ Have it" if is_owned else "○ Missing"
-
-        row, row_layout = self._make_row_shell(
-            container, status, title, notes, highlight=is_owned
-        )
-
-        toggle = SwitchButton(row)
-        toggle.setOnText("Have it")
-        toggle.setOffText("Missing")
-        toggle.setChecked(is_owned)
-        toggle.checkedChanged.connect(
-            lambda checked, k=key: self.gear_owned_changed.emit(k, checked)
-        )
-        row_layout.addWidget(toggle, 0)
-
-        self._insert_row(layout, row)
-
-    # ---------------------------------------------------------
     # Theme / appearance
     # ---------------------------------------------------------
 
@@ -1286,6 +1254,7 @@ class LevelingCard(BaseCard):
         self.next_label.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
         self.skills_next_label.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
         self.gear_rollup_label.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
+        self.gear_planner.refresh_theme()
 
         self.status_header_label.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
         self.status_rows_label.setStyleSheet(
