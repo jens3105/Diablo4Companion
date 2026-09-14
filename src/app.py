@@ -243,6 +243,17 @@ class MainWindow(FluentWindow):
             lambda: self.switchTo(self.builds_interface)
         )
 
+        # Dashboard card's and Build Advisor page's NEXT ACTION line jump
+        # straight to the relevant page/tab when clicked (this phase) -
+        # skill -> Build Guide's Skills tab, paragon -> its Paragon tab,
+        # gear -> the Character page. See _navigate_to_next_action.
+        self.dashboard.build_card.next_action_clicked.connect(
+            self._navigate_to_next_action
+        )
+        self.advisor_card.next_action_clicked.connect(
+            self._navigate_to_next_action
+        )
+
         # Phase 9: Compact Mode - lazily created on first use, torn down
         # (set back to None) when the user closes it, so re-opening it
         # always starts from a clean, freshly-synced window.
@@ -1264,19 +1275,26 @@ class MainWindow(FluentWindow):
             + self._pending_gear_actions(build_name)
         )
 
-    def _advisor_next_action(self, build_name: str) -> str:
+    def _advisor_next_action(self, build_name: str) -> tuple[str | None, str]:
         """Pick the single concrete "next thing to do" across Skills,
         Paragon and Gear for ``build_name`` - the Dashboard Current Build
-        card's one-line summary. Never fabricates an action when nothing
-        is left."""
+        card's and the Build Advisor page's one-line summary. Never
+        fabricates an action when nothing is left.
+
+        Returns ``(kind, text)`` - ``kind`` is whichever pending-action
+        helper produced the action (``"skill"``/``"paragon"``/``"gear"``,
+        already tagged on every tuple ``_advisor_pending_actions``
+        returns), or ``None`` when nothing is left. Lets click-to-
+        navigate (``MainWindow._navigate_to_next_action``) jump to the
+        right page/tab without any separate classification logic."""
 
         pending = self._advisor_pending_actions(build_name)
 
         if pending:
-            _kind, text, _key = pending[0]
-            return text
+            kind, text, _key = pending[0]
+            return kind, text
 
-        return "Build complete!"
+        return None, "Build complete!"
 
     def _refresh_dashboard_build_card(self):
         """Push the current build/level/status/next-action onto the
@@ -1295,15 +1313,15 @@ class MainWindow(FluentWindow):
         if not build_name:
             self.dashboard.build_card.set_build("", 0, [], "")
             self.character_card.set_header(char_name, "", 0)
-            self.advisor_card.set_advisor("", 0, [], "", False, "", {})
+            self.advisor_card.set_advisor("", 0, [], "", False, "", None, {})
             self._refresh_compact_window()
             return
 
         level = self._current_level()
         rows, footer_text, ready = self._compute_build_status(build_name)
-        next_action = self._advisor_next_action(build_name)
+        next_kind, next_action = self._advisor_next_action(build_name)
 
-        self.dashboard.build_card.set_build(build_name, level, rows, next_action)
+        self.dashboard.build_card.set_build(build_name, level, rows, next_action, next_kind)
         self.character_card.set_header(char_name, build_name, level)
         self.advisor_card.set_advisor(
             build_name,
@@ -1312,6 +1330,7 @@ class MainWindow(FluentWindow):
             footer_text,
             ready,
             next_action,
+            next_kind,
             self._advisor_missing_summary(build_name),
         )
 
@@ -1346,6 +1365,27 @@ class MainWindow(FluentWindow):
             category: ([text for _kind, text, _key in actions[:cap]], len(actions))
             for category, actions in per_category.items()
         }
+
+    def _navigate_to_next_action(self, kind: str):
+        """Dashboard card's / Build Advisor page's NEXT ACTION line was
+        clicked - jump to the page (and, for Skills/Paragon, the exact
+        Build Guide tab) that action lives on: ``"skill"`` -> Build
+        Guide's Skills tab, ``"paragon"`` -> its Paragon tab, ``"gear"``
+        -> the Character page (the Equipment Planner has no per-item
+        anchor to jump further into - landing on the page is the
+        achievable minimum there). Uses the same ``switchTo`` pattern
+        already wired for the Dashboard card's whole-card click."""
+
+        if kind == "gear":
+            self.switchTo(self.character_interface)
+            return
+
+        self.switchTo(self.builds_interface)
+
+        if kind == "skill":
+            self.leveling_card.select_section(self.leveling_card.SKILLS_KEY)
+        elif kind == "paragon":
+            self.leveling_card.select_section(self.leveling_card.PARAGON_KEY)
 
     # ---------------------------------------------------------
     # COMPACT MODE (Phase 9)

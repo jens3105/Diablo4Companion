@@ -1,10 +1,66 @@
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 
-from qfluentwidgets import CardWidget, IconWidget, StrongBodyLabel
+from qfluentwidgets import BodyLabel, CardWidget, IconWidget, StrongBodyLabel
 from qfluentwidgets.common.icon import FluentIconBase
 
 from src import theme
+
+
+class ClickableBodyLabel(BodyLabel):
+    """A ``BodyLabel`` that can be toggled (``set_active``) into a
+    clickable, hand-cursor state - used for the Dashboard/Build Advisor
+    "next action" line jumping straight to the relevant page/tab (see
+    ``CurrentBuildCard``/``BuildAdvisorCard``).
+
+    When inactive, an unhandled mouse release just falls through to
+    ``QLabel``'s default (Qt propagates an *ignored* mouse event up to
+    the parent widget - this is exactly how, before this class existed,
+    clicking anywhere on ``CurrentBuildCard`` including this label
+    already fell through to the whole card's own ``clicked`` navigation).
+    When active, the event is accepted here instead, so it stops at this
+    label and fires ``clicked`` rather than also triggering the parent
+    card's navigation."""
+
+    clicked = Signal()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._active = False
+
+    def set_active(self, active: bool):
+        self._active = active
+        self.setCursor(Qt.PointingHandCursor if active else Qt.ArrowCursor)
+
+    def mouseReleaseEvent(self, e):
+        if self._active:
+            e.accept()
+            self.clicked.emit()
+        else:
+            super().mouseReleaseEvent(e)
+
+
+class ClickableStrongBodyLabel(StrongBodyLabel):
+    """Same as ``ClickableBodyLabel``, styled like ``StrongBodyLabel`` -
+    used by ``BuildAdvisorCard``'s bigger next-action line."""
+
+    clicked = Signal()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._active = False
+
+    def set_active(self, active: bool):
+        self._active = active
+        self.setCursor(Qt.PointingHandCursor if active else Qt.ArrowCursor)
+
+    def mouseReleaseEvent(self, e):
+        if self._active:
+            e.accept()
+            self.clicked.emit()
+        else:
+            super().mouseReleaseEvent(e)
 
 
 class BaseCard(CardWidget):

@@ -221,6 +221,34 @@ class LevelingCard(BaseCard):
         self.content_layout.setStretch(self.content_layout.count() - 1, 1)
 
     # ---------------------------------------------------------
+    # Programmatic section navigation (click-to-navigate from the
+    # Dashboard's next-action / the Build Advisor page)
+    # ---------------------------------------------------------
+
+    def select_section(self, key: str):
+        """Switch to the Leveling/Skills/Paragon tab named by ``key``
+        (one of ``LEVELING_KEY``/``SKILLS_KEY``/``PARAGON_KEY``).
+
+        ``SegmentedWidget.setCurrentItem`` alone only updates the pivot's
+        visual selection - the actual page switch happens in the
+        ``onClick`` lambda wired to each item's ``itemClicked`` signal
+        (fired only by a real user click, not by ``setCurrentItem``), so
+        both have to be driven here."""
+
+        page_by_key = {
+            self.LEVELING_KEY: self.leveling_page,
+            self.SKILLS_KEY: self.skills_page,
+            self.PARAGON_KEY: self.paragon_page,
+        }
+        page = page_by_key.get(key)
+
+        if page is None:
+            return
+
+        self.section_selector.setCurrentItem(key)
+        self.section_stack.setCurrentWidget(page)
+
+    # ---------------------------------------------------------
     # Page builders
     # ---------------------------------------------------------
 

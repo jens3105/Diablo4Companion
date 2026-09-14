@@ -11,7 +11,7 @@ from qfluentwidgets import (
 )
 
 from src import theme
-from src.base_card import BaseCard
+from src.base_card import BaseCard, ClickableBodyLabel
 
 
 class CurrentBuildCard(BaseCard):
@@ -28,6 +28,13 @@ class CurrentBuildCard(BaseCard):
     so it doesn't fight with the card-wide ``clicked`` navigation."""
 
     compact_mode_requested = Signal()
+    # Emits the pending action's category ("skill"/"paragon"/"gear")
+    # when the NEXT ACTION line is clicked, so MainWindow can jump to the
+    # right page/tab (Build Guide's Skills or Paragon tab, or the
+    # Character page) - see MainWindow._navigate_to_next_action. Never
+    # emitted when there's nothing to act on (no build, or "Build
+    # complete!") - see set_build's ``next_action_kind``.
+    next_action_clicked = Signal(str)
 
     def __init__(self, parent=None):
         super().__init__("CURRENT BUILD", icon=FIF.GAME, parent=parent)
@@ -78,23 +85,40 @@ class CurrentBuildCard(BaseCard):
         self.next_header.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
         self.content_layout.addWidget(self.next_header)
 
-        self.next_action_label = BodyLabel("—", self.content)
+        self.next_action_label = ClickableBodyLabel("—", self.content)
         self.next_action_label.setWordWrap(True)
+        self.next_action_label.clicked.connect(self._on_next_action_clicked)
         self.content_layout.addWidget(self.next_action_label)
 
         self.content_layout.addStretch(1)
 
-    def set_build(self, build_name: str, level: int, status_rows: list[tuple[str, str, str]], next_action_text: str):
+        self._next_action_kind = None
+
+    def set_build(
+        self,
+        build_name: str,
+        level: int,
+        status_rows: list[tuple[str, str, str]],
+        next_action_text: str,
+        next_action_kind: str | None = None,
+    ):
         """Populate the card. ``status_rows`` is the same ``(emoji,
         label, pct_text)`` list ``LevelingCard.set_build_status`` takes -
         only the emoji + label are shown here, kept to one short line per
-        category so the card stays compact next to the event cards."""
+        category so the card stays compact next to the event cards.
+
+        ``next_action_kind`` is one of ``"skill"``/``"paragon"``/
+        ``"gear"`` (from ``MainWindow._advisor_next_action``) or ``None``
+        when there's nothing to act on - it decides whether the NEXT
+        ACTION line is click-to-navigate right now."""
 
         if not build_name:
             self.build_name_label.setText("No build selected")
             self.level_label.setText("")
             self.status_rows_label.setText("")
             self.next_action_label.setText("—")
+            self._next_action_kind = None
+            self.next_action_label.set_active(False)
             return
 
         self.build_name_label.setText(build_name)
@@ -104,6 +128,12 @@ class CurrentBuildCard(BaseCard):
         self.status_rows_label.setText("\n".join(lines))
 
         self.next_action_label.setText(next_action_text or "—")
+        self._next_action_kind = next_action_kind
+        self.next_action_label.set_active(next_action_kind is not None)
+
+    def _on_next_action_clicked(self):
+        if self._next_action_kind is not None:
+            self.next_action_clicked.emit(self._next_action_kind)
 
     def refresh_theme(self):
         super().refresh_theme()
