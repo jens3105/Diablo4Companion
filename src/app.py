@@ -924,8 +924,9 @@ class MainWindow(FluentWindow):
 
         gear = self.leveling_manager.get_gear_data(build_name)
         owned = self._load_owned_items(build_name)
+        verified_build = self.leveling_manager.get_verified_build(build_name)
 
-        self.leveling_card.set_gear(gear, owned)
+        self.leveling_card.set_gear(gear, owned, verified_build)
 
     def on_gear_owned_changed(self, name: str, owned: bool):
 
@@ -1037,9 +1038,15 @@ class MainWindow(FluentWindow):
             )
             paragon_pct = self._pct(paragon_done, len(boards))
 
-        gear = self.leveling_manager.get_gear_data(build_name) or {}
-        checkable_gear = (gear.get("key_items") or []) + (gear.get("key_aspects") or [])
-        gear_names = {entry["name"] for entry in checkable_gear}
+        verified_gear = (verified_build or {}).get("gear") or []
+
+        if verified_gear:
+            gear_names = {entry["item_name"] for entry in verified_gear}
+        else:
+            gear = self.leveling_manager.get_gear_data(build_name) or {}
+            checkable_gear = (gear.get("key_items") or []) + (gear.get("key_aspects") or [])
+            gear_names = {entry["name"] for entry in checkable_gear}
+
         owned = self._load_owned_items(build_name) & gear_names
         gear_pct = self._pct(len(owned), len(gear_names))
         missing_gear = len(gear_names) - len(owned)

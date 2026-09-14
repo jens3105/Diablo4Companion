@@ -267,6 +267,95 @@
           "Forbidden Contact"
         ]
       }
+    ],
+    "gear": [
+      {
+        "slot": "Helm",
+        "item_name": "Runic Skullcap",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Might"
+      },
+      {
+        "slot": "Chest",
+        "item_name": "Runic Mail",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Disobedience"
+      },
+      {
+        "slot": "Weapon — Axe (Two-Handed)",
+        "item_name": "Parashu",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Mutilation"
+      },
+      {
+        "slot": "Gloves",
+        "item_name": "Fists of Fate",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Pants",
+        "item_name": "Runic Leggings",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Heavenly Strength"
+      },
+      {
+        "slot": "Boots",
+        "item_name": "Runic Cleats",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Rallying Reversal"
+      },
+      {
+        "slot": "Ring 1",
+        "item_name": "Lurid Pact",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Ring 2",
+        "item_name": "Soulwatch Hoop",
+        "rarity": "Legendary",
+        "aspect": "Aggressive Aspect"
+      },
+      {
+        "slot": "Amulet",
+        "item_name": "Seed of Horazon",
+        "rarity": "Mythic",
+        "aspect": "Ghostwalker Aspect"
+      },
+      {
+        "slot": "Talisman (Seal)",
+        "item_name": "Legendary Horadric Seal",
+        "rarity": "Legendary"
+      },
+      {
+        "slot": "Talisman (Charm) 1",
+        "item_name": "Mlor of Horazon's Chains",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 2",
+        "item_name": "Phoba of Horazon's Chains",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 3",
+        "item_name": "Berú of Horazon's Chains",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 4",
+        "item_name": "Fer of Horazon's Chains",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 5",
+        "item_name": "Linta of Horazon's Chains",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 6",
+        "item_name": "Godslayer Crown",
+        "rarity": "Unique"
+      }
     ]
   }
 }

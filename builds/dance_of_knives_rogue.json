@@ -259,6 +259,99 @@
           "Skulker"
         ]
       }
+    ],
+    "gear": [
+      {
+        "slot": "Helm",
+        "item_name": "Cowl of the Nameless",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Chest",
+        "item_name": "Runic Mail",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Debilitating Toxins"
+      },
+      {
+        "slot": "Weapon — Crossbow (Two-Handed)",
+        "item_name": "Warcaster",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Channeling"
+      },
+      {
+        "slot": "Weapon — Dagger 1",
+        "item_name": "Asheara's Khanjar",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Weapon — Dagger 2",
+        "item_name": "Etna's Lost Dagger",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Gloves",
+        "item_name": "Runic Gloves",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Imitated Imbuement"
+      },
+      {
+        "slot": "Pants",
+        "item_name": "Shrouded Gift",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Boots",
+        "item_name": "Runic Cleats",
+        "rarity": "Legendary",
+        "aspect": "Earthstriker's Aspect"
+      },
+      {
+        "slot": "Ring",
+        "item_name": "Soulwatch Hoop",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Alchemical Advantage"
+      },
+      {
+        "slot": "Amulet",
+        "item_name": "Ocelot's Eye",
+        "rarity": "Legendary",
+        "aspect": "Crushing Aspect, Exploiter's Aspect"
+      },
+      {
+        "slot": "Talisman (Seal)",
+        "item_name": "Seal of the Diamond Mind",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Talisman (Charm) 1",
+        "item_name": "Berú of Spellbound Steel",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 2",
+        "item_name": "Fer of Spellbound Steel",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 3",
+        "item_name": "Phoba of the Sightless",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 4",
+        "item_name": "Mlor of Spellbound Steel",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 5",
+        "item_name": "Phoba of Spellbound Steel",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 6",
+        "item_name": "Berú of the Sightless",
+        "rarity": "Set"
+      }
     ]
   }
 }

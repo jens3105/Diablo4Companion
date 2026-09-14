@@ -752,23 +752,46 @@ class LevelingCard(BaseCard):
                 layout, container, title, notes, is_done, is_next, self.mark_board_done, board_id
             )
 
-    def set_gear(self, gear: dict | None, owned_names: set[str]):
-        """Populate the Gear & Powers tab as a toggle checklist over
-        ``key_items``/``key_aspects`` - unlike the one-way Leveling/
-        Skills/Paragon checklists, gear ownership can be lost (an item
-        sold/replaced), so each row gets a two-way "Have it"/"Missing"
-        toggle (see ``_add_toggle_row``) instead of a one-way "Mark as
-        Done" button, and there's a rollup ("X / Y key items equipped")
-        up top instead of a "next" pointer so build-readiness is visible
-        at a glance. ``stat_priority``/``skill_bar`` stay plain reference
-        text, same as before - they aren't checkable items."""
+    def set_gear(
+        self,
+        gear: dict | None,
+        owned_names: set[str],
+        verified_build: dict | None = None,
+    ):
+        """Populate the Gear & Powers tab as a toggle checklist.
+
+        When ``verified_build`` has a real, decoded ``gear`` list (see
+        ``LevelingManager.get_verified_build`` /
+        ``scripts/maxroll_data_decoder.py``'s ``decode_gear``) - the
+        actual equipped loadout (real item name + slot + rarity, and the
+        real socketed Aspect name where one applies) - THAT list is what
+        gets tracked (``_render_verified_gear_checklist``), not the
+        older, prose-derived ``key_items``/``key_aspects`` lists. Each
+        row is keyed by the item's real name (a stable identifier - two
+        equipped items sharing a name within one build is not a
+        realistic case).
+
+        Only when a build has no verified gear data does this fall back
+        to the original ``key_items``/``key_aspects`` toggle checklist
+        (``_render_gear_checklist``) - unchanged for the one build
+        (Heartseeker Rogue) with no verified data at all.
+
+        Unlike the one-way Leveling/Skills/Paragon checklists, gear
+        ownership can be lost (an item sold/replaced), so each row gets
+        a two-way "Have it"/"Missing" toggle (see ``_add_toggle_row``)
+        instead of a one-way "Mark as Done" button, and there's a
+        rollup ("X / Y items equipped") up top instead of a "next"
+        pointer so build-readiness is visible at a glance.
+        ``stat_priority``/``skill_bar`` stay plain reference text either
+        way - they aren't checkable items and have no verified
+        equivalent."""
 
         layout = self.gear_layout
         container = self.gear_container
 
         self._clear_rows(layout)
 
-        if not gear:
+        if not gear and not verified_build:
             self.gear_rollup_label.setText(
                 "No endgame gear guide available for this build."
             )
@@ -781,34 +804,55 @@ class LevelingCard(BaseCard):
             )
             return
 
-        key_items = gear.get("key_items") or []
-        key_aspects = gear.get("key_aspects") or []
+        gear = gear or {}
+        verified_gear = (verified_build or {}).get("gear") or []
+
+        if verified_gear:
+            owned_count = sum(1 for entry in verified_gear if entry["item_name"] in owned_names)
+            self.gear_rollup_label.setText(
+                f"{owned_count} / {len(verified_gear)} items equipped"
+            )
+
+            self._add_section_header(
+                layout, container, "EQUIPPED GEAR (VERIFIED — MAXROLL PLANNER)"
+            )
+            self._add_row(
+                layout,
+                container,
+                f"Real item names, slots and socketed Aspects decoded from Maxroll's "
+                f"\"{verified_build.get('profile_name', '?')}\" planner profile.",
+            )
+            self._render_verified_gear_checklist(layout, container, verified_gear, owned_names)
+        else:
+            key_items = gear.get("key_items") or []
+            key_aspects = gear.get("key_aspects") or []
+
+            checkable = key_items + key_aspects
+            owned_count = sum(1 for entry in checkable if entry["name"] in owned_names)
+
+            if checkable:
+                self.gear_rollup_label.setText(
+                    f"{owned_count} / {len(checkable)} key items equipped"
+                )
+            else:
+                self.gear_rollup_label.setText("No specific gear checklist for this build.")
+
+            self._add_section_header(layout, container, "KEY / SIGNATURE ITEMS")
+
+            if key_items:
+                self._render_gear_checklist(layout, container, key_items, owned_names)
+            else:
+                self._add_row(layout, container, "No specific key items listed.")
+
+            self._add_section_header(layout, container, "KEY ASPECTS")
+
+            if key_aspects:
+                self._render_gear_checklist(layout, container, key_aspects, owned_names)
+            else:
+                self._add_row(layout, container, "No specific key aspects listed.")
+
         stat_priority = gear.get("stat_priority") or []
         skill_bar = gear.get("skill_bar") or []
-
-        checkable = key_items + key_aspects
-        owned_count = sum(1 for entry in checkable if entry["name"] in owned_names)
-
-        if checkable:
-            self.gear_rollup_label.setText(
-                f"{owned_count} / {len(checkable)} key items equipped"
-            )
-        else:
-            self.gear_rollup_label.setText("No specific gear checklist for this build.")
-
-        self._add_section_header(layout, container, "KEY / SIGNATURE ITEMS")
-
-        if key_items:
-            self._render_gear_checklist(layout, container, key_items, owned_names)
-        else:
-            self._add_row(layout, container, "No specific key items listed.")
-
-        self._add_section_header(layout, container, "KEY ASPECTS")
-
-        if key_aspects:
-            self._render_gear_checklist(layout, container, key_aspects, owned_names)
-        else:
-            self._add_row(layout, container, "No specific key aspects listed.")
 
         self._add_section_header(layout, container, "STAT PRIORITY")
 
@@ -1165,6 +1209,34 @@ class LevelingCard(BaseCard):
             self._add_toggle_row(
                 layout, container, title, notes, is_owned, entry["name"]
             )
+
+    def _render_verified_gear_checklist(
+        self,
+        layout: QVBoxLayout,
+        container: QWidget,
+        gear_items: list[dict],
+        owned_names: set[str],
+    ):
+        """Render ``verified_build["gear"]`` (real slot + item name +
+        rarity, and a socketed Aspect name where decoded) as toggle rows
+        via ``_add_toggle_row``, keyed by each item's real name."""
+
+        for entry in gear_items:
+            name = entry["item_name"]
+            rarity = entry.get("rarity") or "?"
+            slot = entry.get("slot", "?")
+            # "—" throughout (not "(slot)") since a slot label can itself
+            # contain punctuation (e.g. "Weapon — Sword (Two-Handed)"),
+            # which would otherwise nest awkwardly inside parens.
+            title = f"{name} — {slot} — {rarity}"
+
+            notes = []
+            aspect = entry.get("aspect")
+            if aspect:
+                notes.append(f"Aspect: {aspect}")
+
+            is_owned = name in owned_names
+            self._add_toggle_row(layout, container, title, notes, is_owned, name)
 
     def _add_toggle_row(
         self,

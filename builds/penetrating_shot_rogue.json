@@ -256,6 +256,105 @@
           "Skulker"
         ]
       }
+    ],
+    "gear": [
+      {
+        "slot": "Helm",
+        "item_name": "Harlequin Crest",
+        "rarity": "Unique"
+      },
+      {
+        "slot": "Chest",
+        "item_name": "Runic Mail",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Debilitating Toxins"
+      },
+      {
+        "slot": "Weapon — Bow",
+        "item_name": "Eaglehorn",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Weapon — Dagger 1",
+        "item_name": "Etna's Lost Dagger",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Weapon — Dagger 2",
+        "item_name": "Bone Blade",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Imitated Imbuement"
+      },
+      {
+        "slot": "Gloves",
+        "item_name": "Runic Gloves",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Contamination"
+      },
+      {
+        "slot": "Pants",
+        "item_name": "Shrouded Gift",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Boots",
+        "item_name": "Runic Cleats",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Mending Obscurity"
+      },
+      {
+        "slot": "Ring 1",
+        "item_name": "Soulwatch Hoop",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Alchemical Advantage"
+      },
+      {
+        "slot": "Ring 2",
+        "item_name": "Soulwatch Hoop",
+        "rarity": "Legendary",
+        "aspect": "Neurotoxic Aspect"
+      },
+      {
+        "slot": "Amulet",
+        "item_name": "Ocelot's Eye",
+        "rarity": "Legendary",
+        "aspect": "Crushing Aspect, Aspect of Retribution"
+      },
+      {
+        "slot": "Talisman (Seal)",
+        "item_name": "Legendary Horadric Seal",
+        "rarity": "Legendary"
+      },
+      {
+        "slot": "Talisman (Charm) 1",
+        "item_name": "Linta of the Sightless",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 2",
+        "item_name": "Phoba of the Sightless",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 3",
+        "item_name": "Berú of the Sightless",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 4",
+        "item_name": "Fer of the Sightless",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 5",
+        "item_name": "Mlor of the Sightless",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 6",
+        "item_name": "Cowl of the Nameless",
+        "rarity": "Unique"
+      }
     ]
   }
 }

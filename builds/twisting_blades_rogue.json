@@ -253,6 +253,105 @@
           "Skulker"
         ]
       }
+    ],
+    "gear": [
+      {
+        "slot": "Helm",
+        "item_name": "Harlequin Crest",
+        "rarity": "Unique"
+      },
+      {
+        "slot": "Chest",
+        "item_name": "Runic Mail",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Disobedience"
+      },
+      {
+        "slot": "Weapon — Crossbow (Two-Handed)",
+        "item_name": "Warcaster",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Imitated Imbuement"
+      },
+      {
+        "slot": "Weapon — Dagger 1",
+        "item_name": "The Maestro",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Weapon — Dagger 2",
+        "item_name": "Etna's Lost Dagger",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Gloves",
+        "item_name": "Fist of the Iron Rose",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Pants",
+        "item_name": "Runic Leggings",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Debilitating Toxins"
+      },
+      {
+        "slot": "Boots",
+        "item_name": "Runic Cleats",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Siphoning Strikes"
+      },
+      {
+        "slot": "Ring 1",
+        "item_name": "Soulwatch Hoop",
+        "rarity": "Legendary",
+        "aspect": "Neurotoxic Aspect"
+      },
+      {
+        "slot": "Ring 2",
+        "item_name": "Soulwatch Hoop",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Malice"
+      },
+      {
+        "slot": "Amulet",
+        "item_name": "Ocelot's Eye",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Contamination, Exploiter's Aspect"
+      },
+      {
+        "slot": "Talisman (Seal)",
+        "item_name": "Legendary Horadric Seal",
+        "rarity": "Legendary"
+      },
+      {
+        "slot": "Talisman (Charm) 1",
+        "item_name": "Mlor of Spellbound Steel",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 2",
+        "item_name": "Fer of Spellbound Steel",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 3",
+        "item_name": "Linta of Spellbound Steel",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 4",
+        "item_name": "Berú of Spellbound Steel",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 5",
+        "item_name": "Phoba of Spellbound Steel",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 6",
+        "item_name": "Godslayer Crown",
+        "rarity": "Unique"
+      }
     ]
   }
 }

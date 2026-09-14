@@ -292,6 +292,92 @@
           "Incombustible"
         ]
       }
+    ],
+    "gear": [
+      {
+        "slot": "Helm",
+        "item_name": "Harmony of Ebewaka",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Chest",
+        "item_name": "Runic Mail",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Debilitating Toxins"
+      },
+      {
+        "slot": "Weapon — Quarterstaff",
+        "item_name": "Rod of Kepeleke",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Gloves",
+        "item_name": "Runic Gloves",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Plains Power"
+      },
+      {
+        "slot": "Pants",
+        "item_name": "Runic Leggings",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Disobedience"
+      },
+      {
+        "slot": "Boots",
+        "item_name": "Path of the Emissary",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Ring 1",
+        "item_name": "Ring of the Midnight Sun",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Ring 2",
+        "item_name": "Ring of Starless Skies",
+        "rarity": "Unique"
+      },
+      {
+        "slot": "Amulet",
+        "item_name": "Ocelot's Eye",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Supremacy, Exploiter's Aspect"
+      },
+      {
+        "slot": "Talisman (Seal)",
+        "item_name": "Legendary Horadric Seal",
+        "rarity": "Legendary"
+      },
+      {
+        "slot": "Talisman (Charm) 1",
+        "item_name": "Berú of the Multitude",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 2",
+        "item_name": "Linta of the Multitude",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 3",
+        "item_name": "Fer of Rezoka's Rage",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 4",
+        "item_name": "Berú of Rezoka's Rage",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 5",
+        "item_name": "Fer of the Multitude",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 6",
+        "item_name": "Protean Heart",
+        "rarity": "Unique"
+      }
     ]
   }
 }

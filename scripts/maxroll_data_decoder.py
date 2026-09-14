@@ -287,6 +287,169 @@ def decode_paragon(profile: dict, data_dict: dict, step_name: str | None = None)
     return result
 
 
+# ``data.min.json["items"]["<slug>"]["type"]`` values that map to a
+# fixed, friendly armor/accessory slot name. Weapon types are numerous
+# and class-specific (Sword1H, Axe2H, Glaive, Bow, Wand, Focus, Totem,
+# Polearm, Staff2H, ...) so those fall through to a generic "Weapon -
+# <type>" label built from the raw type string instead of being
+# hardcoded here one by one.
+_ARMOR_AND_ACCESSORY_SLOT_LABELS = {
+    "Helm": "Helm",
+    "ChestArmor": "Chest",
+    "Gloves": "Gloves",
+    "Legs": "Pants",
+    "Boots": "Boots",
+    "Amulet": "Amulet",
+    "Ring": "Ring",
+    "HoradricSeal": "Talisman (Seal)",
+    "Charm": "Talisman (Charm)",
+    "Quiver": "Quiver",
+}
+
+# Offhand types that aren't weapons themselves (Shield/Focus/Totem).
+_OFFHAND_TYPES = {"Shield", "Focus", "Totem"}
+
+
+def _humanize_item_type(item_type: str) -> str:
+    """Best-effort human label for a ``data.min.json`` item ``type``."""
+
+    if item_type in _ARMOR_AND_ACCESSORY_SLOT_LABELS:
+        return _ARMOR_AND_ACCESSORY_SLOT_LABELS[item_type]
+
+    if item_type in _OFFHAND_TYPES:
+        return f"Offhand ({item_type})"
+
+    if item_type.endswith("2H"):
+        return f"Weapon — {item_type[:-2]} (Two-Handed)"
+
+    return f"Weapon — {item_type}" if item_type else "Item"
+
+
+def _resolve_item_rarity(item_instance: dict, item_def: dict) -> str:
+    """Rarity for one equipped item.
+
+    The profile's own per-instance ``mythic`` flag is authoritative when
+    present - it reflects live game state (e.g. items later reclassified
+    from Unique to Mythic by a balance patch) more reliably than
+    ``data.min.json``'s static ``magicType`` field. Falls back to
+    ``magicType`` (4=Mythic, 3=Set - the newer Horadric Charm "set"
+    items, e.g. the "Abaddon's Flesh" charm set, 2=Unique, 1=Legendary,
+    else Rare) when the instance carries no explicit flag.
+    """
+
+    if item_instance.get("mythic"):
+        return "Mythic"
+
+    return {4: "Mythic", 3: "Set", 2: "Unique", 1: "Legendary"}.get(
+        item_def.get("magicType"), "Rare"
+    )
+
+
+def _aspect_display_name(affix_def: dict) -> str | None:
+    """Real in-game Aspect name from an affix definition's ``prefix``/
+    ``suffix`` fields, using Diablo 4's own naming convention - checked
+    against all 543 real Legendary-power affixes in ``data.min.json``:
+    every one has exactly one of ``prefix``/``suffix`` set, never both,
+    so there's no combined-name pattern to guess:
+
+    - suffix only (e.g. "of Heavenly Strength") -> "Aspect of Heavenly
+      Strength" (suffix already includes the leading "of").
+    - prefix only (e.g. "Demonic") -> "Demonic Aspect" - cross-checked
+      against the real Demonic Aspect tooltip text.
+
+    Returns ``None`` for a definition with neither (a handful of
+    unused/template entries in the data - never real equipped gear).
+    """
+
+    suffix = affix_def.get("suffix")
+    if suffix:
+        return f"Aspect {suffix}"
+
+    prefix = affix_def.get("prefix")
+    if prefix:
+        return f"{prefix} Aspect"
+
+    return None
+
+
+def decode_gear(data: dict, profile: dict, data_dict: dict) -> list[dict]:
+    """Decode ``profile["items"]`` (slot index -> item id, referencing
+    the planner-link-wide item catalog at ``data["items"]``) into the
+    actual equipped loadout.
+
+    For each resolvable item: real name + slot label (via ``data_dict
+    ["items"][<slug>]``) and rarity (see ``_resolve_item_rarity``). When
+    the item instance carries a socketed Legendary Aspect (an
+    ``aspects`` list - Unique/Mythic items never have one, since their
+    slot is occupied by their fixed innate power instead), the real
+    Aspect name is resolved too (see ``_aspect_display_name``), matched
+    by the aspect's numeric ``nid`` against ``data_dict["affixes"]``
+    (grouped by their own ``id`` field - affixes are keyed by slug in
+    the raw dict, not by this id).
+
+    Items with no resolvable base definition/name are skipped rather
+    than guessed. Duplicate slot labels (both Rings, dual-wielded
+    weapons) get a trailing " 1"/" 2" so each row has a distinct key.
+    """
+
+    item_catalog = data.get("items") or {}
+    equipped = profile.get("items") or {}
+    item_defs = data_dict["items"]
+
+    affixes_by_id: dict[int, dict] = {}
+    for affix_def in data_dict["affixes"].values():
+        if isinstance(affix_def, dict) and "id" in affix_def:
+            affixes_by_id[affix_def["id"]] = affix_def
+
+    resolved = []
+
+    for slot_idx in sorted(equipped, key=lambda s: int(s)):
+        instance = item_catalog.get(str(equipped[slot_idx]))
+        if not instance:
+            continue
+
+        slug = instance.get("id")
+        item_def = item_defs.get(slug) if slug else None
+        if not item_def or not item_def.get("name"):
+            continue
+
+        aspect_names = []
+        for aspect_ref in instance.get("aspects") or []:
+            affix_def = affixes_by_id.get(aspect_ref.get("nid"))
+            name = _aspect_display_name(affix_def) if affix_def else None
+            if name:
+                aspect_names.append(name)
+
+        resolved.append(
+            {
+                "slot_label": _humanize_item_type(item_def.get("type", "")),
+                "item_name": item_def["name"],
+                "rarity": _resolve_item_rarity(instance, item_def),
+                "aspect": ", ".join(aspect_names) if aspect_names else None,
+            }
+        )
+
+    label_totals: dict[str, int] = {}
+    for entry in resolved:
+        label_totals[entry["slot_label"]] = label_totals.get(entry["slot_label"], 0) + 1
+
+    label_seen: dict[str, int] = {}
+    result = []
+    for entry in resolved:
+        label = entry.pop("slot_label")
+        if label_totals[label] > 1:
+            label_seen[label] = label_seen.get(label, 0) + 1
+            label = f"{label} {label_seen[label]}"
+
+        gear_entry = {"slot": label, "item_name": entry["item_name"], "rarity": entry["rarity"]}
+        if entry["aspect"]:
+            gear_entry["aspect"] = entry["aspect"]
+
+        result.append(gear_entry)
+
+    return result
+
+
 def decode_skill_bar(profile: dict, data_dict: dict) -> list[str]:
     """Resolve ``profile["skillBar"]`` slugs to real display names via
     ``skills[slug]["name"]``."""
@@ -317,6 +480,7 @@ def decode_profile(
         "skill_bar": decode_skill_bar(profile, data_dict),
         "skill_allocation": decode_skill_allocation(profile, data_dict),
         "paragon_boards": decode_paragon(profile, data_dict, step_name=paragon_step_name),
+        "gear": decode_gear(data, profile, data_dict),
     }
 
 

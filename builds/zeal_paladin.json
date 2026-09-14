@@ -256,6 +256,94 @@
           "Skirmish"
         ]
       }
+    ],
+    "gear": [
+      {
+        "slot": "Helm",
+        "item_name": "Crown of Lucion",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Chest",
+        "item_name": "Runic Mail",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Glynn's Anvil"
+      },
+      {
+        "slot": "Weapon — Sword (Two-Handed)",
+        "item_name": "Red Sermon",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Gloves",
+        "item_name": "Fists of Fate",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Pants",
+        "item_name": "Runic Leggings",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Heavenly Strength"
+      },
+      {
+        "slot": "Boots",
+        "item_name": "Runic Cleats",
+        "rarity": "Legendary",
+        "aspect": "Embattled Aspect"
+      },
+      {
+        "slot": "Ring 1",
+        "item_name": "Soulwatch Hoop",
+        "rarity": "Legendary",
+        "aspect": "Revelator's Aspect"
+      },
+      {
+        "slot": "Ring 2",
+        "item_name": "Soulwatch Hoop",
+        "rarity": "Legendary",
+        "aspect": "Aspect of the Zealot's Covenant"
+      },
+      {
+        "slot": "Amulet",
+        "item_name": "Ocelot's Eye",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Redirected Force, Aspect of Interdiction"
+      },
+      {
+        "slot": "Talisman (Seal)",
+        "item_name": "Legendary Horadric Seal",
+        "rarity": "Legendary"
+      },
+      {
+        "slot": "Talisman (Charm) 1",
+        "item_name": "Berú of Dauntless Faith",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 2",
+        "item_name": "Phoba of Dauntless Faith",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 3",
+        "item_name": "Mlor of Dauntless Faith",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 4",
+        "item_name": "Linta of Dauntless Faith",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 5",
+        "item_name": "Fer of Dauntless Faith",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 6",
+        "item_name": "Griswold's Opus",
+        "rarity": "Unique"
+      }
     ]
   }
 }

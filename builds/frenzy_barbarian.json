@@ -266,6 +266,108 @@
           "Craving"
         ]
       }
+    ],
+    "gear": [
+      {
+        "slot": "Helm",
+        "item_name": "Tuskhelm of Joritz the Mighty",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Chest",
+        "item_name": "Runic Mail",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Disobedience"
+      },
+      {
+        "slot": "Weapon — Mace (Two-Handed)",
+        "item_name": "Bonebreaker",
+        "rarity": "Legendary",
+        "aspect": "Crushing Aspect"
+      },
+      {
+        "slot": "Weapon — Sword (Two-Handed)",
+        "item_name": "The Grandfather",
+        "rarity": "Unique"
+      },
+      {
+        "slot": "Weapon — Sword 1",
+        "item_name": "Shard of Verathiel",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Weapon — Sword 2",
+        "item_name": "Ramaladni's Magnum Opus",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Gloves",
+        "item_name": "Fists of Fate",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Pants",
+        "item_name": "Tibault's Will",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Boots",
+        "item_name": "Hooves of the Mountain God",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Ring 1",
+        "item_name": "Soulwatch Hoop",
+        "rarity": "Legendary",
+        "aspect": "Aspect of the Moonrise"
+      },
+      {
+        "slot": "Ring 2",
+        "item_name": "Soulwatch Hoop",
+        "rarity": "Legendary",
+        "aspect": "Duelist's Aspect"
+      },
+      {
+        "slot": "Amulet",
+        "item_name": "Battle Trance",
+        "rarity": "Mythic",
+        "aspect": "Battle-Mad Aspect"
+      },
+      {
+        "slot": "Talisman (Seal)",
+        "item_name": "Legendary Horadric Seal",
+        "rarity": "Legendary"
+      },
+      {
+        "slot": "Talisman (Charm) 1",
+        "item_name": "Linta of Sescheron's Fury",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 2",
+        "item_name": "Phoba of Sescheron's Fury",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 3",
+        "item_name": "Berú of Sescheron's Fury",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 4",
+        "item_name": "Fer of Sescheron's Fury",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 5",
+        "item_name": "Mlor of Sescheron's Fury",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 6",
+        "item_name": "Paingorger's Gauntlets",
+        "rarity": "Unique"
+      }
     ]
   }
 }

@@ -223,6 +223,112 @@
           "Berserker"
         ]
       }
+    ],
+    "gear": [
+      {
+        "slot": "Helm",
+        "item_name": "Heir of Perdition",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Chest",
+        "item_name": "The Relentless Heart",
+        "rarity": "Unique"
+      },
+      {
+        "slot": "Weapon — Mace (Two-Handed)",
+        "item_name": "Bonebreaker",
+        "rarity": "Legendary",
+        "aspect": "Tidal Aspect"
+      },
+      {
+        "slot": "Weapon — Sword (Two-Handed)",
+        "item_name": "Demonblade",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Limitless Rage"
+      },
+      {
+        "slot": "Weapon — Mace 1",
+        "item_name": "Skullsplitter",
+        "rarity": "Legendary",
+        "aspect": "Hellbent Commander Aspect"
+      },
+      {
+        "slot": "Weapon — Mace 2",
+        "item_name": "Skullsplitter",
+        "rarity": "Legendary",
+        "aspect": "Progenitor's Aspect"
+      },
+      {
+        "slot": "Gloves",
+        "item_name": "Runic Gloves",
+        "rarity": "Legendary",
+        "aspect": "Crushing Aspect"
+      },
+      {
+        "slot": "Pants",
+        "item_name": "Runic Leggings",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Glynn's Anvil"
+      },
+      {
+        "slot": "Boots",
+        "item_name": "Runic Cleats",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Dominance"
+      },
+      {
+        "slot": "Ring 1",
+        "item_name": "Ring of Starless Skies",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Ring 2",
+        "item_name": "Soulwatch Hoop",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Inner Calm"
+      },
+      {
+        "slot": "Amulet",
+        "item_name": "Banished Lord's Talisman",
+        "rarity": "Unique",
+        "aspect": "Battle Fervor's Aspect"
+      },
+      {
+        "slot": "Talisman (Seal)",
+        "item_name": "Legendary Horadric Seal",
+        "rarity": "Legendary"
+      },
+      {
+        "slot": "Talisman (Charm) 1",
+        "item_name": "Phoba of Bul-Kathos' Pride",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 2",
+        "item_name": "Fer of Bul-Kathos' Pride",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 3",
+        "item_name": "Mlor of Bul-Kathos' Pride",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 4",
+        "item_name": "Berú of Bul-Kathos' Pride",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 5",
+        "item_name": "Linta of Bul-Kathos' Pride",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 6",
+        "item_name": "Arreat's Bearing",
+        "rarity": "Unique"
+      }
     ]
   }
 }

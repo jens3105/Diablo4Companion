@@ -273,6 +273,99 @@
           "Flesh Guard"
         ]
       }
+    ],
+    "gear": [
+      {
+        "slot": "Helm",
+        "item_name": "Crown of Lucion",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Chest",
+        "item_name": "Ae'grom's Schism",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Offhand (Focus)",
+        "item_name": "Eye of Baal",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Weapon — Sword",
+        "item_name": "Obsidian Blade",
+        "rarity": "Legendary",
+        "aspect": "Malicious Aspect"
+      },
+      {
+        "slot": "Gloves",
+        "item_name": "Runic Gloves",
+        "rarity": "Legendary",
+        "aspect": "Duelist's Aspect"
+      },
+      {
+        "slot": "Pants",
+        "item_name": "Bindings of Attrition",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Boots",
+        "item_name": "Runic Cleats",
+        "rarity": "Legendary",
+        "aspect": "Aspect of Rallying Reversal"
+      },
+      {
+        "slot": "Ring 1",
+        "item_name": "Soulwatch Hoop",
+        "rarity": "Legendary",
+        "aspect": "Hellbent Commander Aspect"
+      },
+      {
+        "slot": "Ring 2",
+        "item_name": "Soulwatch Hoop",
+        "rarity": "Legendary",
+        "aspect": "Demonic Aspect"
+      },
+      {
+        "slot": "Amulet",
+        "item_name": "Seed of Horazon",
+        "rarity": "Mythic",
+        "aspect": "Sadistic Aspect"
+      },
+      {
+        "slot": "Talisman (Seal)",
+        "item_name": "Seal of the Diamond Mind",
+        "rarity": "Mythic"
+      },
+      {
+        "slot": "Talisman (Charm) 1",
+        "item_name": "Linta of Horazon's Chains",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 2",
+        "item_name": "Berú of Horazon's Chains",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 3",
+        "item_name": "Linta of the Nameless",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 4",
+        "item_name": "Berú of the Nameless",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 5",
+        "item_name": "Fer of Horazon's Chains",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Talisman (Charm) 6",
+        "item_name": "Mlor of Horazon's Chains",
+        "rarity": "Set"
+      }
     ]
   }
 }
