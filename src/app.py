@@ -675,24 +675,43 @@ class MainWindow(FluentWindow):
         # once. Left as "completed_levels" rather than renamed, since the
         # per-build QSettings path already scopes it and nothing outside
         # this file/leveling_card.py ever reads the raw key name.
+        #
+        # Since verified-build data landed, this same key also holds a
+        # build's completed *verified skill names* (``str``) when the
+        # Skills tab is tracking ``verified_build.skill_allocation``
+        # instead of ``milestones`` (see LevelingCard.set_skills) - the
+        # Leveling tab keeps tracking milestone positions (``int``) in
+        # this same set regardless. The two domains never collide (a
+        # skill name is never a pure digit string), so one shared set
+        # still works - see ``_load_completed_levels``.
         return f"{self._char_prefix()}/skills/{build_name}/completed_levels"
 
-    def _load_completed_levels(self, build_name: str) -> set[int]:
+    def _load_completed_levels(self, build_name: str) -> set:
+        """Return the completed-levels set for ``build_name``, preserving
+        each entry's original kind: a milestone position comes back as
+        ``int`` (Leveling tab, and the Skills tab fallback for builds
+        with no verified data), a verified skill name comes back as
+        ``str`` (Skills tab for builds with ``verified_build``)."""
 
         raw = self.settings.value(self._completed_levels_key(build_name), [], type=list)
         completed = set()
 
         for value in raw:
-            try:
-                completed.add(int(value))
-            except (TypeError, ValueError):
+            text = str(value)
+            if not text:
                 continue
+            try:
+                completed.add(int(text))
+            except ValueError:
+                completed.add(text)
 
         return completed
 
-    def _save_completed_levels(self, build_name: str, completed: set[int]):
+    def _save_completed_levels(self, build_name: str, completed: set):
 
-        self.settings.setValue(self._completed_levels_key(build_name), sorted(completed))
+        self.settings.setValue(
+            self._completed_levels_key(build_name), sorted(completed, key=str)
+        )
 
     def _refresh_skills(self):
         """Rebuild the Skills tab for the current build, combining its
@@ -716,10 +735,13 @@ class MainWindow(FluentWindow):
             verified_build,
         )
 
-    def on_mark_done(self, index: int):
-        """``index`` is a milestone's position in its build's milestone
-        list (see ``LevelingCard._render_milestone_checklist``), not a
-        game level - multiple milestones can share a level."""
+    def on_mark_done(self, key):
+        """``key`` is either a milestone's position in its build's
+        milestone list (``int`` - see ``LevelingCard._render_milestone_
+        checklist``; not a game level, since multiple milestones can
+        share a level) or, for a build with verified skill data, a
+        verified skill's name (``str`` - see ``LevelingCard._render_
+        verified_skill_checklist``)."""
 
         build_name = self.leveling_manager.current_build_name
 
@@ -727,7 +749,7 @@ class MainWindow(FluentWindow):
             return
 
         completed = self._load_completed_levels(build_name)
-        completed.add(index)
+        completed.add(key)
         self._save_completed_levels(build_name, completed)
 
         self._refresh_skills()
@@ -742,29 +764,98 @@ class MainWindow(FluentWindow):
         # Its own QSettings key - Paragon boards and skill milestones are
         # different lists/units, so completion state is never conflated
         # into the shared "skills/.../completed_levels" key.
+        #
+        # Since verified-build data landed, this key holds board *ids*
+        # (``str``, e.g. "Paragon_Warlock_00") for builds where the
+        # Paragon tab tracks ``verified_build.paragon_boards`` instead of
+        # the older, often-empty ``paragon.boards`` (whose completion was
+        # keyed by position - ``int``). See ``_load_completed_boards`` for
+        # how the 2 builds that had real progress on the old int keys
+        # (Blazing Scream Warlock, Blight Necromancer) get migrated onto
+        # the new board-id keys instead of appearing reset.
         return f"{self._char_prefix()}/paragon/{build_name}/completed_boards"
 
-    def _load_completed_boards(self, build_name: str) -> set[int]:
+    def _load_completed_boards(self, build_name: str) -> set:
+        """Return the completed-boards set for ``build_name``, migrating
+        any pre-verified-data progress (positional ``int`` indices into
+        the old ``paragon.boards`` list) onto the new verified board-id
+        (``str``) scheme where possible - see
+        ``_migrate_legacy_board_progress``."""
 
         raw = self.settings.value(self._completed_boards_key(build_name), [], type=list)
         completed = set()
 
         for value in raw:
+            text = str(value)
+            if not text:
+                continue
             try:
-                completed.add(int(value))
-            except (TypeError, ValueError):
+                completed.add(int(text))
+            except ValueError:
+                completed.add(text)
+
+        migrated = self._migrate_legacy_board_progress(build_name, completed)
+
+        if migrated != completed:
+            self._save_completed_boards(build_name, migrated)
+
+        return migrated
+
+    def _migrate_legacy_board_progress(self, build_name: str, completed: set) -> set:
+        """Translate old, pre-verified-data Paragon board progress
+        (positional ``int`` index into the guide-prose-derived
+        ``paragon.boards`` list) onto the new verified board-id (``str``)
+        scheme, by matching board/glyph name across both lists.
+
+        Only Blazing Scream Warlock and Blight Necromancer ever had a
+        non-empty legacy ``paragon.boards`` list, and for both, the same
+        5 boards appear in ``verified_build.paragon_boards`` too - just
+        in a different order (confirmed by inspecting both lists), so a
+        stored legacy index no longer points at the same board once the
+        Paragon tab switches to tracking the verified list positionally.
+        Matching by name keeps a player's real "Mark as Done" progress on
+        those 2 builds pointing at the same board instead of silently
+        landing on the wrong one or disappearing.
+
+        No-op (returns ``completed`` unchanged) for every other build,
+        which never had a populated legacy board list to lose progress
+        from in the first place."""
+
+        verified_build = self.leveling_manager.get_verified_build(build_name)
+        verified_boards = (verified_build or {}).get("paragon_boards") or []
+        legacy_boards = self.leveling_manager.get_paragon_data(build_name).get("boards") or []
+
+        legacy_indices = {value for value in completed if isinstance(value, int)}
+
+        if not verified_boards or not legacy_boards or not legacy_indices:
+            return completed
+
+        migrated = set(completed) - legacy_indices
+
+        for idx in legacy_indices:
+            if idx < 0 or idx >= len(legacy_boards):
                 continue
 
-        return completed
+            legacy_name = (legacy_boards[idx].get("name") or "").strip().lower()
 
-    def _save_completed_boards(self, build_name: str, completed: set[int]):
+            for i, verified_board in enumerate(verified_boards):
+                if (verified_board.get("glyph") or "").strip().lower() == legacy_name:
+                    # Fallback format must match LevelingCard._board_id.
+                    migrated.add(verified_board.get("board") or f"verified_board_{i}")
+                    break
 
-        self.settings.setValue(self._completed_boards_key(build_name), sorted(completed))
+        return migrated
+
+    def _save_completed_boards(self, build_name: str, completed: set):
+
+        self.settings.setValue(
+            self._completed_boards_key(build_name), sorted(completed, key=str)
+        )
 
     def _refresh_paragon(self):
         """Rebuild the Paragon tab's board checklist for the current
         build, combining its (level-independent) board/glyph data with
-        the persisted set of completed board indices."""
+        the persisted set of completed boards."""
 
         build_name = self.leveling_manager.current_build_name
 
@@ -783,7 +874,11 @@ class MainWindow(FluentWindow):
             verified_build,
         )
 
-    def on_mark_board_done(self, index: int):
+    def on_mark_board_done(self, key):
+        """``key`` is either a legacy board's position in ``paragon.
+        boards`` (``int`` - builds with no verified board data) or a
+        verified board's stable id (``str`` - see ``LevelingCard.
+        _board_id``)."""
 
         build_name = self.leveling_manager.current_build_name
 
@@ -791,7 +886,7 @@ class MainWindow(FluentWindow):
             return
 
         completed = self._load_completed_boards(build_name)
-        completed.add(index)
+        completed.add(key)
         self._save_completed_boards(build_name, completed)
 
         self._refresh_paragon()
@@ -887,22 +982,60 @@ class MainWindow(FluentWindow):
     def _compute_build_status(self, build_name: str):
         """Pure aggregation over the persisted completion state each tab
         already reads: ``skills/<build>/completed_levels`` (Skills +
-        Leveling, they share one set), ``paragon/<build>/completed_boards``
-        and ``gear/<build>/owned_items``. Factored out of
-        ``_refresh_build_status`` (Phase 7) so the Build Guide's status
-        widget and the Dashboard's Current Build card compute the exact
-        same 🟢/🟡/🔴 rows instead of two copies of this math.
+        Leveling - they share one set, see ``_load_completed_levels``),
+        ``paragon/<build>/completed_boards`` and ``gear/<build>/
+        owned_items``. Factored out of ``_refresh_build_status``
+        (Phase 7) so the Build Guide's status widget and the Dashboard's
+        Current Build card compute the exact same 🟢/🟡/🔴 rows instead
+        of two copies of this math.
+
+        Skills and Leveling used to always show the identical percentage,
+        since both tracked the same ``milestones`` list. Now that the
+        Skills tab tracks ``verified_build.skill_allocation`` instead
+        (for the 25 builds that have it), the two rows are computed
+        separately: Leveling always counts milestone positions (``int``)
+        completed out of ``len(milestones)``; Skills counts verified
+        skill names (``str``) completed out of ``len(skill_allocation)``
+        when present, else falls back to the same milestone math as
+        Leveling. Paragon works the same way against verified board ids
+        vs. legacy board positions.
 
         Returns ``(rows, footer_text, ready)`` - see
         ``LevelingCard.set_build_status`` for the shape of ``rows``."""
 
         milestones = self.leveling_manager.get_skills_data(build_name)["milestones"]
         completed_levels = self._load_completed_levels(build_name)
-        skills_pct = self._pct(len(completed_levels), len(milestones))
+
+        leveling_done = sum(
+            1 for v in completed_levels if isinstance(v, int) and 0 <= v < len(milestones)
+        )
+        leveling_pct = self._pct(leveling_done, len(milestones))
+
+        verified_build = self.leveling_manager.get_verified_build(build_name)
+        verified_skills = (verified_build or {}).get("skill_allocation") or []
+
+        if verified_skills:
+            skill_names = {entry["skill"] for entry in verified_skills}
+            skills_done = sum(1 for v in completed_levels if isinstance(v, str) and v in skill_names)
+            skills_pct = self._pct(skills_done, len(verified_skills))
+        else:
+            skills_pct = leveling_pct
 
         boards = self.leveling_manager.get_paragon_data(build_name).get("boards") or []
         completed_boards = self._load_completed_boards(build_name)
-        paragon_pct = self._pct(len(completed_boards), len(boards))
+        verified_boards = (verified_build or {}).get("paragon_boards") or []
+
+        if verified_boards:
+            board_ids = {
+                vb.get("board") or f"verified_board_{i}" for i, vb in enumerate(verified_boards)
+            }
+            paragon_done = sum(1 for v in completed_boards if isinstance(v, str) and v in board_ids)
+            paragon_pct = self._pct(paragon_done, len(verified_boards))
+        else:
+            paragon_done = sum(
+                1 for v in completed_boards if isinstance(v, int) and 0 <= v < len(boards)
+            )
+            paragon_pct = self._pct(paragon_done, len(boards))
 
         gear = self.leveling_manager.get_gear_data(build_name) or {}
         checkable_gear = (gear.get("key_items") or []) + (gear.get("key_aspects") or [])
@@ -913,7 +1046,7 @@ class MainWindow(FluentWindow):
 
         rows = [
             (self._status_emoji(skills_pct), "Skills", self._pct_text(skills_pct)),
-            (self._status_emoji(skills_pct), "Leveling", self._pct_text(skills_pct)),
+            (self._status_emoji(leveling_pct), "Leveling", self._pct_text(leveling_pct)),
             (self._status_emoji(paragon_pct), "Paragon", self._pct_text(paragon_pct)),
             (self._status_emoji(gear_pct), "Gear", self._pct_text(gear_pct)),
         ]
@@ -922,6 +1055,7 @@ class MainWindow(FluentWindow):
         # a category with no trackable data (N/A) can't block readiness.
         ready = (
             (skills_pct is None or skills_pct == 100)
+            and (leveling_pct is None or leveling_pct == 100)
             and (paragon_pct is None or paragon_pct == 100)
             and (gear_pct is None or gear_pct == 100)
         )
