@@ -1,5 +1,4 @@
 import os
-import subprocess
 from datetime import datetime, timezone
 
 import requests
@@ -43,39 +42,36 @@ from src.paragon_interface import RARITY_LABELS, ParagonCard, ParagonInterface
 from src.quick_search import QuickSearchDialog
 
 
-# Build-data update check (Update Center, scoped-down): the running app
-# and its ``builds/*.json`` data are both just a git checkout of this
-# same public repo, so "is my build data current" is answerable by
-# comparing local HEAD against the branch tip on GitHub - no auth, no
-# self-update, just a read-only informational check (see SettingsInterface).
+# App update check (Windows Product Phase W5): GitHub Releases is the
+# single, central release source for the packaged Windows product -
+# deliberately NOT a git-checkout/HEAD-SHA comparison (that only ever
+# worked for a dev source checkout, showed "Not a git checkout" for
+# every real user running the installed .exe, and conflated "app
+# version" with "build data freshness", which are two different
+# things - build-data-specific update checking is its own later phase,
+# W10, not this one). Read-only informational check only here (see
+# SettingsInterface._on_check_updates_clicked) - no download/install,
+# that's W7/W8.
 GITHUB_REPO = "jens3105/Diablo4Companion"
-GITHUB_BRANCH = "feature/dashboard-v2"
-GITHUB_COMMIT_API_URL = (
-    f"https://api.github.com/repos/{GITHUB_REPO}/commits/{GITHUB_BRANCH}"
-)
+GITHUB_RELEASES_API_URL = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 
 
-def get_local_commit_sha() -> str | None:
-    """Return the full SHA of the local checkout's current HEAD commit,
-    or ``None`` if this isn't a git checkout (e.g. a packaged build) or
-    ``git`` isn't available. Uses the same repo-root pattern as
-    ``LevelingManager`` for locating ``builds/`` - ``src/app.py`` sits one
-    level shallower, so one fewer ``dirname`` call."""
+def _parse_semver(version_text: str) -> tuple[int, int, int] | None:
+    """Parse a ``"1.2.3"``/``"v1.2.3"`` style string into a comparable
+    ``(major, minor, patch)`` tuple, or ``None`` if it doesn't match
+    that shape - never guessed/coerced, an unparseable release tag just
+    can't be compared (see the caller's DATA UNAVAILABLE-style fallback
+    message)."""
 
-    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    text = version_text.strip()
+    if text.lower().startswith("v"):
+        text = text[1:]
 
-    try:
-        result = subprocess.run(
-            ["git", "rev-parse", "HEAD"],
-            cwd=repo_root,
-            capture_output=True,
-            text=True,
-            timeout=5,
-            check=True,
-        )
-        return result.stdout.strip()
-    except (OSError, subprocess.SubprocessError):
+    parts = text.split(".")
+    if len(parts) != 3 or not all(p.isdigit() for p in parts):
         return None
+
+    return tuple(int(p) for p in parts)
 
 
 class BuildsInterface(QWidget):
@@ -199,25 +195,18 @@ class SettingsInterface(QWidget):
         layout.addSpacing(16)
 
         # -------------------------
-        # Build data updates
+        # App updates (Windows Product Phase W5)
         # -------------------------
-        # Read-only check: compares the local checkout's HEAD against the
-        # branch tip on GitHub. Deliberately does NOT pull/apply anything -
-        # a running app rewriting its own git checkout is out of scope and
-        # risky. See ``get_local_commit_sha`` / ``GITHUB_COMMIT_API_URL``.
+        # Read-only check against GitHub Releases - the current version
+        # always comes from src/version.py (works identically from
+        # source or a frozen Windows build, see that module's
+        # docstring), never from git. Deliberately does NOT download/
+        # install anything yet - that's W7/W8.
 
-        updates_title = StrongBodyLabel("Build Data Updates", self)
+        updates_title = StrongBodyLabel("App Updates", self)
         layout.addWidget(updates_title)
 
-        self._local_sha = get_local_commit_sha()
-        local_short = self._local_sha[:7] if self._local_sha else "unknown"
-
-        self.current_version_label = CaptionLabel(
-            f"Current build data: {local_short}"
-            if self._local_sha
-            else "Current build data: unknown (not a git checkout)",
-            self,
-        )
+        self.current_version_label = CaptionLabel(f"Current version: {__version__}", self)
         layout.addWidget(self.current_version_label)
 
         self.update_status_label = BodyLabel("", self)
@@ -251,7 +240,7 @@ class SettingsInterface(QWidget):
 
         self.check_updates_button.setEnabled(False)
         self.check_updates_button.setText("Checking...")
-        self.update_status_label.setText("Checking GitHub for the latest build data...")
+        self.update_status_label.setText("Checking GitHub Releases for updates...")
         self.update_status_label.show()
         # Force the "Checking..." state to actually paint before the
         # (blocking) network call below - same synchronous-call style
@@ -260,31 +249,45 @@ class SettingsInterface(QWidget):
         QApplication.processEvents()
 
         try:
-            response = requests.get(GITHUB_COMMIT_API_URL, timeout=8)
+            response = requests.get(GITHUB_RELEASES_API_URL, timeout=8)
+
+            if response.status_code == 404:
+                # No GitHub Release has been published yet (true today -
+                # release automation is a later phase, W2/W3/W4 only ever
+                # produced CI build artifacts, not a Release). Not a
+                # network error, not a bug - an honest, expected state.
+                self.update_status_label.setText(
+                    "No published releases found yet."
+                )
+                return
+
             response.raise_for_status()
             data = response.json()
 
-            remote_sha = data.get("sha", "")
-            commit_info = data.get("commit", {}) or {}
-            author_info = commit_info.get("author", {}) or {}
-            remote_date = author_info.get("date", "")
-            remote_message = (commit_info.get("message") or "").strip().splitlines()[0] if commit_info.get("message") else ""
+            remote_tag = data.get("tag_name", "")
+            if not remote_tag:
+                raise ValueError("GitHub Release havde ingen tag_name")
 
-            if not remote_sha:
-                raise ValueError("GitHub svarede uden en commit-sha")
+            remote_version = _parse_semver(remote_tag)
+            local_version = _parse_semver(__version__)
 
-            if self._local_sha and remote_sha == self._local_sha:
-                self.update_status_label.setText("Build data up to date")
-            else:
-                date_str = remote_date.split("T")[0] if remote_date else "ukendt dato"
-                detail = f" - {remote_message}" if remote_message else ""
+            if remote_version is None or local_version is None:
+                # Can't safely compare - never guess which is newer.
                 self.update_status_label.setText(
-                    f"Newer build data available (updated {date_str}{detail}). "
-                    f"Run 'git pull' in the app folder to update."
+                    f"Latest release: {remote_tag} (current: {__version__}) - "
+                    f"could not compare versions automatically."
                 )
+            elif remote_version > local_version:
+                release_name = (data.get("name") or remote_tag).strip()
+                self.update_status_label.setText(
+                    f"A newer version is available: {release_name} "
+                    f"(currently on {__version__})."
+                )
+            else:
+                self.update_status_label.setText(f"Up to date (version {__version__}).")
 
         except (requests.RequestException, ValueError) as exc:
-            print(f"Kunne ikke tjekke for build-data opdateringer: {exc}")
+            print(f"Kunne ikke tjekke for opdateringer: {exc}")
             self.update_status_label.setText(
                 "Could not check for updates (network error) - try again later."
             )
