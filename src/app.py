@@ -34,6 +34,7 @@ from src.build_advisor_interface import BuildAdvisorCard, BuildAdvisorInterface
 from src.character_interface import CharacterCard, CharacterInterface
 from src.compact_window import CompactWindow
 from src.dashboard import DashboardWidget
+from src.gear_builder_interface import GearBuilderCard, GearBuilderInterface
 from src.leveling_card import LevelingCard
 from src.managers.leveling_manager import LevelingManager
 from src.paragon_interface import RARITY_LABELS, ParagonCard, ParagonInterface
@@ -358,6 +359,19 @@ class MainWindow(FluentWindow):
         self.paragon_interface = ParagonInterface(self.paragon_card)
         self.paragon_interface.setObjectName("paragonInterface")
 
+        # Gear Builder page: a detail-first, one-card-per-slot read-out of
+        # a build's verified_build.gear (real item name/slot/rarity/
+        # aspect, honest "DATA UNAVAILABLE" for everything the Maxroll
+        # source never decodes) - see src/gear_builder_interface.py's
+        # module docstring. Same "owns no build selector" pattern, and
+        # the exact same gear/<build>/owned_items tracking as the
+        # Character page's silhouette planner - one shared model, two
+        # read-outs.
+        self.gear_builder_card = GearBuilderCard()
+
+        self.gear_builder_interface = GearBuilderInterface(self.gear_builder_card)
+        self.gear_builder_interface.setObjectName("gearBuilderInterface")
+
         # Build Advisor page: a bigger, standalone read-out of the exact
         # same Build Status + next-action + pending-actions data the
         # Dashboard's Current Build card and Compact Mode already use.
@@ -372,6 +386,7 @@ class MainWindow(FluentWindow):
         self.addSubInterface(self.dashboard, FIF.HOME, "Dashboard")
         self.addSubInterface(self.builds_interface, FIF.GAME, "Build Guide")
         self.addSubInterface(self.character_interface, FIF.FINGERPRINT, "Character")
+        self.addSubInterface(self.gear_builder_interface, FIF.SHOPPING_CART, "Gear Builder")
         self.addSubInterface(self.paragon_interface, FIF.TILES, "Paragon")
         self.addSubInterface(self.advisor_interface, FIF.ROBOT, "Build Advisor")
         self.addSubInterface(
@@ -442,6 +457,7 @@ class MainWindow(FluentWindow):
         self.leveling_card.mark_done.connect(self.on_mark_done)
         self.leveling_card.mark_board_done.connect(self.on_mark_board_done)
         self.character_card.gear_owned_changed.connect(self.on_gear_owned_changed)
+        self.gear_builder_card.item_owned_changed.connect(self.on_gear_owned_changed)
         self.leveling_card.character_changed.connect(self.on_character_changed)
         self.leveling_card.add_character_requested.connect(self.on_add_character)
         self.leveling_card.rename_character_requested.connect(self.on_rename_character)
@@ -499,6 +515,7 @@ class MainWindow(FluentWindow):
             self.dashboard.upcoming_card,
             self.leveling_card,
             self.character_card,
+            self.gear_builder_card,
             self.paragon_card,
             self.advisor_card,
         ):
@@ -1314,6 +1331,7 @@ class MainWindow(FluentWindow):
         verified_build = self.leveling_manager.get_verified_build(build_name)
 
         self.character_card.set_gear(gear, owned, verified_build)
+        self.gear_builder_card.set_gear(owned, verified_build)
 
     def on_gear_owned_changed(self, name: str, owned: bool):
 
@@ -1749,6 +1767,7 @@ class MainWindow(FluentWindow):
             self.dashboard.build_card.set_build("", 0, [], "")
             self.dashboard.build_card.set_paragon_summary(None)
             self.character_card.set_header(char_name, "", 0)
+            self.gear_builder_card.set_header(char_name, "", 0)
             self.paragon_card.set_paragon("", "", 0, None, set(), set(), None)
             self.advisor_card.set_advisor("", 0, [], "", False, "", None, {})
             self._refresh_compact_window()
@@ -1763,6 +1782,7 @@ class MainWindow(FluentWindow):
             self._paragon_dashboard_summary(build_name, rows[2])
         )
         self.character_card.set_header(char_name, build_name, level)
+        self.gear_builder_card.set_header(char_name, build_name, level)
         # rows[2] is the "Paragon" row - see _compute_build_status - so
         # the Paragon page's overall % is the exact same figure, never a
         # second computation of it.
@@ -2061,7 +2081,7 @@ class MainWindow(FluentWindow):
 
     def _build_quick_search_items(self) -> list[dict]:
         """Flat, filterable list of ``{"label", "category", "action"}``
-        entries: the 5 nav pages, every build across every class (so any
+        entries: the 6 nav pages, every build across every class (so any
         build is one keystroke-search away from being switched to), and
         the ACTIVE build's skill/gear names (cheap - just the one
         already-loaded build, not all 25) so the player can jump
@@ -2075,6 +2095,7 @@ class MainWindow(FluentWindow):
             ("Dashboard", self.dashboard),
             ("Build Guide", self.builds_interface),
             ("Character", self.character_interface),
+            ("Gear Builder", self.gear_builder_interface),
             ("Paragon", self.paragon_interface),
             ("Build Advisor", self.advisor_interface),
             ("Settings", self.settings_interface),
