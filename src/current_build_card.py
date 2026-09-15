@@ -28,12 +28,13 @@ class CurrentBuildCard(BaseCard):
     so it doesn't fight with the card-wide ``clicked`` navigation."""
 
     compact_mode_requested = Signal()
-    # Emits the pending action's category ("skill"/"paragon"/"gear")
-    # when the NEXT ACTION line is clicked, so MainWindow can jump to the
-    # right page/tab (Build Guide's Skills or Paragon tab, or the
-    # Character page) - see MainWindow._navigate_to_next_action. Never
-    # emitted when there's nothing to act on (no build, or "Build
-    # complete!") - see set_build's ``next_action_kind``.
+    # Emits the pending action's category
+    # ("leveling"/"skill"/"paragon"/"gear") when the NEXT ACTION line is
+    # clicked, so MainWindow can jump to the right page/tab (Build
+    # Guide's Leveling, Skills or Paragon tab, or the Character page) -
+    # see MainWindow._navigate_to_next_action. Never emitted when there's
+    # nothing to act on (no build, or "Build complete!") - see
+    # set_build's ``next_action_kind``.
     next_action_clicked = Signal(str)
 
     def __init__(self, parent=None):
@@ -107,10 +108,10 @@ class CurrentBuildCard(BaseCard):
         only the emoji + label are shown here, kept to one short line per
         category so the card stays compact next to the event cards.
 
-        ``next_action_kind`` is one of ``"skill"``/``"paragon"``/
-        ``"gear"`` (from ``MainWindow._advisor_next_action``) or ``None``
-        when there's nothing to act on - it decides whether the NEXT
-        ACTION line is click-to-navigate right now."""
+        ``next_action_kind`` is one of ``"leveling"``/``"skill"``/
+        ``"paragon"``/``"gear"`` (from ``MainWindow._advisor_next_
+        action``) or ``None`` when there's nothing to act on - it decides
+        whether the NEXT ACTION line is click-to-navigate right now."""
 
         if not build_name:
             self.build_name_label.setText("No build selected")

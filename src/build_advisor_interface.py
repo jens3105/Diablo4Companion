@@ -34,11 +34,12 @@ class BuildAdvisorCard(BaseCard):
     """Bigger, standalone version of the Build Status + next-action
     read-out, plus a capped "what's missing" list per category."""
 
-    # Emits the pending action's category ("skill"/"paragon"/"gear")
-    # when the NEXT ACTION line is clicked, so MainWindow can jump to the
-    # right page/tab - see MainWindow._navigate_to_next_action. Never
-    # emitted when there's nothing to act on (no build, or "Build
-    # complete!") - see set_advisor's ``next_action_kind``.
+    # Emits the pending action's category
+    # ("leveling"/"skill"/"paragon"/"gear") when the NEXT ACTION line is
+    # clicked, so MainWindow can jump to the right page/tab - see
+    # MainWindow._navigate_to_next_action. Never emitted when there's
+    # nothing to act on (no build, or "Build complete!") - see
+    # set_advisor's ``next_action_kind``.
     next_action_clicked = Signal(str)
 
     def __init__(self, parent=None):
@@ -146,9 +147,9 @@ class BuildAdvisorCard(BaseCard):
         what ``MainWindow._compute_build_status`` returns.
         ``next_action_text``/``next_action_kind`` are
         ``MainWindow._advisor_next_action``'s result - ``next_action_kind``
-        is one of ``"skill"``/``"paragon"``/``"gear"`` or ``None`` when
-        there's nothing to act on, and decides whether the NEXT ACTION
-        line is click-to-navigate right now. ``pending_by_category`` maps
+        is one of ``"leveling"``/``"skill"``/``"paragon"``/``"gear"`` or
+        ``None`` when there's nothing to act on, and decides whether the
+        NEXT ACTION line is click-to-navigate right now. ``pending_by_category`` maps
         each of ``Skills``/``Paragon``/``Gear`` to ``(capped_texts,
         total_count)`` - already capped by the caller (see
         ``MainWindow._advisor_missing_summary``) so this widget never has

@@ -1396,14 +1396,21 @@ class MainWindow(FluentWindow):
     # ever looked at Skills/Leveling milestones).
     #
     # Priority order - deliberate, not arbitrary:
-    #   1. Skills   - usually the actual blocker while leveling: a build
+    #   1. Leveling - the milestone-by-level path (when it's a distinct
+    #                 checklist from Skills - see ``_pending_leveling_
+    #                 actions``) is usually the earliest-blocking thing
+    #                 in a real playthrough: at low level a build isn't
+    #                 even at the point where its endgame Skills/Paragon/
+    #                 Gear checklist is relevant yet, so surface this
+    #                 first.
+    #   2. Skills   - usually the actual blocker while leveling: a build
     #                 simply doesn't work yet without its core skill
     #                 allocation, so this is "what do I do right now".
-    #   2. Paragon  - the next endgame power spike once skills are
+    #   3. Paragon  - the next endgame power spike once skills are
     #                 sorted, and (unlike Gear) it's a one-way checklist
     #                 the player fully controls at their own pace, not
     #                 gated on a drop.
-    #   3. Gear     - drop-gated ("equip Crown of Lucion") and the one
+    #   4. Gear     - drop-gated ("equip Crown of Lucion") and the one
     #                 category that can regress (an item sold/replaced),
     #                 so it's the least "do this next" and most "keep an
     #                 eye out for this" of the three - last in priority.
@@ -1415,6 +1422,41 @@ class MainWindow(FluentWindow):
     # boards``/``_load_owned_items``) - no new tracking, no parallel
     # validation engine.
     # -----------------------------------------------------------
+
+    def _pending_leveling_actions(self, build_name: str) -> list[tuple[str, str, object]]:
+        """Every not-yet-completed Leveling milestone, in order, as
+        ``(kind, text, key)`` - ``kind`` is always ``"leveling"`` here,
+        ``key`` is the milestone's position, exactly what ``on_mark_done``
+        already expects for a milestone key (see ``_pending_skill_
+        actions``). Reuses the exact same ``milestones`` list and shared
+        ``completed_levels`` set that ``_compute_build_status``'s
+        "Leveling" row already sources its percentage from - no second
+        way of computing Leveling completion.
+
+        For a build with no verified skill data, the Skills tab falls
+        back to tracking these same milestones against this same
+        completed set (see ``_pending_skill_actions``), so this returns
+        nothing in that case - otherwise every pending milestone would
+        show up twice, once as a "Skills" action and once as a
+        "Leveling" action. Only once a build has verified
+        ``skill_allocation`` does Skills switch to tracking that instead,
+        leaving the milestone checklist represented by no other category
+        - that's the only case this needs to surface anything."""
+
+        verified_build = self.leveling_manager.get_verified_build(build_name)
+        verified_skills = (verified_build or {}).get("skill_allocation") or []
+
+        if not verified_skills:
+            return []
+
+        completed = self._load_completed_levels(build_name)
+        milestones = self.leveling_manager.get_skills_data(build_name)["milestones"]
+
+        return [
+            ("leveling", f"Add 1 point to {m['skill']} (Lvl {m['level']})", i)
+            for i, m in enumerate(milestones)
+            if i not in completed
+        ]
 
     def _pending_skill_actions(self, build_name: str) -> list[tuple[str, str, object]]:
         """Every not-yet-completed Skills entry, in order, as ``(kind,
@@ -1523,31 +1565,34 @@ class MainWindow(FluentWindow):
 
     def _advisor_pending_actions(self, build_name: str) -> list[tuple[str, str, object]]:
         """The full unified Build Advisor list for ``build_name``: every
-        pending Skills action, then every pending Paragon action, then
-        every pending Gear action (see the priority-order comment above)
-        - each item ``(kind, text, key)``. The single source of truth for
-        "what's next" shared by ``_advisor_next_action`` (Dashboard's
-        Current Build card) and ``_compact_next_action`` (Compact Mode),
-        so both surfaces always agree."""
+        pending Leveling action, then every pending Skills action, then
+        every pending Paragon action, then every pending Gear action (see
+        the priority-order comment above) - each item ``(kind, text,
+        key)``. The single source of truth for "what's next" shared by
+        ``_advisor_next_action`` (Dashboard's Current Build card) and
+        ``_compact_next_action`` (Compact Mode), so both surfaces always
+        agree."""
 
         return (
-            self._pending_skill_actions(build_name)
+            self._pending_leveling_actions(build_name)
+            + self._pending_skill_actions(build_name)
             + self._pending_paragon_actions(build_name)
             + self._pending_gear_actions(build_name)
         )
 
     def _advisor_next_action(self, build_name: str) -> tuple[str | None, str]:
-        """Pick the single concrete "next thing to do" across Skills,
-        Paragon and Gear for ``build_name`` - the Dashboard Current Build
-        card's and the Build Advisor page's one-line summary. Never
-        fabricates an action when nothing is left.
+        """Pick the single concrete "next thing to do" across Leveling,
+        Skills, Paragon and Gear for ``build_name`` - the Dashboard
+        Current Build card's and the Build Advisor page's one-line
+        summary. Never fabricates an action when nothing is left.
 
         Returns ``(kind, text)`` - ``kind`` is whichever pending-action
-        helper produced the action (``"skill"``/``"paragon"``/``"gear"``,
-        already tagged on every tuple ``_advisor_pending_actions``
-        returns), or ``None`` when nothing is left. Lets click-to-
-        navigate (``MainWindow._navigate_to_next_action``) jump to the
-        right page/tab without any separate classification logic."""
+        helper produced the action (``"leveling"``/``"skill"``/
+        ``"paragon"``/``"gear"``, already tagged on every tuple
+        ``_advisor_pending_actions`` returns), or ``None`` when nothing
+        is left. Lets click-to-navigate (``MainWindow._navigate_to_
+        next_action``) jump to the right page/tab without any separate
+        classification logic."""
 
         pending = self._advisor_pending_actions(build_name)
 
@@ -1629,13 +1674,14 @@ class MainWindow(FluentWindow):
 
     def _navigate_to_next_action(self, kind: str):
         """Dashboard card's / Build Advisor page's NEXT ACTION line was
-        clicked - jump to the page (and, for Skills/Paragon, the exact
-        Build Guide tab) that action lives on: ``"skill"`` -> Build
-        Guide's Skills tab, ``"paragon"`` -> its Paragon tab, ``"gear"``
-        -> the Character page (the Equipment Planner has no per-item
-        anchor to jump further into - landing on the page is the
-        achievable minimum there). Uses the same ``switchTo`` pattern
-        already wired for the Dashboard card's whole-card click."""
+        clicked - jump to the page (and, for Leveling/Skills/Paragon, the
+        exact Build Guide tab) that action lives on: ``"leveling"`` ->
+        Build Guide's Leveling tab, ``"skill"`` -> its Skills tab,
+        ``"paragon"`` -> its Paragon tab, ``"gear"`` -> the Character page
+        (the Equipment Planner has no per-item anchor to jump further
+        into - landing on the page is the achievable minimum there). Uses
+        the same ``switchTo`` pattern already wired for the Dashboard
+        card's whole-card click."""
 
         if kind == "gear":
             self.switchTo(self.character_interface)
@@ -1643,7 +1689,9 @@ class MainWindow(FluentWindow):
 
         self.switchTo(self.builds_interface)
 
-        if kind == "skill":
+        if kind == "leveling":
+            self.leveling_card.select_section(self.leveling_card.LEVELING_KEY)
+        elif kind == "skill":
             self.leveling_card.select_section(self.leveling_card.SKILLS_KEY)
         elif kind == "paragon":
             self.leveling_card.select_section(self.leveling_card.PARAGON_KEY)
@@ -1666,14 +1714,14 @@ class MainWindow(FluentWindow):
         line) and how the Done button should mark the current one, built
         on the same ``_advisor_pending_actions`` list so Compact Mode and
         the Dashboard card can never disagree about what's next - across
-        Skills, Paragon AND Gear now, not just Skills/Leveling.
+        Leveling, Skills, Paragon AND Gear now.
 
         Returns ``(current_text, preview_text, kind, key)`` - ``kind`` is
         ``None`` when there is nothing left to mark, otherwise one of
-        ``"skill"``/``"paragon"``/``"gear"`` telling ``on_compact_done``
-        which existing handler (``on_mark_done``/``on_mark_board_done``/
-        ``on_gear_owned_changed``) to route the Done button through, with
-        ``key`` as that handler's argument."""
+        ``"leveling"``/``"skill"``/``"paragon"``/``"gear"`` telling
+        ``on_compact_done`` which existing handler (``on_mark_done``/
+        ``on_mark_board_done``/``on_gear_owned_changed``) to route the
+        Done button through, with ``key`` as that handler's argument."""
 
         pending = self._advisor_pending_actions(build_name)
 
@@ -1740,15 +1788,21 @@ class MainWindow(FluentWindow):
         """Compact window's Done button - routes through whichever
         existing handler (``on_mark_done``/``on_mark_board_done``/
         ``on_gear_owned_changed``) owns the advisor's current action, so
-        the main window's Skills/Paragon/Gear tabs and Build Status
-        update immediately too, not just Compact Mode's own view. Marking
-        a Gear action "done" here means "equip it" - it flips the same
-        one-way toggle a "Have it" switch in the Gear planner would."""
+        the main window's Leveling/Skills/Paragon/Gear tabs and Build
+        Status update immediately too, not just Compact Mode's own view.
+        Marking a Gear action "done" here means "equip it" - it flips the
+        same one-way toggle a "Have it" switch in the Gear planner would.
+
+        ``"leveling"`` routes through the exact same ``on_mark_done`` as
+        ``"skill"`` - a Leveling action's key is a milestone position
+        into the same shared ``completed_levels`` set (see
+        ``_pending_leveling_actions``), so no separate handler is
+        needed."""
 
         if self._compact_action_kind is None:
             return
 
-        if self._compact_action_kind == "skill":
+        if self._compact_action_kind in ("skill", "leveling"):
             self.on_mark_done(self._compact_action_key)
         elif self._compact_action_kind == "paragon":
             self.on_mark_board_done(self._compact_action_key)
