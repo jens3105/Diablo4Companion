@@ -1,0 +1,49 @@
+name: Windows Build
+
+# Windows Product Phase W2 — proves the app can be reliably built into a
+# Windows PyInstaller onedir executable via GitHub Actions.
+#
+# Trigger choice: manual (workflow_dispatch) plus push to this repo's only
+# branch (feature/dashboard-v2, there is no main) when build-relevant
+# paths change. This phase explicitly excludes release automation /
+# auto-tagging, so there is no `on: release` or version-tag trigger here —
+# just a normal CI build trigger suitable for proving the pipeline works.
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - feature/dashboard-v2
+    paths:
+      - "src/**"
+      - "main.py"
+      - "requirements.txt"
+      - "diablo4companion.spec"
+      - "builds/**"
+      - ".github/workflows/windows-build.yml"
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build with PyInstaller (onedir)
+        run: pyinstaller diablo4companion.spec
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Diablo4Companion-windows
+          path: dist/Diablo4Companion/
+          if-no-files-found: error
