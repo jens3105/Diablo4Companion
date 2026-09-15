@@ -20,11 +20,20 @@
 ; answered.
 ;
 ; Compile with (from repo root):
-;     ISCC.exe installer\diablo4companion.iss
-; Produces installer\Output\Diablo4Companion-Setup.exe.
+;     ISCC.exe /DMyAppVersion=1.0.0 installer\diablo4companion.iss
+; (the CI workflow passes /DMyAppVersion using the canonical version
+; from ../src/version.py; omitting /D falls back to the hardcoded
+; default below). Produces installer\Output\Diablo4Companion-Setup.exe.
 
 #define MyAppName "Diablo 4 Companion"
-#define MyAppVersion "1.0.0"
+; Windows Product Phase W4 -- Versioning: the canonical version now
+; lives in ../src/version.py. The CI workflow passes it in via
+; /DMyAppVersion=X.Y.Z on the ISCC command line; this hardcoded value
+; is only a safe fallback default for an ad hoc local compile that
+; skips the /D define.
+#ifndef MyAppVersion
+  #define MyAppVersion "1.0.0"
+#endif
 #define MyAppExeName "Diablo4Companion.exe"
 #define MyAppPublisher "jens3105"
 #define MyAppURL "https://github.com/jens3105/Diablo4Companion"

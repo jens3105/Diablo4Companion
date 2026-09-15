@@ -14,6 +14,11 @@ name: Windows Build
 # paths change. This phase explicitly excludes release automation /
 # auto-tagging, so there is no `on: release` or version-tag trigger here —
 # just a normal CI build trigger suitable for proving the pipeline works.
+#
+# Windows Product Phase W4 (added later, same workflow) — reads the one
+# canonical version string from src/version.py and passes it into the
+# Inno Setup compile step via /DMyAppVersion, instead of relying on the
+# .iss file's own hardcoded fallback.
 on:
   workflow_dispatch: {}
   push:
@@ -57,6 +62,16 @@ jobs:
 
       # --- Windows Product Phase W3: Inno Setup installer -----------------
 
+      # --- Windows Product Phase W4: canonical version -> installer -------
+
+      - name: Read canonical app version
+        shell: pwsh
+        run: |
+          $version = python -c "from src.version import __version__; print(__version__)"
+          if ($LASTEXITCODE -ne 0 -or -not $version) { throw "Failed to read __version__ from src/version.py" }
+          Write-Host "Canonical app version: $version"
+          echo "APP_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
       - name: Locate or install Inno Setup (ISCC)
         shell: pwsh
         run: |
@@ -74,7 +89,7 @@ jobs:
       - name: Compile installer with Inno Setup
         shell: pwsh
         run: |
-          & "$env:ISCC_PATH" "installer\diablo4companion.iss"
+          & "$env:ISCC_PATH" "/DMyAppVersion=$env:APP_VERSION" "installer\diablo4companion.iss"
           if ($LASTEXITCODE -ne 0) { throw "ISCC.exe failed with exit code $LASTEXITCODE" }
 
       - name: Upload installer artifact
@@ -113,6 +128,22 @@ jobs:
             throw "Expected 26 builds/*.json files in $buildsDir, found $jsonCount"
           }
           Write-Host "OK: found all 26 builds/*.json files."
+
+          # Windows Product Phase W4: confirm the /DMyAppVersion value we
+          # passed into ISCC actually made it into the installed app's
+          # registered version metadata (Add/Remove Programs), i.e. that
+          # the canonical src/version.py value was really consumed, not
+          # just silently ignored in favor of the .iss fallback default.
+          $uninstKey = Get-ChildItem "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall" -ErrorAction SilentlyContinue |
+            Get-ItemProperty -ErrorAction SilentlyContinue |
+            Where-Object { $_.DisplayName -eq "Diablo 4 Companion" }
+          if (-not $uninstKey) {
+            throw "No Add/Remove Programs entry found for Diablo 4 Companion"
+          }
+          if ($uninstKey.DisplayVersion -ne $env:APP_VERSION) {
+            throw "Installed DisplayVersion '$($uninstKey.DisplayVersion)' does not match canonical version '$env:APP_VERSION'"
+          }
+          Write-Host "OK: installed DisplayVersion matches canonical version ($env:APP_VERSION)."
 
           $uninst = Get-ChildItem -Path $installDir -Filter "unins*.exe" -File -ErrorAction SilentlyContinue
           if (-not $uninst) {

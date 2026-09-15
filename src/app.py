@@ -30,6 +30,7 @@ from qfluentwidgets import (
 
 from src import theme
 from src.api import DiabloAPI
+from src.version import __version__
 from src.build_advisor_interface import BuildAdvisorCard, BuildAdvisorInterface
 from src.character_interface import CharacterCard, CharacterInterface
 from src.compact_window import CompactWindow
@@ -122,6 +123,11 @@ class SettingsInterface(QWidget):
 
         title = SubtitleLabel("Diablo IV Companion", self)
         layout.addWidget(title)
+
+        # Windows Product Phase W4: surface the one canonical version
+        # (src/version.py) in the UI - no separate hardcoded copy here.
+        version_label = CaptionLabel(f"Version {__version__}", self)
+        layout.addWidget(version_label)
 
         info = BodyLabel(
             "A lightweight second-screen companion app for Diablo IV. It "
