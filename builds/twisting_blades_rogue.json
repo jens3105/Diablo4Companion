@@ -191,67 +191,2151 @@
         "glyph": "Versatility",
         "glyph_level": 150,
         "nodes": [
-          "Skillful",
-          "Outlaw",
-          "Resilience",
-          "Prime"
-        ]
+          {
+            "index": 10,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 31,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 32,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 53,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 71,
+            "slug": "Generic_Magic_Int",
+            "name": "Generic_Magic_Int",
+            "rarity": 2
+          },
+          {
+            "index": 72,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 74,
+            "slug": "Generic_Magic_DamageToElite",
+            "name": "Generic_Magic_DamageToElite",
+            "rarity": 2
+          },
+          {
+            "index": 75,
+            "slug": "Generic_Magic_Str",
+            "name": "Generic_Magic_Str",
+            "rarity": 2
+          },
+          {
+            "index": 92,
+            "slug": "Generic_Magic_Int",
+            "name": "Generic_Magic_Int",
+            "rarity": 2
+          },
+          {
+            "index": 93,
+            "slug": "Generic_Rare_051",
+            "name": "Skillful",
+            "rarity": 3
+          },
+          {
+            "index": 95,
+            "slug": "Rogue_Rare_037",
+            "name": "Outlaw",
+            "rarity": 3
+          },
+          {
+            "index": 96,
+            "slug": "Generic_Magic_Str",
+            "name": "Generic_Magic_Str",
+            "rarity": 2
+          },
+          {
+            "index": 113,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 114,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 116,
+            "slug": "Generic_Magic_DamageToElite",
+            "name": "Generic_Magic_DamageToElite",
+            "rarity": 2
+          },
+          {
+            "index": 117,
+            "slug": "Generic_Magic_DamageToElite",
+            "name": "Generic_Magic_DamageToElite",
+            "rarity": 2
+          },
+          {
+            "index": 135,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 136,
+            "slug": "Generic_Socket",
+            "name": "Glyph Socket",
+            "rarity": 0
+          },
+          {
+            "index": 137,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 138,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 159,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 180,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 200,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 201,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 218,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 222,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 238,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 239,
+            "slug": "Generic_Rare_001",
+            "name": "Resilience",
+            "rarity": 3
+          },
+          {
+            "index": 240,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 242,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 243,
+            "slug": "Generic_Rare_075",
+            "name": "Prime",
+            "rarity": 3
+          },
+          {
+            "index": 244,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 260,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 264,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 281,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 282,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 283,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 284,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 285,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          }
+        ],
+        "rotation": 0,
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "glyph_socket_index": 136,
+        "start_node_index": 304,
+        "board_width": 21
       },
       {
         "board": "Paragon_Rogue_03",
         "glyph": "Fluidity",
         "glyph_level": 150,
         "nodes": [
-          "Calculated",
-          "Deviant",
-          "Devious",
-          "Cheap Shot",
-          "Artifice",
-          "Safeguard",
-          "Spearhead"
-        ]
+          {
+            "index": 56,
+            "slug": "Generic_Magic_DamageToCC",
+            "name": "Generic_Magic_DamageToCC",
+            "rarity": 2
+          },
+          {
+            "index": 57,
+            "slug": "Generic_Magic_Armor",
+            "name": "Generic_Magic_Armor",
+            "rarity": 2
+          },
+          {
+            "index": 77,
+            "slug": "Generic_Magic_DamageToCC",
+            "name": "Generic_Magic_DamageToCC",
+            "rarity": 2
+          },
+          {
+            "index": 78,
+            "slug": "Generic_Rare_021",
+            "name": "Calculated",
+            "rarity": 3
+          },
+          {
+            "index": 98,
+            "slug": "Generic_Magic_DamageToCC",
+            "name": "Generic_Magic_DamageToCC",
+            "rarity": 2
+          },
+          {
+            "index": 99,
+            "slug": "Generic_Magic_Armor",
+            "name": "Generic_Magic_Armor",
+            "rarity": 2
+          },
+          {
+            "index": 118,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 119,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 130,
+            "slug": "Rogue_Rare_041",
+            "name": "Deviant",
+            "rarity": 3
+          },
+          {
+            "index": 131,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 132,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 133,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 138,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 139,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 151,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 152,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 154,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 157,
+            "slug": "Generic_Magic_Int",
+            "name": "Generic_Magic_Int",
+            "rarity": 2
+          },
+          {
+            "index": 158,
+            "slug": "Generic_Magic_DamageToCC",
+            "name": "Generic_Magic_DamageToCC",
+            "rarity": 2
+          },
+          {
+            "index": 159,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 172,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 175,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 178,
+            "slug": "Generic_Rare_016",
+            "name": "Devious",
+            "rarity": 3
+          },
+          {
+            "index": 179,
+            "slug": "Generic_Magic_DamageToCC",
+            "name": "Generic_Magic_DamageToCC",
+            "rarity": 2
+          },
+          {
+            "index": 180,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 196,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 198,
+            "slug": "Generic_Magic_Int",
+            "name": "Generic_Magic_Int",
+            "rarity": 2
+          },
+          {
+            "index": 199,
+            "slug": "Generic_Magic_DamageToCC",
+            "name": "Generic_Magic_DamageToCC",
+            "rarity": 2
+          },
+          {
+            "index": 200,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 210,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 211,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 216,
+            "slug": "Rogue_Legendary_007",
+            "name": "Cheap Shot",
+            "rarity": 4
+          },
+          {
+            "index": 217,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 221,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 222,
+            "slug": "Generic_Socket",
+            "name": "Glyph Socket",
+            "rarity": 0
+          },
+          {
+            "index": 232,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 233,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 234,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 235,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 238,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 240,
+            "slug": "Generic_Magic_Str",
+            "name": "Generic_Magic_Str",
+            "rarity": 2
+          },
+          {
+            "index": 241,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 242,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 256,
+            "slug": "Generic_Magic_DamageReductionFromElite",
+            "name": "Generic_Magic_DamageReductionFromElite",
+            "rarity": 2
+          },
+          {
+            "index": 259,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 262,
+            "slug": "Generic_Rare_096",
+            "name": "Artifice",
+            "rarity": 3
+          },
+          {
+            "index": 263,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 277,
+            "slug": "Generic_Magic_DamageReductionFromElite",
+            "name": "Generic_Magic_DamageReductionFromElite",
+            "rarity": 2
+          },
+          {
+            "index": 278,
+            "slug": "Generic_Magic_Armor",
+            "name": "Generic_Magic_Armor",
+            "rarity": 2
+          },
+          {
+            "index": 280,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 283,
+            "slug": "Generic_Magic_Str",
+            "name": "Generic_Magic_Str",
+            "rarity": 2
+          },
+          {
+            "index": 284,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 298,
+            "slug": "Generic_Rare_018",
+            "name": "Safeguard",
+            "rarity": 3
+          },
+          {
+            "index": 299,
+            "slug": "Generic_Magic_Armor",
+            "name": "Generic_Magic_Armor",
+            "rarity": 2
+          },
+          {
+            "index": 300,
+            "slug": "Generic_Magic_DamageReductionFromElite",
+            "name": "Generic_Magic_DamageReductionFromElite",
+            "rarity": 2
+          },
+          {
+            "index": 301,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 302,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 303,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 304,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 325,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 346,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 347,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 348,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 349,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 350,
+            "slug": "Generic_Magic_DamageToHigh",
+            "name": "Generic_Magic_DamageToHigh",
+            "rarity": 2
+          },
+          {
+            "index": 351,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 367,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 371,
+            "slug": "Generic_Magic_DamageToHigh",
+            "name": "Generic_Magic_DamageToHigh",
+            "rarity": 2
+          },
+          {
+            "index": 372,
+            "slug": "Generic_Rare_011",
+            "name": "Spearhead",
+            "rarity": 3
+          },
+          {
+            "index": 388,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 392,
+            "slug": "Generic_Magic_DamageToHigh",
+            "name": "Generic_Magic_DamageToHigh",
+            "rarity": 2
+          },
+          {
+            "index": 393,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 409,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 430,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          }
+        ],
+        "rotation": 3,
+        "position": {
+          "x": 0,
+          "y": -1
+        },
+        "glyph_socket_index": 222,
+        "start_node_index": null,
+        "board_width": 21
       },
       {
         "board": "Paragon_Rogue_01",
         "glyph": "Tracker",
         "glyph_level": 150,
         "nodes": [
-          "Potent",
-          "Concoction",
-          "Suffused Resilience",
-          "Ready Supply",
-          "Eldritch Bounty",
-          "Restorative",
-          "Imbuer"
-        ]
+          {
+            "index": 10,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 31,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 37,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 52,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 57,
+            "slug": "Rogue_Rare_012",
+            "name": "Potent",
+            "rarity": 3
+          },
+          {
+            "index": 58,
+            "slug": "Generic_Magic_Str",
+            "name": "Generic_Magic_Str",
+            "rarity": 2
+          },
+          {
+            "index": 73,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 78,
+            "slug": "Rogue_Magic_DamageImbued",
+            "name": "Rogue_Magic_DamageImbued",
+            "rarity": 2
+          },
+          {
+            "index": 79,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 94,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 99,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 102,
+            "slug": "Generic_Magic_Int",
+            "name": "Generic_Magic_Int",
+            "rarity": 2
+          },
+          {
+            "index": 103,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 112,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 113,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 114,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 115,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 116,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 117,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 118,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 119,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 120,
+            "slug": "Generic_Socket",
+            "name": "Glyph Socket",
+            "rarity": 0
+          },
+          {
+            "index": 121,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 122,
+            "slug": "Generic_Magic_DamageElemental",
+            "name": "Generic_Magic_DamageElemental",
+            "rarity": 2
+          },
+          {
+            "index": 123,
+            "slug": "Rogue_Rare_038",
+            "name": "Concoction",
+            "rarity": 3
+          },
+          {
+            "index": 124,
+            "slug": "Generic_Magic_DamageElemental",
+            "name": "Generic_Magic_DamageElemental",
+            "rarity": 2
+          },
+          {
+            "index": 132,
+            "slug": "Generic_Magic_DamageReduction",
+            "name": "Generic_Magic_DamageReduction",
+            "rarity": 2
+          },
+          {
+            "index": 133,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 138,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 142,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 144,
+            "slug": "Generic_Magic_DamageElemental",
+            "name": "Generic_Magic_DamageElemental",
+            "rarity": 2
+          },
+          {
+            "index": 145,
+            "slug": "Generic_Magic_Int",
+            "name": "Generic_Magic_Int",
+            "rarity": 2
+          },
+          {
+            "index": 151,
+            "slug": "Generic_Magic_DamageReduction",
+            "name": "Generic_Magic_DamageReduction",
+            "rarity": 2
+          },
+          {
+            "index": 152,
+            "slug": "Generic_Rare_019",
+            "name": "Suffused Resilience",
+            "rarity": 3
+          },
+          {
+            "index": 153,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 159,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 163,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 166,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 173,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 174,
+            "slug": "Generic_Magic_DamageReduction",
+            "name": "Generic_Magic_DamageReduction",
+            "rarity": 2
+          },
+          {
+            "index": 179,
+            "slug": "Generic_Magic_DamageElemental",
+            "name": "Generic_Magic_DamageElemental",
+            "rarity": 2
+          },
+          {
+            "index": 180,
+            "slug": "Rogue_Magic_ImbueCDR",
+            "name": "Rogue_Magic_ImbueCDR",
+            "rarity": 2
+          },
+          {
+            "index": 184,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 187,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 199,
+            "slug": "Rogue_Magic_ImbueCDR",
+            "name": "Rogue_Magic_ImbueCDR",
+            "rarity": 2
+          },
+          {
+            "index": 200,
+            "slug": "Rogue_Rare_010",
+            "name": "Ready Supply",
+            "rarity": 3
+          },
+          {
+            "index": 201,
+            "slug": "Generic_Magic_DamageElemental",
+            "name": "Generic_Magic_DamageElemental",
+            "rarity": 2
+          },
+          {
+            "index": 205,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 208,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 221,
+            "slug": "Generic_Magic_DamageElemental",
+            "name": "Generic_Magic_DamageElemental",
+            "rarity": 2
+          },
+          {
+            "index": 229,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 230,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 242,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 261,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 262,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 263,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 264,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 282,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 285,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 299,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 300,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 301,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 302,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 303,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 306,
+            "slug": "Generic_Magic_HealingBonus",
+            "name": "Generic_Magic_HealingBonus",
+            "rarity": 2
+          },
+          {
+            "index": 307,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 319,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 320,
+            "slug": "Rogue_Legendary_002",
+            "name": "Eldritch Bounty",
+            "rarity": 4
+          },
+          {
+            "index": 327,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 328,
+            "slug": "Generic_Rare_042",
+            "name": "Restorative",
+            "rarity": 3
+          },
+          {
+            "index": 339,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 340,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 359,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 360,
+            "slug": "Generic_Magic_Armor",
+            "name": "Generic_Magic_Armor",
+            "rarity": 2
+          },
+          {
+            "index": 379,
+            "slug": "Generic_Magic_Armor",
+            "name": "Generic_Magic_Armor",
+            "rarity": 2
+          },
+          {
+            "index": 380,
+            "slug": "Rogue_Rare_009",
+            "name": "Imbuer",
+            "rarity": 3
+          },
+          {
+            "index": 381,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 401,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          }
+        ],
+        "rotation": 3,
+        "position": {
+          "x": 1,
+          "y": -1
+        },
+        "glyph_socket_index": 120,
+        "start_node_index": null,
+        "board_width": 21
       },
       {
         "board": "Paragon_Rogue_07",
         "glyph": "Canny",
         "glyph_level": 150,
         "nodes": [
-          "Defensive Stance",
-          "Toughened",
-          "Unassailable",
-          "Exploit Weakness",
-          "Exploit",
-          "Artifice",
-          "Misery"
-        ]
+          {
+            "index": 96,
+            "slug": "Generic_Magic_ResistanceCold",
+            "name": "Generic_Magic_ResistanceCold",
+            "rarity": 2
+          },
+          {
+            "index": 116,
+            "slug": "Generic_Magic_ResistanceCold",
+            "name": "Generic_Magic_ResistanceCold",
+            "rarity": 2
+          },
+          {
+            "index": 117,
+            "slug": "Generic_Magic_ResistanceMaxCold",
+            "name": "Generic_Magic_ResistanceMaxCold",
+            "rarity": 2
+          },
+          {
+            "index": 130,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 131,
+            "slug": "Generic_Magic_Armor",
+            "name": "Generic_Magic_Armor",
+            "rarity": 2
+          },
+          {
+            "index": 132,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 133,
+            "slug": "Generic_Magic_Armor",
+            "name": "Generic_Magic_Armor",
+            "rarity": 2
+          },
+          {
+            "index": 134,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 137,
+            "slug": "Generic_Magic_ResistanceCold",
+            "name": "Generic_Magic_ResistanceCold",
+            "rarity": 2
+          },
+          {
+            "index": 138,
+            "slug": "Generic_Rare_012",
+            "name": "Defensive Stance",
+            "rarity": 3
+          },
+          {
+            "index": 151,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 152,
+            "slug": "Generic_Magic_Armor",
+            "name": "Generic_Magic_Armor",
+            "rarity": 2
+          },
+          {
+            "index": 153,
+            "slug": "Generic_Rare_106",
+            "name": "Toughened",
+            "rarity": 3
+          },
+          {
+            "index": 155,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 156,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 157,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 158,
+            "slug": "Generic_Magic_ResistanceMaxCold",
+            "name": "Generic_Magic_ResistanceMaxCold",
+            "rarity": 2
+          },
+          {
+            "index": 172,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 178,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 182,
+            "slug": "Necromancer_Rare_011",
+            "name": "Unassailable",
+            "rarity": 3
+          },
+          {
+            "index": 183,
+            "slug": "Generic_Magic_Armor",
+            "name": "Generic_Magic_Armor",
+            "rarity": 2
+          },
+          {
+            "index": 184,
+            "slug": "Generic_Magic_DamageReductionFromVulnerable",
+            "name": "Generic_Magic_DamageReductionFromVulnerable",
+            "rarity": 2
+          },
+          {
+            "index": 192,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 193,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 199,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 202,
+            "slug": "Generic_Magic_Armor",
+            "name": "Generic_Magic_Armor",
+            "rarity": 2
+          },
+          {
+            "index": 203,
+            "slug": "Generic_Magic_DamageReductionFromVulnerable",
+            "name": "Generic_Magic_DamageReductionFromVulnerable",
+            "rarity": 2
+          },
+          {
+            "index": 204,
+            "slug": "Generic_Magic_DamageReductionFromVulnerable",
+            "name": "Generic_Magic_DamageReductionFromVulnerable",
+            "rarity": 2
+          },
+          {
+            "index": 210,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 211,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 212,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 213,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 219,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 220,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 221,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 222,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 223,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 234,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 235,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 239,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 240,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 256,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 257,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 258,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 260,
+            "slug": "Rogue_Legendary_010",
+            "name": "Exploit Weakness",
+            "rarity": 4
+          },
+          {
+            "index": 277,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 278,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 287,
+            "slug": "Generic_Magic_DamageToVulnerable",
+            "name": "Generic_Magic_DamageToVulnerable",
+            "rarity": 2
+          },
+          {
+            "index": 296,
+            "slug": "Generic_Magic_DamageToVulnerable",
+            "name": "Generic_Magic_DamageToVulnerable",
+            "rarity": 2
+          },
+          {
+            "index": 299,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 301,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 307,
+            "slug": "Generic_Rare_049",
+            "name": "Exploit",
+            "rarity": 3
+          },
+          {
+            "index": 308,
+            "slug": "Generic_Magic_LuckyHitBonus",
+            "name": "Generic_Magic_LuckyHitBonus",
+            "rarity": 2
+          },
+          {
+            "index": 315,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 316,
+            "slug": "Generic_Magic_DamageToVulnerable",
+            "name": "Generic_Magic_DamageToVulnerable",
+            "rarity": 2
+          },
+          {
+            "index": 317,
+            "slug": "Generic_Rare_096",
+            "name": "Artifice",
+            "rarity": 3
+          },
+          {
+            "index": 318,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 319,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 320,
+            "slug": "Generic_Socket",
+            "name": "Glyph Socket",
+            "rarity": 0
+          },
+          {
+            "index": 322,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 328,
+            "slug": "Generic_Magic_DamageToVulnerable",
+            "name": "Generic_Magic_DamageToVulnerable",
+            "rarity": 2
+          },
+          {
+            "index": 329,
+            "slug": "Generic_Magic_DamageToVulnerable",
+            "name": "Generic_Magic_DamageToVulnerable",
+            "rarity": 2
+          },
+          {
+            "index": 339,
+            "slug": "Generic_Magic_DamageToVulnerable",
+            "name": "Generic_Magic_DamageToVulnerable",
+            "rarity": 2
+          },
+          {
+            "index": 341,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 342,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 343,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 344,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 348,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 349,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 350,
+            "slug": "Generic_Magic_LuckyHitBonus",
+            "name": "Generic_Magic_LuckyHitBonus",
+            "rarity": 2
+          },
+          {
+            "index": 361,
+            "slug": "Generic_Magic_DamageToElite",
+            "name": "Generic_Magic_DamageToElite",
+            "rarity": 2
+          },
+          {
+            "index": 362,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 365,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 366,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 367,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 368,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 369,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 382,
+            "slug": "Generic_Magic_Int",
+            "name": "Generic_Magic_Int",
+            "rarity": 2
+          },
+          {
+            "index": 383,
+            "slug": "Rogue_Rare_046",
+            "name": "Misery",
+            "rarity": 3
+          },
+          {
+            "index": 384,
+            "slug": "Generic_Magic_DamageToElite",
+            "name": "Generic_Magic_DamageToElite",
+            "rarity": 2
+          },
+          {
+            "index": 388,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 403,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 404,
+            "slug": "Generic_Magic_DamageToElite",
+            "name": "Generic_Magic_DamageToElite",
+            "rarity": 2
+          },
+          {
+            "index": 405,
+            "slug": "Generic_Magic_Int",
+            "name": "Generic_Magic_Int",
+            "rarity": 2
+          },
+          {
+            "index": 409,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 430,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          }
+        ],
+        "rotation": 0,
+        "position": {
+          "x": 1,
+          "y": -2
+        },
+        "glyph_socket_index": 320,
+        "start_node_index": null,
+        "board_width": 21
       },
       {
         "board": "Paragon_Rogue_10",
         "glyph": "Bane",
         "glyph_level": 150,
         "nodes": [
-          "Giant Killer",
-          "Assassin",
-          "Ranger",
-          "Brawler",
-          "Danse Macabre",
-          "Acrobat",
-          "Skulker"
-        ]
+          {
+            "index": 10,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 28,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 29,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 30,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 31,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 49,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 70,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 91,
+            "slug": "Generic_Magic_Int",
+            "name": "Generic_Magic_Int",
+            "rarity": 2
+          },
+          {
+            "index": 95,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 97,
+            "slug": "Generic_Magic_Str",
+            "name": "Generic_Magic_Str",
+            "rarity": 2
+          },
+          {
+            "index": 111,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 112,
+            "slug": "Rogue_Rare_033",
+            "name": "Giant Killer",
+            "rarity": 3
+          },
+          {
+            "index": 113,
+            "slug": "Generic_Magic_DamageToElite",
+            "name": "Generic_Magic_DamageToElite",
+            "rarity": 2
+          },
+          {
+            "index": 114,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 115,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 116,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 117,
+            "slug": "Generic_Magic_DamageToHealthy",
+            "name": "Generic_Magic_DamageToHealthy",
+            "rarity": 2
+          },
+          {
+            "index": 118,
+            "slug": "Rogue_Rare_034",
+            "name": "Assassin",
+            "rarity": 3
+          },
+          {
+            "index": 133,
+            "slug": "Generic_Magic_DamageToElite",
+            "name": "Generic_Magic_DamageToElite",
+            "rarity": 2
+          },
+          {
+            "index": 134,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 136,
+            "slug": "Generic_Socket",
+            "name": "Glyph Socket",
+            "rarity": 0
+          },
+          {
+            "index": 139,
+            "slug": "Generic_Magic_DamageToHealthy",
+            "name": "Generic_Magic_DamageToHealthy",
+            "rarity": 2
+          },
+          {
+            "index": 140,
+            "slug": "Generic_Magic_Str",
+            "name": "Generic_Magic_Str",
+            "rarity": 2
+          },
+          {
+            "index": 141,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 153,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 154,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 155,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 159,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 160,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 161,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 173,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 174,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 176,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 180,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 182,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 183,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 193,
+            "slug": "Generic_Magic_DamageReductionFromFar",
+            "name": "Generic_Magic_DamageReductionFromFar",
+            "rarity": 2
+          },
+          {
+            "index": 194,
+            "slug": "Generic_Magic_DamageToFar",
+            "name": "Generic_Magic_DamageToFar",
+            "rarity": 2
+          },
+          {
+            "index": 197,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 199,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 204,
+            "slug": "Generic_Magic_DamageToNear",
+            "name": "Generic_Magic_DamageToNear",
+            "rarity": 2
+          },
+          {
+            "index": 205,
+            "slug": "Generic_Magic_DamageToNear",
+            "name": "Generic_Magic_DamageToNear",
+            "rarity": 2
+          },
+          {
+            "index": 214,
+            "slug": "Rogue_Rare_018",
+            "name": "Ranger",
+            "rarity": 3
+          },
+          {
+            "index": 215,
+            "slug": "Generic_Magic_DamageToFar",
+            "name": "Generic_Magic_DamageToFar",
+            "rarity": 2
+          },
+          {
+            "index": 218,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 219,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 220,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 225,
+            "slug": "Generic_Magic_DamageReductionFromNear",
+            "name": "Generic_Magic_DamageReductionFromNear",
+            "rarity": 2
+          },
+          {
+            "index": 226,
+            "slug": "Rogue_Rare_016",
+            "name": "Brawler",
+            "rarity": 3
+          },
+          {
+            "index": 235,
+            "slug": "Generic_Magic_DamageReductionFromFar",
+            "name": "Generic_Magic_DamageReductionFromFar",
+            "rarity": 2
+          },
+          {
+            "index": 236,
+            "slug": "Generic_Magic_DamageToFar",
+            "name": "Generic_Magic_DamageToFar",
+            "rarity": 2
+          },
+          {
+            "index": 241,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 246,
+            "slug": "Generic_Magic_DamageToNear",
+            "name": "Generic_Magic_DamageToNear",
+            "rarity": 2
+          },
+          {
+            "index": 247,
+            "slug": "Generic_Magic_DamageReductionFromNear",
+            "name": "Generic_Magic_DamageReductionFromNear",
+            "rarity": 2
+          },
+          {
+            "index": 262,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 283,
+            "slug": "Rogue_Legendary_017",
+            "name": "Danse Macabre",
+            "rarity": 4
+          },
+          {
+            "index": 300,
+            "slug": "Rogue_Magic_MobilityCooldown",
+            "name": "Rogue_Magic_MobilityCooldown",
+            "rarity": 2
+          },
+          {
+            "index": 301,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 304,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 321,
+            "slug": "Rogue_Magic_MobilityCooldown",
+            "name": "Rogue_Magic_MobilityCooldown",
+            "rarity": 2
+          },
+          {
+            "index": 322,
+            "slug": "Rogue_Rare_036",
+            "name": "Acrobat",
+            "rarity": 3
+          },
+          {
+            "index": 323,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 324,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 325,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 326,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 327,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 328,
+            "slug": "Rogue_Rare_035",
+            "name": "Skulker",
+            "rarity": 3
+          },
+          {
+            "index": 342,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 343,
+            "slug": "Rogue_Magic_MobilityCooldown",
+            "name": "Rogue_Magic_MobilityCooldown",
+            "rarity": 2
+          }
+        ],
+        "rotation": 1,
+        "position": {
+          "x": 0,
+          "y": -2
+        },
+        "glyph_socket_index": 136,
+        "start_node_index": null,
+        "board_width": 21
       }
     ],
     "gear": [

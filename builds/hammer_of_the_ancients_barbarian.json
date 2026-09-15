@@ -179,49 +179,1143 @@
         "glyph": "Imbiber",
         "glyph_level": 25,
         "nodes": [
-          "Iron Strength",
-          "Brawn"
-        ]
+          {
+            "index": 10,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 31,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 32,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 53,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 74,
+            "slug": "Generic_Magic_DamageToElite",
+            "name": "Generic_Magic_DamageToElite",
+            "rarity": 2
+          },
+          {
+            "index": 95,
+            "slug": "Barbarian_Rare_039",
+            "name": "Iron Strength",
+            "rarity": 3
+          },
+          {
+            "index": 96,
+            "slug": "Generic_Magic_Will",
+            "name": "Generic_Magic_Will",
+            "rarity": 2
+          },
+          {
+            "index": 116,
+            "slug": "Generic_Magic_DamageToElite",
+            "name": "Generic_Magic_DamageToElite",
+            "rarity": 2
+          },
+          {
+            "index": 134,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 135,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 136,
+            "slug": "Generic_Socket",
+            "name": "Glyph Socket",
+            "rarity": 0
+          },
+          {
+            "index": 137,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 138,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 139,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 140,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 159,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 160,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 179,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 180,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 201,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 222,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 243,
+            "slug": "Barbarian_Rare_022",
+            "name": "Brawn",
+            "rarity": 3
+          },
+          {
+            "index": 264,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 283,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 284,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 285,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 304,
+            "slug": "StartNodeBarb",
+            "name": "Paragon Starting Node",
+            "rarity": 0
+          }
+        ],
+        "rotation": 0,
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "glyph_socket_index": 136,
+        "start_node_index": 304,
+        "board_width": 21
       },
       {
         "board": "Paragon_Barb_04",
         "glyph": "Dominate",
         "glyph_level": 25,
         "nodes": [
-          "Destroyer",
-          "Decimator"
-        ]
+          {
+            "index": 10,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 31,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 52,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 73,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 74,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 95,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 115,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 116,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 136,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 157,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 178,
+            "slug": "Generic_Socket",
+            "name": "Glyph Socket",
+            "rarity": 0
+          },
+          {
+            "index": 179,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 180,
+            "slug": "Generic_Magic_OverpowerDamage",
+            "name": "Generic_Magic_OverpowerDamage",
+            "rarity": 2
+          },
+          {
+            "index": 181,
+            "slug": "Barbarian_Rare_030",
+            "name": "Destroyer",
+            "rarity": 3
+          },
+          {
+            "index": 182,
+            "slug": "Generic_Magic_OverpowerDamage",
+            "name": "Generic_Magic_OverpowerDamage",
+            "rarity": 2
+          },
+          {
+            "index": 198,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 199,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 203,
+            "slug": "Generic_Magic_Will",
+            "name": "Generic_Magic_Will",
+            "rarity": 2
+          },
+          {
+            "index": 204,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 205,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 219,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 226,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 227,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 228,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 229,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 230,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 240,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 241,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 261,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 282,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 283,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 284,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 285,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 304,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 306,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 325,
+            "slug": "Barbarian_Legendary_014",
+            "name": "Decimator",
+            "rarity": 4
+          },
+          {
+            "index": 327,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 348,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 369,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 390,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 409,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 410,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 411,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 430,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          }
+        ],
+        "rotation": 0,
+        "position": {
+          "x": 0,
+          "y": -1
+        },
+        "glyph_socket_index": 178,
+        "start_node_index": null,
+        "board_width": 21
       },
       {
         "board": "Paragon_Barb_06",
         "glyph": "Wrath",
         "glyph_level": 25,
         "nodes": [
-          "Brash",
-          "Flawless Technique",
-          "Slayer",
-          "Heavy Blows"
-        ]
+          {
+            "index": 78,
+            "slug": "Generic_Rare_059",
+            "name": "Brash",
+            "rarity": 3
+          },
+          {
+            "index": 99,
+            "slug": "Generic_Magic_ResistanceFire",
+            "name": "Generic_Magic_ResistanceFire",
+            "rarity": 2
+          },
+          {
+            "index": 118,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 119,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 120,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 121,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 122,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 136,
+            "slug": "Barbarian_Legendary_016",
+            "name": "Flawless Technique",
+            "rarity": 4
+          },
+          {
+            "index": 137,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 138,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 139,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 143,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 162,
+            "slug": "Generic_Rare_067",
+            "name": "Slayer",
+            "rarity": 3
+          },
+          {
+            "index": 164,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 182,
+            "slug": "Generic_Magic_Armor",
+            "name": "Generic_Magic_Armor",
+            "rarity": 2
+          },
+          {
+            "index": 183,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 184,
+            "slug": "Generic_Magic_Armor",
+            "name": "Generic_Magic_Armor",
+            "rarity": 2
+          },
+          {
+            "index": 185,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 202,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 203,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 206,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 221,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 222,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 223,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 227,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 228,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 229,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 230,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 238,
+            "slug": "Generic_Magic_Dex",
+            "name": "Generic_Magic_Dex",
+            "rarity": 2
+          },
+          {
+            "index": 242,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 259,
+            "slug": "Barbarian_Rare_024",
+            "name": "Heavy Blows",
+            "rarity": 3
+          },
+          {
+            "index": 262,
+            "slug": "Generic_Socket",
+            "name": "Glyph Socket",
+            "rarity": 0
+          },
+          {
+            "index": 263,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 280,
+            "slug": "Generic_Magic_CriticalDamage",
+            "name": "Generic_Magic_CriticalDamage",
+            "rarity": 2
+          },
+          {
+            "index": 281,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 282,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 283,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 284,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 305,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 326,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 347,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 367,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 368,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 388,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 409,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 430,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          }
+        ],
+        "rotation": 0,
+        "position": {
+          "x": 0,
+          "y": -2
+        },
+        "glyph_socket_index": 262,
+        "start_node_index": null,
+        "board_width": 21
       },
       {
         "board": "Paragon_Barb_02",
         "glyph": "Challenger",
         "glyph_level": 25,
         "nodes": [
-          "Blood Rage",
-          "Wrath"
-        ]
+          {
+            "index": 134,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 135,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 136,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 137,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 138,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 155,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 159,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 176,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 177,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 180,
+            "slug": "Barbarian_Magic_BerserkDamage",
+            "name": "Barbarian_Magic_BerserkDamage",
+            "rarity": 2
+          },
+          {
+            "index": 198,
+            "slug": "Barbarian_Legendary_004",
+            "name": "Blood Rage",
+            "rarity": 4
+          },
+          {
+            "index": 201,
+            "slug": "Barbarian_Rare_037",
+            "name": "Wrath",
+            "rarity": 3
+          },
+          {
+            "index": 222,
+            "slug": "Barbarian_Magic_BerserkDamage",
+            "name": "Barbarian_Magic_BerserkDamage",
+            "rarity": 2
+          },
+          {
+            "index": 227,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 228,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 229,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 230,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 243,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 246,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 247,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 248,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 264,
+            "slug": "Generic_Socket",
+            "name": "Glyph Socket",
+            "rarity": 0
+          },
+          {
+            "index": 265,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 266,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 267,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 284,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 285,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          }
+        ],
+        "rotation": 2,
+        "position": {
+          "x": 1,
+          "y": -2
+        },
+        "glyph_socket_index": 264,
+        "start_node_index": null,
+        "board_width": 21
       },
       {
         "board": "Paragon_Barb_03",
         "glyph": "Might",
         "glyph_level": 25,
         "nodes": [
-          "Tenacity",
-          "Fierce",
-          "Carnage",
-          "Berserker"
-        ]
+          {
+            "index": 10,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 31,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 32,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 33,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 34,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 35,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 56,
+            "slug": "Generic_Magic_ResistanceCold",
+            "name": "Generic_Magic_ResistanceCold",
+            "rarity": 2
+          },
+          {
+            "index": 77,
+            "slug": "Generic_Magic_ResistanceCold",
+            "name": "Generic_Magic_ResistanceCold",
+            "rarity": 2
+          },
+          {
+            "index": 78,
+            "slug": "Barbarian_Rare_010",
+            "name": "Tenacity",
+            "rarity": 3
+          },
+          {
+            "index": 98,
+            "slug": "Generic_Magic_ResistanceCold",
+            "name": "Generic_Magic_ResistanceCold",
+            "rarity": 2
+          },
+          {
+            "index": 118,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 119,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 138,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 139,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 159,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 178,
+            "slug": "Barbarian_Rare_023",
+            "name": "Fierce",
+            "rarity": 3
+          },
+          {
+            "index": 179,
+            "slug": "Generic_Magic_CriticalDamage",
+            "name": "Generic_Magic_CriticalDamage",
+            "rarity": 2
+          },
+          {
+            "index": 180,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 201,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 216,
+            "slug": "Barbarian_Legendary_009",
+            "name": "Carnage",
+            "rarity": 4
+          },
+          {
+            "index": 217,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 222,
+            "slug": "Generic_Socket",
+            "name": "Glyph Socket",
+            "rarity": 0
+          },
+          {
+            "index": 238,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 243,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 259,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 262,
+            "slug": "Barbarian_Rare_003",
+            "name": "Berserker",
+            "rarity": 3
+          },
+          {
+            "index": 263,
+            "slug": "Barbarian_Magic_BerserkDamage",
+            "name": "Barbarian_Magic_BerserkDamage",
+            "rarity": 2
+          },
+          {
+            "index": 264,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 280,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 283,
+            "slug": "Generic_Magic_Will",
+            "name": "Generic_Magic_Will",
+            "rarity": 2
+          },
+          {
+            "index": 301,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 302,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 303,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 304,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          }
+        ],
+        "rotation": 3,
+        "position": {
+          "x": 1,
+          "y": -1
+        },
+        "glyph_socket_index": 222,
+        "start_node_index": null,
+        "board_width": 21
       }
     ],
     "gear": [

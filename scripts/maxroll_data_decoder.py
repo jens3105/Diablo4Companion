@@ -219,16 +219,42 @@ def decode_skill_allocation(profile: dict, data_dict: dict) -> list[dict]:
 
 def decode_paragon(profile: dict, data_dict: dict, step_name: str | None = None) -> list[dict]:
     """Decode ``profile["paragon"]["steps"]`` into a clean list of
-    ``{"board": id, "glyph": name, "glyph_level": int, "nodes": [names]}``.
+    board entries carrying both the taken-node summary and the raw grid
+    placement info a future Paragon-board UI needs:
+
+    ``{"board": id, "glyph": name, "glyph_level": int,
+      "nodes": [{"index", "slug", "name", "rarity"}, ...],
+      "rotation": int, "position": {"x", "y"},
+      "glyph_socket_index": int | None, "start_node_index": int | None,
+      "board_width": int | None}``
+
+    ``board`` is already the raw Maxroll board slug (e.g.
+    "Paragon_Sorc_00") - there's no separate display name to also carry
+    as a "board_id" field, that would just duplicate this one.
 
     ``step_name`` picks which progressive paragon step to decode (builds
     typically publish several - "Lvl 1", "Lvl 50", "Lvl 100", "Lvl 150 -
     all points", etc.); defaults to the last step, which is the fullest/
-    final layout. ``nodes`` only lists Rare/Legendary paragon nodes
-    (``paragonNodes[slug]["rarity"]`` 3 or 4) - Normal/Magic stat nodes
-    have no real names in the game itself (just plain stat rolls), so
-    including them would mean inventing labels instead of reporting real
-    data.
+    final layout.
+
+    ``nodes`` now lists EVERY taken node (Normal/Magic stat nodes
+    included, not just Rare/Legendary as before) - ``name`` is the real
+    ``paragonNodes[slug]["name"]`` when the game gives that node a
+    unique display name (only Rare(3)/Legendary(4) nodes normally do,
+    though a couple of Normal(0) utility nodes like ``Generic_Socket``
+    ("Glyph Socket") also carry one), else the slug itself is used as an
+    honest fallback label rather than inventing a stat description.
+
+    ``glyph_socket_index``/``start_node_index`` are found by scanning
+    the board's own node-slug array (from ``paragonBoards[id]["nodes"]``)
+    for whichever slug's ``paragonNodes[slug]`` entry carries the
+    ``socket``/``start`` boolean flag - not by string-matching a
+    particular slug name, since the start-node slug differs per class
+    (``StartNodeSorc``, ``StartNodeBarb``, etc., confirmed against every
+    class in ``data_dict["classes"]``) while ``Generic_Socket`` is the
+    one socket slug shared by all boards. Most boards have no start node
+    at all (only each class's own board "_00" does) and both are
+    ``None`` when absent - never guessed.
     """
 
     steps = profile.get("paragon", {}).get("steps") or []
@@ -250,9 +276,27 @@ def decode_paragon(profile: dict, data_dict: dict, step_name: str | None = None)
         board_id = board.get("id")
         board_def = boards_data.get(board_id)
 
-        node_names = []
+        node_entries = []
+        glyph_socket_index = None
+        start_node_index = None
+        board_width = board_def.get("width") if board_def else None
+
         if board_def:
             node_slugs = board_def.get("nodes", [])
+
+            # Locate this board's glyph socket / class start node by
+            # flag, not by name-matching a slug - see docstring.
+            for i, slug in enumerate(node_slugs):
+                if not slug:
+                    continue
+                node_def = paragon_nodes.get(slug)
+                if not node_def:
+                    continue
+                if glyph_socket_index is None and node_def.get("socket"):
+                    glyph_socket_index = i
+                if start_node_index is None and node_def.get("start"):
+                    start_node_index = i
+
             for idx_str in board.get("nodes", {}):
                 idx = int(idx_str)
                 if idx >= len(node_slugs):
@@ -263,10 +307,20 @@ def decode_paragon(profile: dict, data_dict: dict, step_name: str | None = None)
                 node_def = paragon_nodes.get(slug)
                 if not node_def:
                     continue
-                # Only surface named (Rare/Legendary) nodes - Normal/Magic
-                # stat nodes have no unique display name in the game.
-                if node_def.get("rarity", 0) >= 3 and node_def.get("name"):
-                    node_names.append(node_def["name"].strip())
+
+                name = node_def.get("name")
+                name = name.strip() if name else slug
+
+                node_entries.append(
+                    {
+                        "index": idx,
+                        "slug": slug,
+                        "name": name,
+                        "rarity": node_def.get("rarity", 0),
+                    }
+                )
+
+        node_entries.sort(key=lambda e: e["index"])
 
         glyph_slug = board.get("glyph")
         glyph_def = paragon_glyphs.get(glyph_slug) if glyph_slug else None
@@ -280,7 +334,12 @@ def decode_paragon(profile: dict, data_dict: dict, step_name: str | None = None)
                 "board": board_id,
                 "glyph": glyph_name,
                 "glyph_level": board.get("glyphLevel"),
-                "nodes": node_names,
+                "nodes": node_entries,
+                "rotation": board.get("rotation"),
+                "position": board.get("position"),
+                "glyph_socket_index": glyph_socket_index,
+                "start_node_index": start_node_index,
+                "board_width": board_width,
             }
         )
 

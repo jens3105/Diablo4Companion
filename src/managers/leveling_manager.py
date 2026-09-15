@@ -35,7 +35,12 @@ class LevelingManager:
                 "skill_allocation": [{"skill": str, "rank": int, "max_rank": int,
                                        "upgrades_chosen": [str, ...]}, ...],
                 "paragon_boards": [{"board": str, "glyph": str, "glyph_level": int,
-                                     "nodes": [str, ...]}, ...],
+                                     "nodes": [{"index": int, "slug": str, "name": str,
+                                                "rarity": int}, ...],
+                                     "rotation": int, "position": {"x": int, "y": int},
+                                     "glyph_socket_index": int | None,
+                                     "start_node_index": int | None,
+                                     "board_width": int | None}, ...],
             } | None  (only present for builds with a genuine decoded Maxroll
                        Planner profile - see scripts/maxroll_data_decoder.py)
         }
@@ -383,7 +388,16 @@ class LevelingManager:
                     pb["board"]: {
                         "glyph": pb.get("glyph"),
                         "glyph_level": pb.get("glyph_level"),
-                        "nodes": list(pb.get("nodes") or []),
+                        # Node entries are ``{"index", "slug", "name",
+                        # "rarity"}`` dicts as of the paragon-board grid
+                        # decoder phase - only their names are tracked here,
+                        # same as the flat name list this snapshot compared
+                        # before, since this feeds a "what changed" diff by
+                        # name (see ``_diff_verified``), not the grid data.
+                        "nodes": [
+                            n["name"] if isinstance(n, dict) else n
+                            for n in (pb.get("nodes") or [])
+                        ],
                     }
                     for pb in verified.get("paragon_boards", [])
                 },

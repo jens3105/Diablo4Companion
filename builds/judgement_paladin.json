@@ -176,67 +176,2151 @@
         "glyph": "Sentinel",
         "glyph_level": 150,
         "nodes": [
-          "Raw Power",
-          "Iron Strength",
-          "Tenacity",
-          "Brawn"
-        ]
+          {
+            "index": 10,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 31,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 32,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 53,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 72,
+            "slug": "Generic_Magic_DamageToElite",
+            "name": "Generic_Magic_DamageToElite",
+            "rarity": 2
+          },
+          {
+            "index": 74,
+            "slug": "Generic_Magic_DamageToElite",
+            "name": "Generic_Magic_DamageToElite",
+            "rarity": 2
+          },
+          {
+            "index": 93,
+            "slug": "Generic_Rare_118",
+            "name": "Raw Power",
+            "rarity": 3
+          },
+          {
+            "index": 95,
+            "slug": "Barbarian_Rare_039",
+            "name": "Iron Strength",
+            "rarity": 3
+          },
+          {
+            "index": 113,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 114,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 116,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 117,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 135,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 136,
+            "slug": "Generic_Socket",
+            "name": "Glyph Socket",
+            "rarity": 0
+          },
+          {
+            "index": 137,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 156,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 158,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 177,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 179,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 198,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 200,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 218,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 219,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 221,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 222,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 238,
+            "slug": "Generic_Magic_Armor",
+            "name": "Generic_Magic_Armor",
+            "rarity": 2
+          },
+          {
+            "index": 239,
+            "slug": "Barbarian_Rare_015",
+            "name": "Tenacity",
+            "rarity": 3
+          },
+          {
+            "index": 240,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 242,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 243,
+            "slug": "Barbarian_Rare_022",
+            "name": "Brawn",
+            "rarity": 3
+          },
+          {
+            "index": 244,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 260,
+            "slug": "Generic_Magic_Armor",
+            "name": "Generic_Magic_Armor",
+            "rarity": 2
+          },
+          {
+            "index": 264,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 283,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 284,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 285,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          }
+        ],
+        "rotation": 0,
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "glyph_socket_index": 136,
+        "start_node_index": 304,
+        "board_width": 21
       },
       {
         "board": "Paragon_Paladin_06",
         "glyph": "Resplendence",
         "glyph_level": 150,
         "nodes": [
-          "Battering Ram",
-          "Cull",
-          "Relentless",
-          "Inured",
-          "Defiance",
-          "Endure",
-          "Dervish"
-        ]
+          {
+            "index": 47,
+            "slug": "Generic_Magic_ArmorPercent",
+            "name": "Generic_Magic_ArmorPercent",
+            "rarity": 2
+          },
+          {
+            "index": 48,
+            "slug": "Generic_Magic_ArmorPercent",
+            "name": "Generic_Magic_ArmorPercent",
+            "rarity": 2
+          },
+          {
+            "index": 68,
+            "slug": "Paladin_Rare_035",
+            "name": "Battering Ram",
+            "rarity": 3
+          },
+          {
+            "index": 69,
+            "slug": "Generic_Magic_MoveSpeed",
+            "name": "Generic_Magic_MoveSpeed",
+            "rarity": 2
+          },
+          {
+            "index": 77,
+            "slug": "Generic_Magic_DamageToVulnerable",
+            "name": "Generic_Magic_DamageToVulnerable",
+            "rarity": 2
+          },
+          {
+            "index": 78,
+            "slug": "Paladin_Rare_036",
+            "name": "Cull",
+            "rarity": 3
+          },
+          {
+            "index": 89,
+            "slug": "Generic_Magic_MoveSpeed",
+            "name": "Generic_Magic_MoveSpeed",
+            "rarity": 2
+          },
+          {
+            "index": 90,
+            "slug": "Generic_Magic_MoveSpeed",
+            "name": "Generic_Magic_MoveSpeed",
+            "rarity": 2
+          },
+          {
+            "index": 98,
+            "slug": "Generic_Magic_DamageToVulnerable",
+            "name": "Generic_Magic_DamageToVulnerable",
+            "rarity": 2
+          },
+          {
+            "index": 99,
+            "slug": "Generic_Magic_DamageToVulnerable",
+            "name": "Generic_Magic_DamageToVulnerable",
+            "rarity": 2
+          },
+          {
+            "index": 108,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 109,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 110,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 111,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 112,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 113,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 120,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 121,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 122,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 129,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 134,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 135,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 136,
+            "slug": "Paladin_Legendary_006",
+            "name": "Relentless",
+            "rarity": 4
+          },
+          {
+            "index": 143,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 150,
+            "slug": "Generic_Magic_CDR",
+            "name": "Generic_Magic_CDR",
+            "rarity": 2
+          },
+          {
+            "index": 151,
+            "slug": "Generic_Magic_CDR",
+            "name": "Generic_Magic_CDR",
+            "rarity": 2
+          },
+          {
+            "index": 152,
+            "slug": "Paladin_Rare_037",
+            "name": "Inured",
+            "rarity": 3
+          },
+          {
+            "index": 162,
+            "slug": "Paladin_Rare_005",
+            "name": "Defiance",
+            "rarity": 3
+          },
+          {
+            "index": 163,
+            "slug": "Generic_Magic_ArmorPercent",
+            "name": "Generic_Magic_ArmorPercent",
+            "rarity": 2
+          },
+          {
+            "index": 164,
+            "slug": "Generic_Magic_ArmorPercent",
+            "name": "Generic_Magic_ArmorPercent",
+            "rarity": 2
+          },
+          {
+            "index": 170,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 171,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 172,
+            "slug": "Generic_Magic_CDR",
+            "name": "Generic_Magic_CDR",
+            "rarity": 2
+          },
+          {
+            "index": 173,
+            "slug": "Generic_Magic_ArmorPercent",
+            "name": "Generic_Magic_ArmorPercent",
+            "rarity": 2
+          },
+          {
+            "index": 174,
+            "slug": "Generic_Magic_ArmorPercent",
+            "name": "Generic_Magic_ArmorPercent",
+            "rarity": 2
+          },
+          {
+            "index": 175,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 182,
+            "slug": "Generic_Magic_ArmorPercent",
+            "name": "Generic_Magic_ArmorPercent",
+            "rarity": 2
+          },
+          {
+            "index": 183,
+            "slug": "Generic_Magic_ArmorPercent",
+            "name": "Generic_Magic_ArmorPercent",
+            "rarity": 2
+          },
+          {
+            "index": 184,
+            "slug": "Generic_Magic_ArmorPercent",
+            "name": "Generic_Magic_ArmorPercent",
+            "rarity": 2
+          },
+          {
+            "index": 190,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 191,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 196,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 204,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 210,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 211,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 217,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 225,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 226,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 227,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 228,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 229,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 230,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 238,
+            "slug": "Generic_Magic_Will",
+            "name": "Generic_Magic_Will",
+            "rarity": 2
+          },
+          {
+            "index": 239,
+            "slug": "Generic_Magic_Int",
+            "name": "Generic_Magic_Int",
+            "rarity": 2
+          },
+          {
+            "index": 240,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 241,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 243,
+            "slug": "Generic_Magic_Int",
+            "name": "Generic_Magic_Int",
+            "rarity": 2
+          },
+          {
+            "index": 244,
+            "slug": "Generic_Magic_Will",
+            "name": "Generic_Magic_Will",
+            "rarity": 2
+          },
+          {
+            "index": 246,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 258,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 259,
+            "slug": "Paladin_Rare_041",
+            "name": "Endure",
+            "rarity": 3
+          },
+          {
+            "index": 262,
+            "slug": "Generic_Socket",
+            "name": "Glyph Socket",
+            "rarity": 0
+          },
+          {
+            "index": 265,
+            "slug": "Paladin_Rare_040",
+            "name": "Dervish",
+            "rarity": 3
+          },
+          {
+            "index": 266,
+            "slug": "Generic_Magic_CDR",
+            "name": "Generic_Magic_CDR",
+            "rarity": 2
+          },
+          {
+            "index": 267,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 279,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 280,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 283,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 284,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 285,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 286,
+            "slug": "Generic_Magic_CDR",
+            "name": "Generic_Magic_CDR",
+            "rarity": 2
+          },
+          {
+            "index": 287,
+            "slug": "Generic_Magic_CDR",
+            "name": "Generic_Magic_CDR",
+            "rarity": 2
+          }
+        ],
+        "rotation": 3,
+        "position": {
+          "x": 0,
+          "y": -1
+        },
+        "glyph_socket_index": 262,
+        "start_node_index": null,
+        "board_width": 21
       },
       {
         "board": "Paragon_Paladin_07",
         "glyph": "Spirit",
         "glyph_level": 150,
         "nodes": [
-          "Benediction",
-          "Restorative",
-          "Sturdy",
-          "Sentencing",
-          "Luminous",
-          "Grace",
-          "Endure"
-        ]
+          {
+            "index": 96,
+            "slug": "Generic_Magic_HealingBonus",
+            "name": "Generic_Magic_HealingBonus",
+            "rarity": 2
+          },
+          {
+            "index": 116,
+            "slug": "Paladin_Magic_JudgementDamage",
+            "name": "Paladin_Magic_JudgementDamage",
+            "rarity": 2
+          },
+          {
+            "index": 117,
+            "slug": "Generic_Magic_HealingBonus",
+            "name": "Generic_Magic_HealingBonus",
+            "rarity": 2
+          },
+          {
+            "index": 130,
+            "slug": "Generic_Magic_HealingBonus",
+            "name": "Generic_Magic_HealingBonus",
+            "rarity": 2
+          },
+          {
+            "index": 131,
+            "slug": "Generic_Magic_HealingBonus",
+            "name": "Generic_Magic_HealingBonus",
+            "rarity": 2
+          },
+          {
+            "index": 132,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 133,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 134,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 137,
+            "slug": "Paladin_Magic_JudgementDamage",
+            "name": "Paladin_Magic_JudgementDamage",
+            "rarity": 2
+          },
+          {
+            "index": 138,
+            "slug": "Paladin_Rare_046",
+            "name": "Benediction",
+            "rarity": 3
+          },
+          {
+            "index": 152,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 153,
+            "slug": "Generic_Rare_042",
+            "name": "Restorative",
+            "rarity": 3
+          },
+          {
+            "index": 155,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 156,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 157,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 158,
+            "slug": "Paladin_Magic_JudgementDamage",
+            "name": "Paladin_Magic_JudgementDamage",
+            "rarity": 2
+          },
+          {
+            "index": 178,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 182,
+            "slug": "Paladin_Rare_054",
+            "name": "Sturdy",
+            "rarity": 3
+          },
+          {
+            "index": 183,
+            "slug": "Generic_Magic_ArmorPercent",
+            "name": "Generic_Magic_ArmorPercent",
+            "rarity": 2
+          },
+          {
+            "index": 184,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 199,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 202,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 203,
+            "slug": "Generic_Magic_ArmorPercent",
+            "name": "Generic_Magic_ArmorPercent",
+            "rarity": 2
+          },
+          {
+            "index": 204,
+            "slug": "Generic_Magic_ArmorPercent",
+            "name": "Generic_Magic_ArmorPercent",
+            "rarity": 2
+          },
+          {
+            "index": 210,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 211,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 212,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 219,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 220,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 221,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 222,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 223,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 233,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 234,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 235,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 239,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 240,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 244,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 245,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 256,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 257,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 258,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 260,
+            "slug": "Paladin_Legendary_007",
+            "name": "Sentencing",
+            "rarity": 4
+          },
+          {
+            "index": 266,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 277,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 278,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 287,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 299,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 301,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 307,
+            "slug": "Paladin_Rare_043",
+            "name": "Luminous",
+            "rarity": 3
+          },
+          {
+            "index": 308,
+            "slug": "Generic_Magic_AttackSpeed",
+            "name": "Generic_Magic_AttackSpeed",
+            "rarity": 2
+          },
+          {
+            "index": 315,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 316,
+            "slug": "Generic_Magic_LuckyHitBonus",
+            "name": "Generic_Magic_LuckyHitBonus",
+            "rarity": 2
+          },
+          {
+            "index": 317,
+            "slug": "Paladin_Rare_042",
+            "name": "Grace",
+            "rarity": 3
+          },
+          {
+            "index": 318,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 319,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 320,
+            "slug": "Generic_Socket",
+            "name": "Glyph Socket",
+            "rarity": 0
+          },
+          {
+            "index": 322,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 328,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 329,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 338,
+            "slug": "Generic_Magic_Will",
+            "name": "Generic_Magic_Will",
+            "rarity": 2
+          },
+          {
+            "index": 339,
+            "slug": "Generic_Magic_Will",
+            "name": "Generic_Magic_Will",
+            "rarity": 2
+          },
+          {
+            "index": 341,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 342,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 343,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 344,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 348,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 349,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 350,
+            "slug": "Generic_Magic_AttackSpeed",
+            "name": "Generic_Magic_AttackSpeed",
+            "rarity": 2
+          },
+          {
+            "index": 361,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 362,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 365,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 366,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 367,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 368,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 369,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 382,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 383,
+            "slug": "Paladin_Rare_041",
+            "name": "Endure",
+            "rarity": 3
+          },
+          {
+            "index": 384,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 388,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 403,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 409,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 430,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          }
+        ],
+        "rotation": 0,
+        "position": {
+          "x": 0,
+          "y": -2
+        },
+        "glyph_socket_index": 320,
+        "start_node_index": null,
+        "board_width": 21
       },
       {
         "board": "Paragon_Paladin_01",
         "glyph": "Law",
         "glyph_level": 150,
         "nodes": [
-          "Knight",
-          "Ironclad",
-          "Insulate",
-          "Stalwart",
-          "Castle",
-          "Grappler",
-          "Defiance"
-        ]
+          {
+            "index": 10,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 15,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 31,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 32,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 33,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 36,
+            "slug": "Generic_Magic_DamagePhysical",
+            "name": "Generic_Magic_DamagePhysical",
+            "rarity": 2
+          },
+          {
+            "index": 54,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 55,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 56,
+            "slug": "Generic_Magic_Int",
+            "name": "Generic_Magic_Int",
+            "rarity": 2
+          },
+          {
+            "index": 57,
+            "slug": "Paladin_Rare_010",
+            "name": "Knight",
+            "rarity": 3
+          },
+          {
+            "index": 58,
+            "slug": "Generic_Magic_DamagePhysical",
+            "name": "Generic_Magic_DamagePhysical",
+            "rarity": 2
+          },
+          {
+            "index": 59,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 78,
+            "slug": "Generic_Magic_Int",
+            "name": "Generic_Magic_Int",
+            "rarity": 2
+          },
+          {
+            "index": 95,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 96,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 98,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 99,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 101,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 102,
+            "slug": "Generic_Magic_ArmorPercent",
+            "name": "Generic_Magic_ArmorPercent",
+            "rarity": 2
+          },
+          {
+            "index": 116,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 117,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 118,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 119,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 120,
+            "slug": "Generic_Socket",
+            "name": "Glyph Socket",
+            "rarity": 0
+          },
+          {
+            "index": 121,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 122,
+            "slug": "Generic_Magic_ArmorPercent",
+            "name": "Generic_Magic_ArmorPercent",
+            "rarity": 2
+          },
+          {
+            "index": 123,
+            "slug": "Paladin_Rare_007",
+            "name": "Ironclad",
+            "rarity": 3
+          },
+          {
+            "index": 124,
+            "slug": "Generic_Magic_Str",
+            "name": "Generic_Magic_Str",
+            "rarity": 2
+          },
+          {
+            "index": 125,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 132,
+            "slug": "Generic_Magic_DamageToCC",
+            "name": "Generic_Magic_DamageToCC",
+            "rarity": 2
+          },
+          {
+            "index": 138,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 139,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 141,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 143,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 151,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 152,
+            "slug": "Paladin_Rare_009",
+            "name": "Insulate",
+            "rarity": 3
+          },
+          {
+            "index": 153,
+            "slug": "Generic_Magic_DamageToCC",
+            "name": "Generic_Magic_DamageToCC",
+            "rarity": 2
+          },
+          {
+            "index": 159,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 162,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 173,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 174,
+            "slug": "Generic_Magic_DamageToCC",
+            "name": "Generic_Magic_DamageToCC",
+            "rarity": 2
+          },
+          {
+            "index": 175,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 179,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 180,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 182,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 183,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 196,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 197,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 198,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 199,
+            "slug": "Generic_Magic_BlockChance",
+            "name": "Generic_Magic_BlockChance",
+            "rarity": 2
+          },
+          {
+            "index": 200,
+            "slug": "Paladin_Rare_008",
+            "name": "Stalwart",
+            "rarity": 3
+          },
+          {
+            "index": 201,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 204,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 205,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 218,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 221,
+            "slug": "Generic_Magic_BlockChance",
+            "name": "Generic_Magic_BlockChance",
+            "rarity": 2
+          },
+          {
+            "index": 226,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 227,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 228,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 229,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 230,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 238,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 239,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 242,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 243,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 258,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 259,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 264,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 279,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 285,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 299,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 300,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 306,
+            "slug": "Generic_Magic_DamagePhysical",
+            "name": "Generic_Magic_DamagePhysical",
+            "rarity": 2
+          },
+          {
+            "index": 307,
+            "slug": "Generic_Magic_DamagePhysical",
+            "name": "Generic_Magic_DamagePhysical",
+            "rarity": 2
+          },
+          {
+            "index": 308,
+            "slug": "Generic_Magic_DamageToCC",
+            "name": "Generic_Magic_DamageToCC",
+            "rarity": 2
+          },
+          {
+            "index": 320,
+            "slug": "Paladin_Legendary_001",
+            "name": "Castle",
+            "rarity": 4
+          },
+          {
+            "index": 328,
+            "slug": "Paladin_Rare_006",
+            "name": "Grappler",
+            "rarity": 3
+          },
+          {
+            "index": 338,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 339,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 340,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 341,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 349,
+            "slug": "Generic_Magic_DamageToCC",
+            "name": "Generic_Magic_DamageToCC",
+            "rarity": 2
+          },
+          {
+            "index": 359,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 360,
+            "slug": "Generic_Magic_Armor",
+            "name": "Generic_Magic_Armor",
+            "rarity": 2
+          },
+          {
+            "index": 379,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 380,
+            "slug": "Paladin_Rare_005",
+            "name": "Defiance",
+            "rarity": 3
+          },
+          {
+            "index": 381,
+            "slug": "Generic_Magic_Armor",
+            "name": "Generic_Magic_Armor",
+            "rarity": 2
+          },
+          {
+            "index": 401,
+            "slug": "Generic_Magic_Armor",
+            "name": "Generic_Magic_Armor",
+            "rarity": 2
+          }
+        ],
+        "rotation": 0,
+        "position": {
+          "x": -1,
+          "y": -2
+        },
+        "glyph_socket_index": 120,
+        "start_node_index": null,
+        "board_width": 21
       },
       {
         "board": "Paragon_Paladin_09",
         "glyph": "Judicator",
         "glyph_level": 150,
         "nodes": [
-          "Champion",
-          "Fortitude",
-          "Constitution",
-          "Blurring",
-          "Beacon",
-          "Spiked Shield",
-          "Sturdy"
-        ]
+          {
+            "index": 10,
+            "slug": "Generic_Gate",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 31,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 32,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 33,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 34,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 55,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 76,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 92,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 95,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 96,
+            "slug": "Paladin_Magic_Faith",
+            "name": "Paladin_Magic_Faith",
+            "rarity": 2
+          },
+          {
+            "index": 97,
+            "slug": "Generic_Magic_Int",
+            "name": "Generic_Magic_Int",
+            "rarity": 2
+          },
+          {
+            "index": 111,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 112,
+            "slug": "Paladin_Rare_053",
+            "name": "Champion",
+            "rarity": 3
+          },
+          {
+            "index": 113,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 114,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 115,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 116,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 118,
+            "slug": "Paladin_Rare_058",
+            "name": "Fortitude",
+            "rarity": 3
+          },
+          {
+            "index": 132,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 134,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 136,
+            "slug": "Generic_Socket",
+            "name": "Glyph Socket",
+            "rarity": 0
+          },
+          {
+            "index": 139,
+            "slug": "Generic_Magic_Int",
+            "name": "Generic_Magic_Int",
+            "rarity": 2
+          },
+          {
+            "index": 140,
+            "slug": "Paladin_Magic_Faith",
+            "name": "Paladin_Magic_Faith",
+            "rarity": 2
+          },
+          {
+            "index": 141,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 153,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 159,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 160,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 161,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 173,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 174,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 180,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 182,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 183,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 193,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 194,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 199,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 201,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 204,
+            "slug": "Generic_Magic_AttackSpeed",
+            "name": "Generic_Magic_AttackSpeed",
+            "rarity": 2
+          },
+          {
+            "index": 205,
+            "slug": "Generic_Magic_CriticalDamage",
+            "name": "Generic_Magic_CriticalDamage",
+            "rarity": 2
+          },
+          {
+            "index": 214,
+            "slug": "Paladin_Rare_055",
+            "name": "Constitution",
+            "rarity": 3
+          },
+          {
+            "index": 215,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 220,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 221,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 222,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 225,
+            "slug": "Generic_Magic_CriticalDamage",
+            "name": "Generic_Magic_CriticalDamage",
+            "rarity": 2
+          },
+          {
+            "index": 226,
+            "slug": "Paladin_Rare_056",
+            "name": "Blurring",
+            "rarity": 3
+          },
+          {
+            "index": 235,
+            "slug": "Generic_Magic_ResistanceAll",
+            "name": "Generic_Magic_ResistanceAll",
+            "rarity": 2
+          },
+          {
+            "index": 236,
+            "slug": "Generic_Magic_HPPercent",
+            "name": "Generic_Magic_HPPercent",
+            "rarity": 2
+          },
+          {
+            "index": 241,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 246,
+            "slug": "Generic_Magic_AttackSpeed",
+            "name": "Generic_Magic_AttackSpeed",
+            "rarity": 2
+          },
+          {
+            "index": 247,
+            "slug": "Generic_Magic_CriticalDamage",
+            "name": "Generic_Magic_CriticalDamage",
+            "rarity": 2
+          },
+          {
+            "index": 262,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 283,
+            "slug": "Paladin_Legendary_009",
+            "name": "Beacon",
+            "rarity": 4
+          },
+          {
+            "index": 300,
+            "slug": "Generic_Magic_BlockChance",
+            "name": "Generic_Magic_BlockChance",
+            "rarity": 2
+          },
+          {
+            "index": 301,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 304,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 321,
+            "slug": "Generic_Magic_Damage",
+            "name": "Generic_Magic_Damage",
+            "rarity": 2
+          },
+          {
+            "index": 322,
+            "slug": "Paladin_Rare_057",
+            "name": "Spiked Shield",
+            "rarity": 3
+          },
+          {
+            "index": 323,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 324,
+            "slug": "Generic_Normal_Str",
+            "name": "Generic_Normal_Str",
+            "rarity": 0
+          },
+          {
+            "index": 325,
+            "slug": "Generic_Normal_Int",
+            "name": "Generic_Normal_Int",
+            "rarity": 0
+          },
+          {
+            "index": 326,
+            "slug": "Generic_Normal_Dex",
+            "name": "Generic_Normal_Dex",
+            "rarity": 0
+          },
+          {
+            "index": 327,
+            "slug": "Generic_Normal_Will",
+            "name": "Generic_Normal_Will",
+            "rarity": 0
+          },
+          {
+            "index": 328,
+            "slug": "Paladin_Rare_054",
+            "name": "Sturdy",
+            "rarity": 3
+          },
+          {
+            "index": 329,
+            "slug": "Generic_Magic_DamageReductionFromElite",
+            "name": "Generic_Magic_DamageReductionFromElite",
+            "rarity": 2
+          },
+          {
+            "index": 342,
+            "slug": "Generic_Magic_BlockChance",
+            "name": "Generic_Magic_BlockChance",
+            "rarity": 2
+          },
+          {
+            "index": 343,
+            "slug": "Generic_Magic_BlockChance",
+            "name": "Generic_Magic_BlockChance",
+            "rarity": 2
+          }
+        ],
+        "rotation": 2,
+        "position": {
+          "x": -1,
+          "y": -3
+        },
+        "glyph_socket_index": 136,
+        "start_node_index": null,
+        "board_width": 21
       }
     ],
     "gear": [

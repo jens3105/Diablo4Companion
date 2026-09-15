@@ -782,8 +782,13 @@ class LevelingCard(BaseCard):
 
             notes = []
             nodes = board.get("nodes") or []
-            if nodes:
-                notes.append(", ".join(nodes))
+            # Node entries are ``{"index", "slug", "name", "rarity"}`` dicts
+            # (decoder Phase: paragon board grid data) - the checklist note
+            # still only surfaces named Rare(3)/Legendary(4) picks, same as
+            # before, not every generic stat node now included in the list.
+            named_nodes = [n["name"] for n in nodes if isinstance(n, dict) and n.get("rarity", 0) >= 3]
+            if named_nodes:
+                notes.append(", ".join(named_nodes))
 
             self._add_checklist_row(
                 layout, container, title, notes, is_done, is_next, self.mark_board_done, board_id
