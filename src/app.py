@@ -1466,7 +1466,13 @@ class MainWindow(FluentWindow):
                 if board_id in completed:
                     continue
                 glyph = board.get("glyph") or "?"
-                actions.append(("paragon", f"Slot {glyph} glyph on {board_id}", board_id))
+                # "Board {i + 1}", not the raw Maxroll board id (e.g.
+                # "Paragon_Warlock_00") - matches the label LevelingCard's
+                # own Paragon checklist shows for this same board (see
+                # _render_verified_board_checklist), so the Dashboard/
+                # Build Advisor/Compact Mode next-action text never shows
+                # an internal data key a player wouldn't recognize.
+                actions.append(("paragon", f"Slot {glyph} glyph on Board {i + 1}", board_id))
             return actions
 
         boards = self.leveling_manager.get_paragon_data(build_name).get("boards") or []

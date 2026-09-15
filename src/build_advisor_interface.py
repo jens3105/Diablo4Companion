@@ -12,7 +12,7 @@ same as ``CurrentBuildCard``/``LevelingCard``'s Build Status widget."""
 
 from PySide6.QtCore import Signal
 from PySide6.QtGui import QColor, QFontMetrics
-from PySide6.QtWidgets import QHBoxLayout, QSizePolicy, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QHBoxLayout, QSizePolicy, QWidget
 
 from qfluentwidgets import (
     BodyLabel,

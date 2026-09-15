@@ -744,9 +744,17 @@ class LevelingCard(BaseCard):
         completed: set,
     ):
         """Render ``verified_build["paragon_boards"]`` as the actual
-        ✓/→/○ Paragon checklist (real board id + glyph + glyph level as
+        ✓/→/○ Paragon checklist (board number + glyph + glyph level as
         the row label, real Rare/Legendary node picks as the note),
-        keyed by each board's stable id rather than its position."""
+        keyed by each board's stable id rather than its position.
+
+        The label shows "Board N" (N = display position), not the raw
+        Maxroll board id (e.g. "Paragon_Warlock_00") - that id is a data
+        key, not something a player would recognize, and Maxroll's own
+        planner has no plain-English board name to show instead. Only
+        the *label* is positional; ``completed``/``mark_board_done``
+        still key off the stable ``board_id`` from ``_board_id``, so
+        re-ordering never loses a player's progress."""
 
         next_index = next(
             (
@@ -765,7 +773,7 @@ class LevelingCard(BaseCard):
             glyph = board.get("glyph") or "?"
             glyph_level = board.get("glyph_level")
             glyph_text = f"{glyph} (Lv{glyph_level})" if glyph_level else glyph
-            title = f"{board.get('board') or board_id} — {glyph_text}"
+            title = f"Board {i + 1} — {glyph_text}"
 
             notes = []
             nodes = board.get("nodes") or []
