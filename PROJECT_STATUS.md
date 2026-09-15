@@ -4,24 +4,42 @@ _Sidst opdateret: 2026-09-15_
 
 ## Current phase
 
-**Phase 0.5 — Project Control System** (dette dokumentationssystem selv).
+**Build Validation** — samlet valideringslag (Skills/Paragon/Gear/
+Gems/Tempering) + Tempering-toggle-tracking (den ene dimension der
+manglede). Kode-fasen er færdig.
 
 ## Current status
 
-Alle roadmap-faser 1–18 er implementeret og verificeret. Appen har
-været igennem en fuld pre-sæson regressions-sweep (26 builds × 8 sider,
-karakter-isolation, Compact Mode, frisk-installation) uden fejl. Ingen
-kendte bugs i kø. Ingen kode-ændringer i denne fase — kun
-dokumentation.
+Build Validation-fasen er implementeret og verificeret:
+
+- Tempering har nu rigtig spiller-tracking (`gear/<build>/
+  tempered_items`, samme mønster som `socketed_gems`) med en "Have it"
+  `SwitchButton` pr. tempered affix i Gear Builder — tidligere var
+  Tempering kun read-only tekst.
+- `_compute_build_status` viser nu 6 rækker (Skills, Leveling, Paragon,
+  Gear, Gems, Tempering) i stedet for 4; procent-udregningen er
+  faktoriseret ud i en delt `_category_percents`-hjælper.
+- Ny `_build_validation(build_name)` samler eksisterende procent- og
+  differences-data (fra `_category_percents`/`_pending_*_actions`) i én
+  struktur (`overall_percent` + pr.-kategori `percent`/`status`/
+  `differences`) til Build Advisor eller fremtidige forbrugere — ingen
+  ny/parallel fuldført-logik.
+- `_advisor_pending_actions`/`_advisor_missing_summary` inkluderer nu
+  Tempering (lavest prioritet, tilføjet sidst).
+- "different"-status findes i datastrukturen men er bevidst
+  uopnåelig (ingen rigtig karakter-import findes) — samme præcedens som
+  `gear_planner.SlotStatus.INCORRECT` og Gems' "Wrong gem".
+
+Ingen kendte bugs i kø.
 
 ## Last completed phase
 
-Fase 18 — Tempering-data (rigtige Tempering Manual-navne + tier, hentet
-fra allerede-hentet Maxroll-data der tidligere blev ignoreret).
+Build Validation (denne fase).
 
-## Last commit (før denne dokumentationsfase)
+## Last commit
 
-`f7b9d2b` — "Decode real Tempering data into Gear Builder"
+`c0dc918` — "Add Build Validation layer: Tempering tracking +
+Gems/Tempering status rows + _build_validation aggregation"
 
 Branch: `feature/dashboard-v2` (repoets eneste/default branch — der er
 ikke noget `main`, det er normalt for dette repo).
@@ -32,20 +50,21 @@ ikke noget `main`, det er normalt for dette repo).
   `HOME`/`XDG_CONFIG_HOME`, aldrig mod brugerens rigtige config
   (`~/.config/Diablo4Companion/DesktopCompanion.conf`).
 - **Seneste resultat (2026-09-15):** ren sweep, 0 fejl.
-  - Alle 26 builds × alle sider (Dashboard, Build Guide, Character,
-    Gear Builder, Gems, Paragon, Build Advisor, Settings) — ingen
-    exceptions.
-  - Cross-system konsistens (Skills/Paragon/Gear/Gems) bekræftet
-    konsistent efter toggle, både live og via kode-inspektion (alle
-    surfaces læser samme `_compute_build_status`/`_advisor_next_action`
-    beregning — ingen parallel logik at divergere).
-  - Karakter-isolation for de nye `paragon/<build>/completed_nodes` og
-    `gear/<build>/socketed_gems` nøgler bekræftet (ingen data lækker
-    mellem karakterer).
-  - Compact Mode's Done-knap testet udtømmende for alle actionable
-    typer (leveling/skill/paragon_node/gear/gem) — 407 klik, 0 fejl,
-    0 no-ops.
-  - Frisk installation (tom QSettings) crasher ikke nogen side.
+  - Alle 26 builds: `_compute_build_status` (6 rækker) og
+    `_build_validation` (5 kategorier) kørt uden exceptions.
+  - Konsistens bekræftet: `_compute_build_status`'s Gems/Tempering-
+    procenttekst matcher `_build_validation`'s rå procent 1:1, før og
+    efter live gem-/tempering-toggles, på 6 forskellige builds.
+  - Heartseeker Rogue (ingen `verified_build`): Paragon/Gems/Tempering
+    korrekt "unavailable"; Skills/Gear beholder deres eksisterende,
+    bevidste prosa-lag-fallback (samme som før denne fase — ikke en
+    regression).
+  - Build med items uden tempering-data (f.eks. Talismans/Ring 1 på
+    flere warlock/necro/paladin/sorc-builds) bekræftet: intet toggle
+    vises, "DATA UNAVAILABLE" forbliver.
+  - Alle nav-sider (Dashboard, Build Guide, Character, Gear Builder,
+    Gems, Paragon, Build Advisor, Settings) skifter uden crash.
+  - Build Advisor-siden viser nu Tempering i "What's missing".
 - **Se TEST_STATUS.md** for detaljeret teststrategi og kendte gaps.
 
 ## Blockers
@@ -60,6 +79,8 @@ konkret instruktion").
 
 ## Kort changelog (seneste faser, nyeste øverst)
 
+- `c0dc918` — Build Validation: Tempering-toggle-tracking + Gems/
+  Tempering Build Status-rækker + `_build_validation`-aggregeringslag.
 - `f7b9d2b` — Tempering: rigtige Manual-navne + tier i Gear Builder.
 - `945fb2c` — Gem-effekttekst renderes med rigtige udregnede tal (ikke
   rå Maxroll-skabelon-syntaks).
