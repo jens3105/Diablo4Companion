@@ -92,3 +92,14 @@ Source: "..\dist\Diablo4Companion\_internal\builds\*.json"; DestDir: "{app}\buil
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{group}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+
+[Run]
+; Windows Product Phase W8: Inno Setup's own built-in "launch after
+; install" mechanism - deliberately used instead of a custom
+; restart-helper process, since this already does exactly what W8's
+; update pipeline needs (relaunch the newly-installed version once the
+; user finishes the wizard). "skipifsilent" means this never fires
+; during the existing W3 CI silent-install verification
+; (/VERYSILENT implies skipifsilent is honored), so it doesn't affect
+; the automated headless install-check.
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,Diablo 4 Companion}"; Flags: nowait postinstall skipifsilent

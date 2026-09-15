@@ -92,11 +92,30 @@ jobs:
           & "$env:ISCC_PATH" "/DMyAppVersion=$env:APP_VERSION" "installer\diablo4companion.iss"
           if ($LASTEXITCODE -ne 0) { throw "ISCC.exe failed with exit code $LASTEXITCODE" }
 
+      # --- Windows Product Phase W8: installer checksum sidecar -----------
+      # No release is published by this workflow (deliberately out of
+      # scope, see PROJECT_STATUS.md) - this only proves the real
+      # SHA256-computation mechanism works and produces a genuine
+      # checksum file as a CI artifact, ready to attach whenever the
+      # user chooses to publish an actual release in a later phase.
+      # src/updater.py's verify_download() is what a future release's
+      # attached .sha256 file would be checked against.
+
+      - name: Compute installer SHA256 checksum
+        shell: pwsh
+        run: |
+          $setupExe = "installer\Output\Diablo4Companion-Setup.exe"
+          $hash = Get-FileHash -Path $setupExe -Algorithm SHA256
+          $hash.Hash.ToLower() | Out-File -FilePath "installer\Output\Diablo4Companion-Setup.exe.sha256" -Encoding ascii -NoNewline
+          Write-Host "SHA256: $($hash.Hash.ToLower())"
+
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
         with:
           name: Diablo4Companion-Setup
-          path: installer/Output/Diablo4Companion-Setup.exe
+          path: |
+            installer/Output/Diablo4Companion-Setup.exe
+            installer/Output/Diablo4Companion-Setup.exe.sha256
           if-no-files-found: error
 
       - name: Silent-install the installer for verification
@@ -167,3 +186,24 @@ jobs:
           }
           Write-Host "OK: process still running after 8s (PID $($proc.Id)); stopping it now."
           Stop-Process -Id $proc.Id -Force
+
+      # --- Windows Product Phase W8: real subprocess.Popen smoke test -----
+      # Decoupled from any GitHub Release concern - this only proves
+      # src/updater.py's launch_installer() mechanism itself (a plain
+      # subprocess.Popen([path], shell=False)) can actually spawn an
+      # external Windows process without raising, using a harmless
+      # real executable already present on the runner instead of a
+      # real installer/release asset.
+      - name: Test launch_installer() against a real Windows executable
+        shell: pwsh
+        env:
+          PYTHONPATH: "."
+        run: |
+          python -c "
+          import shutil
+          from src.updater import launch_installer
+          launch_installer(shutil.which('notepad.exe'))
+          print('OK: launch_installer() spawned notepad.exe without raising')
+          "
+          Start-Sleep -Seconds 2
+          Get-Process -Name notepad -ErrorAction SilentlyContinue | Stop-Process -Force

@@ -1,4 +1,6 @@
 import os
+import shutil
+import tempfile
 from datetime import datetime, timezone
 
 import requests
@@ -29,6 +31,7 @@ from qfluentwidgets import (
 
 from src import theme
 from src.api import DiabloAPI
+from src import updater
 from src.version import __version__
 from src.build_advisor_interface import BuildAdvisorCard, BuildAdvisorInterface
 from src.character_interface import CharacterCard, CharacterInterface
@@ -325,13 +328,25 @@ class SettingsInterface(QWidget):
             self.check_updates_button.setText("Check for Updates")
 
     def _on_update_now_clicked(self):
-        """Windows Product Phase W7: the update *action*, stopping short
-        of W8's actual download/verify/install/restart pipeline - this
-        method is the seam W8 extends. Refuses to act (defensively,
-        even though the button is only ever shown/enabled right after
-        ``_on_check_updates_clicked`` confirms a genuinely newer release)
-        unless ``_pending_update_release`` is a real, confirmed target -
-        never starts an update on a guess."""
+        """Windows Product Phase W8: the real download -> verify ->
+        install -> restart pipeline, built on top of W7's confirmed
+        ``_pending_update_release`` target.
+
+        Refuses to act (defensively, even though the button is only
+        ever shown/enabled right after ``_on_check_updates_clicked``
+        confirms a genuinely newer release) unless
+        ``_pending_update_release`` is a real, confirmed target - never
+        starts an update on a guess. Every step reuses
+        ``self.update_status_label`` for progress/status, matching this
+        page's existing style.
+
+        No custom restart-helper here by design: the Inno Setup
+        installer's own ``[Run]`` "launch after install" section
+        (installer/diablo4companion.iss) already relaunches the new
+        version once the user finishes the wizard - this method's job
+        ends at getting a verified installer running and this (old)
+        process out of its way.
+        """
 
         release = self._pending_update_release
         if not release:
@@ -340,12 +355,112 @@ class SettingsInterface(QWidget):
         release_name = (release.get("name") or release.get("tag_name") or "").strip()
 
         self.update_now_button.setEnabled(False)
-        self.update_status_label.setText(
-            f"Update to {release_name} confirmed. Automatic download and "
-            f"installation aren't available in this version yet - please "
-            f"download it manually from the GitHub Releases page for now."
+        self.update_status_label.setText(f"Preparing to update to {release_name}...")
+        self.update_status_label.show()
+        QApplication.processEvents()
+
+        installer_asset = updater.find_installer_asset(release)
+        if installer_asset is None:
+            self.update_status_label.setText(
+                "Update asset not found - please download manually from "
+                "GitHub Releases."
+            )
+            self.update_now_button.setEnabled(True)
+            return
+
+        temp_dir = tempfile.mkdtemp(prefix="d4c_update_")
+        installer_path = os.path.join(temp_dir, updater.INSTALLER_ASSET_NAME)
+
+        def _on_progress(downloaded: int, total: int | None):
+            if total:
+                percent = int(downloaded * 100 / total)
+                self.update_status_label.setText(
+                    f"Downloading update... {percent}% "
+                    f"({downloaded // 1024} KB / {total // 1024} KB)"
+                )
+            else:
+                self.update_status_label.setText(
+                    f"Downloading update... {downloaded // 1024} KB"
+                )
+            QApplication.processEvents()
+
+        self.update_status_label.setText("Downloading update...")
+        QApplication.processEvents()
+
+        try:
+            updater.download_asset(installer_asset, installer_path, _on_progress)
+        except (requests.RequestException, OSError, RuntimeError) as exc:
+            print(f"Kunne ikke downloade opdateringen: {exc}")
+            self.update_status_label.setText(
+                "Could not download the update (network error) - try "
+                "again later."
+            )
+            self._cleanup_update_temp_dir(temp_dir)
+            self.update_now_button.setEnabled(True)
+            return
+
+        # The checksum sidecar is optional - a failed/missing fetch of
+        # IT specifically degrades to size-only verification below,
+        # rather than aborting the whole update. Only a bad *installer*
+        # download/verification aborts.
+        checksum_asset_data: bytes | None = None
+        checksum_asset = updater.find_checksum_asset(release)
+        if checksum_asset is not None:
+            try:
+                checksum_response = requests.get(
+                    checksum_asset["browser_download_url"], timeout=15
+                )
+                checksum_response.raise_for_status()
+                checksum_asset_data = checksum_response.content
+            except requests.RequestException as exc:
+                print(f"Kunne ikke hente checksum, falder tilbage til size-only: {exc}")
+                checksum_asset_data = None
+
+        self.update_status_label.setText("Verifying downloaded update...")
+        QApplication.processEvents()
+
+        is_valid, reason = updater.verify_download(
+            installer_path, installer_asset, checksum_asset_data
         )
-        self.update_now_button.setEnabled(True)
+        if not is_valid:
+            self.update_status_label.setText(f"Update verification failed: {reason}")
+            self._cleanup_update_temp_dir(temp_dir)
+            self.update_now_button.setEnabled(True)
+            return
+
+        self.update_status_label.setText("Starting installer...")
+        QApplication.processEvents()
+
+        try:
+            updater.launch_installer(installer_path)
+        except OSError as exc:
+            print(f"Kunne ikke starte installeren: {exc}")
+            self.update_status_label.setText(
+                "Could not start the installer - please download it "
+                "manually from GitHub Releases."
+            )
+            self.update_now_button.setEnabled(True)
+            return
+
+        self.update_status_label.setText(
+            "Installer started. Restarting Diablo 4 Companion..."
+        )
+        # Give the status text a moment to actually render before the
+        # app quits, and let the just-launched installer get going
+        # before this process's own locked files (the running exe/DLLs)
+        # would otherwise block it.
+        QTimer.singleShot(1000, QApplication.quit)
+
+    @staticmethod
+    def _cleanup_update_temp_dir(temp_dir: str) -> None:
+        """Best-effort cleanup of a partial/failed update download's
+        temp directory - cleanup failing itself must never crash the
+        app on top of the original download/verification failure."""
+
+        try:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+        except OSError:
+            pass
 
 
 class MainWindow(FluentWindow):
