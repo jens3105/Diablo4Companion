@@ -36,6 +36,7 @@ from src.compact_window import CompactWindow
 from src.dashboard import DashboardWidget
 from src.leveling_card import LevelingCard
 from src.managers.leveling_manager import LevelingManager
+from src.paragon_interface import ParagonCard, ParagonInterface
 from src.quick_search import QuickSearchDialog
 
 
@@ -347,6 +348,16 @@ class MainWindow(FluentWindow):
         self.character_interface = CharacterInterface(self.character_card)
         self.character_interface.setObjectName("characterInterface")
 
+        # Paragon page: dedicated Overview (board list + overall %) and
+        # Board detail (grid visualization) view over a build's verified
+        # paragon_boards - see src/paragon_interface.py's module
+        # docstring. Same "owns no build selector of its own" pattern as
+        # the Character page above.
+        self.paragon_card = ParagonCard()
+
+        self.paragon_interface = ParagonInterface(self.paragon_card)
+        self.paragon_interface.setObjectName("paragonInterface")
+
         # Build Advisor page: a bigger, standalone read-out of the exact
         # same Build Status + next-action + pending-actions data the
         # Dashboard's Current Build card and Compact Mode already use.
@@ -361,6 +372,7 @@ class MainWindow(FluentWindow):
         self.addSubInterface(self.dashboard, FIF.HOME, "Dashboard")
         self.addSubInterface(self.builds_interface, FIF.GAME, "Build Guide")
         self.addSubInterface(self.character_interface, FIF.FINGERPRINT, "Character")
+        self.addSubInterface(self.paragon_interface, FIF.TILES, "Paragon")
         self.addSubInterface(self.advisor_interface, FIF.ROBOT, "Build Advisor")
         self.addSubInterface(
             self.settings_interface,
@@ -477,6 +489,7 @@ class MainWindow(FluentWindow):
             self.dashboard.upcoming_card,
             self.leveling_card,
             self.character_card,
+            self.paragon_card,
             self.advisor_card,
         ):
             card.refresh_theme()
@@ -1619,6 +1632,7 @@ class MainWindow(FluentWindow):
         if not build_name:
             self.dashboard.build_card.set_build("", 0, [], "")
             self.character_card.set_header(char_name, "", 0)
+            self.paragon_card.set_paragon("", "", 0, None, set(), None)
             self.advisor_card.set_advisor("", 0, [], "", False, "", None, {})
             self._refresh_compact_window()
             return
@@ -1629,6 +1643,17 @@ class MainWindow(FluentWindow):
 
         self.dashboard.build_card.set_build(build_name, level, rows, next_action, next_kind)
         self.character_card.set_header(char_name, build_name, level)
+        # rows[2] is the "Paragon" row - see _compute_build_status - so
+        # the Paragon page's overall % is the exact same figure, never a
+        # second computation of it.
+        self.paragon_card.set_paragon(
+            char_name,
+            build_name,
+            level,
+            self.leveling_manager.get_verified_build(build_name),
+            self._load_completed_boards(build_name),
+            rows[2],
+        )
         self.advisor_card.set_advisor(
             build_name,
             level,
@@ -1643,10 +1668,10 @@ class MainWindow(FluentWindow):
         # Everything that can move the Dashboard card's needle (build/
         # class/level/character switch, or any mark-done in the Build
         # Guide's tabs or the Character page, all of which route through
-        # here already) also moves Compact Mode's, the Character header's
-        # and the Build Advisor page's - so pushing it from this one spot
-        # is enough to keep everything live-synced without extra signal
-        # wiring.
+        # here already) also moves Compact Mode's, the Character header's,
+        # the Paragon page's and the Build Advisor page's - so pushing it
+        # from this one spot is enough to keep everything live-synced
+        # without extra signal wiring.
         self._refresh_compact_window()
 
     def _advisor_missing_summary(
@@ -1876,6 +1901,7 @@ class MainWindow(FluentWindow):
             ("Dashboard", self.dashboard),
             ("Build Guide", self.builds_interface),
             ("Character", self.character_interface),
+            ("Paragon", self.paragon_interface),
             ("Build Advisor", self.advisor_interface),
             ("Settings", self.settings_interface),
         ]
