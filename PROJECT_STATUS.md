@@ -4,16 +4,85 @@ _Sidst opdateret: 2026-09-15_
 
 ## Current phase
 
-**Windows Product Phase W7 — Update Now** — **DONE.** Settings har nu
-en "Update Now"-knap der kun vises/aktiveres når `_on_check_updates_
-clicked` (W5/W6) har bekræftet en reelt nyere GitHub Release. Klik
-giver tydelig bekræftelses-feedback (hvilken version, at target er
-fundet) og henviser til manuel download fra GitHub Releases-siden —
-intet download/verify/install/restart/rollback endnu, det er W8/W9.
+**Windows Product Phase W8 — Download → Verify → Install → Restart** —
+**DONE.** "Update Now" (W7) er nu en reel, virkende Windows-opdaterer:
+finder installer-asset'et på det bekræftede GitHub Release-target
+(`_pending_update_release`), downloader det til en
+`tempfile.mkdtemp()`-sti, verificerer det (størrelse altid, SHA256 når
+en `.sha256`-sidecar findes), starter den verificerede installer
+(`subprocess.Popen(..., shell=False)`), og lukker appen 1 sekund efter
+et vellykket start så Inno Setups egen `[Run]`-sektion kan genstarte
+den nye version — ingen custom restart-helper-proces.
 
-Ingen download/verify/install/restart (W8), ingen rollback (W9), ingen
-Build Data-updater (W10), ingen Character State, ingen
-Diablo-feature-arbejde i denne fase.
+**HARD CONSTRAINT overholdt:** ingen GitHub Release er oprettet,
+redigeret eller på anden måde publiceret i denne fase — brugeren blev
+eksplicit spurgt og sagde nej til at oprette en (selv en draft/test-
+prerelease) for at teste denne pipeline. Al test er kørt mod
+konstrueret/fake release-data og allerede-eksisterende offentligt
+indhold (se "Tests" nedenfor).
+
+Ingen rollback (W9), ingen Build Data-updater (W10), ingen Character
+State, ingen Diablo-feature-arbejde i denne fase. W9/W10 er begge
+stadig **IKKE STARTET**.
+
+### W8 — hvad er lavet
+
+- **Ny `src/updater.py`** (rene funktioner, ingen ny dependency —
+  `requests`/`hashlib`/`subprocess`/`tempfile`/`os`, alle allerede brugt
+  i projektet):
+  - `find_installer_asset(release)` / `find_checksum_asset(release)` —
+    matcher et release-assets `"name"`-felt PRÆCIST mod hhv.
+    `"Diablo4Companion-Setup.exe"` og
+    `"Diablo4Companion-Setup.exe.sha256"` (ingen pattern/gæt). Returnerer
+    `None` gracefully hvis fraværende — en reel, forventet tilstand
+    (gammel/mangelfuld release), ikke en fejl.
+  - `download_asset(asset, dest_path, progress_callback=None)` —
+    streamer via `requests.get(..., stream=True)` til en
+    `tempfile.mkdtemp()`-baseret sti, kalder `progress_callback` pr.
+    chunk. Kaster reelt på netværksfejl/timeout, og på en downloadet
+    størrelse der ikke matcher `asset["size"]` (ufuldstændig download).
+  - `verify_download(file_path, asset, checksum_asset_data)` — tjekker
+    ALTID filstørrelse mod `asset["size"]`. Når `checksum_asset_data`
+    (indholdet af `.sha256`-sidecar'en) er givet, udregnes filens
+    RIGTIGE SHA256 (`hashlib.sha256`) og sammenlignes — et mismatch er
+    ALTID `False`, aldrig overtrumfet af en bestået størrelsestjek. Uden
+    checksum returneres ærligt `"size-only check passed, no checksum
+    available"` i stedet for at foregive fuld verifikation.
+  - `launch_installer(installer_path)` — `subprocess.Popen([path],
+    shell=False)`. Aldrig `shell=True`, stien er eneste argument — ingen
+    GitHub-metadata-afledt streng når nogensinde et shell.
+- **`src/app.py`'s `SettingsInterface._on_update_now_clicked`** udvidet
+  fra W7's placeholder til den fulde pipeline: Preparing → Downloading
+  (med procent/KB-status) → Verifying → Installing → Restarting, alt
+  vist via det eksisterende `self.update_status_label`.
+  `self.update_now_button` deaktiveres under hele forløbet og
+  genaktiveres på ALLE fejl-stier. Intet asset fundet → fejlbesked, stop
+  (intet download-forsøg). Download-fejl → fejlbesked, best-effort
+  oprydning af det delvise temp-fil (`shutil.rmtree(ignore_errors)`),
+  stop. Checksum-hentning fejler for sig selv → falder tilbage til
+  size-only-verifikation i stedet for at afbryde hele opdateringen.
+  Verifikation fejler (uanset årsag) → viser den præcise årsag, sletter
+  den dårlige temp-fil, og starter ALDRIG installeren — dette er en hård
+  regel, ikke en nice-to-have. Kun ved bestået verifikation: starter
+  installeren, og lukker appen via `QTimer.singleShot(1000,
+  QApplication.quit)` så statusteksten når at blive tegnet først.
+- **`installer/diablo4companion.iss`**: ny `[Run]`-sektion der bruger
+  Inno Setups eget indbyggede "launch after install" (`nowait postinstall
+  skipifsilent`) — ingen custom restart-helper-proces nødvendig.
+  `skipifsilent` bekræftet (se Windows-runner-verifikation) at IKKE
+  bryde den eksisterende W3 `/VERYSILENT` CI-installationstjek.
+- **`.github/workflows/windows-build.yml`** (udvidet, ingen
+  release-publicering tilføjet): ny step "Compute installer SHA256
+  checksum" (`Get-FileHash` i PowerShell) lige efter Inno
+  Setup-kompileringen, skriver `Diablo4Companion-Setup.exe.sha256` som
+  en sidecar-fil, uploadet sammen med den eksisterende
+  `Diablo4Companion-Setup`-CI-artifact (`actions/upload-artifact`) —
+  dette er en privat CI-artifact, ikke en offentlig release, så det er
+  inden for scope. Derudover en ny step "Test launch_installer() against
+  a real Windows executable" der kalder den rigtige
+  `src.updater.launch_installer()` mod `notepad.exe` på runneren for at
+  bevise selve `subprocess.Popen(..., shell=False)`-mekanismen virker på
+  Windows — helt afkoblet fra GitHub Releases.
 
 ### W7 — hvad er lavet
 
@@ -221,7 +290,8 @@ Build Advisor (denne fase).
 
 ## Last commit
 
-`fb7ae9e` — "Windows Product Phase W7: Update Now action" (pushet).
+`1f38fce` — "Windows Product Phase W8: Download -> Verify -> Install ->
+Restart" (pushet).
 
 Branch: `feature/dashboard-v2` (repoets eneste/default branch — der er
 ikke noget `main`, det er normalt for dette repo).
@@ -237,6 +307,48 @@ Output: `dist/Diablo4Companion/` (onedir), inkl.
 
 ## Tests
 
+- **W8 lokal verifikation (2026-09-15, Linux) — rene funktioner
+  (`src/updater.py`), ingen netværk/GitHub:**
+  `find_installer_asset`/`find_checksum_asset` testet mod konstruerede
+  fake release/asset-dicts (matcher GitHub's rigtige JSON-form): præcist
+  match, fraværende asset (`None`), manglende `"assets"`-nøgle, og
+  bevidste near-miss-navne (forkert case/suffix) — alle korrekte.
+  `verify_download` testet med en RIGTIG lokal temp-fil og dens RIGTIGE
+  udregnede SHA256: size-only match/mismatch, korrekt checksum, bevidst
+  FORKERT checksum (hård fejl, aldrig overtrumfet af bestået
+  størrelsestjek), ingen størrelse-info overhovedet, samt to
+  virkelighedstro `.sha256`-filformer (trailing newline, "hash␣␣filnavn"
+  sha256sum-stil) — alle 17 assertions bestået.
+- **W8 lokal verifikation (2026-09-15, Linux) — RIGTIGT netværkskald,
+  ingen GitHub-oprettelse:** `download_asset` kørt mod en allerede-
+  eksisterende offentlig URL (dette repos egen
+  `requirements.txt`-fil rå fra GitHub) for at bevise den rigtige
+  HTTP-streaming-med-progress-callback-mekanisme virker end-to-end:
+  downloadet indhold matcher byte-for-byte, progress-callback kaldt
+  korrekt med slutstatus == fuld størrelse, `verify_download` bestod på
+  den rigtige downloadede fil, og fejlede korrekt på en bevidst forkert
+  størrelse. `download_asset` bekræftet at kaste `RuntimeError` når
+  en asset lyver om sin størrelse (ufuldstændig-download-detektion).
+- **W8 lokal verifikation (2026-09-15, Linux) — fuld
+  `_on_update_now_clicked`-pipeline mod KONSTRUERET/FAKE release-data**
+  (intet rigtigt GitHub Release oprettet, jf. hard constraint;
+  `updater.download_asset`/`launch_installer`/`requests.get` monkey-
+  patchet så ingen rigtig download/installer-start sker): 6 scenarier
+  bestået — intet installer-asset fundet (fejlbesked, intet download-
+  forsøg), download-fejl (fejlbesked, `launch_installer` aldrig kaldt,
+  knap genaktiveret), FORKERT checksum efter vellykket download
+  (verifikation fejler, `launch_installer` ALDRIG kaldt — den hårde
+  regel bekræftet), checksum-hentning fejler for sig selv (falder
+  korrekt tilbage til size-only og fortsætter til install), fuld
+  succes-vej (installer startes, "Restarting..."-status vist), og
+  `launch_installer` selv kaster (fejlbesked, appen lukker IKKE, knap
+  genaktiveret). Temp-mappe-oprydning bekræftet: kun de 3 scenarier der
+  reelt skal beholde den verificerede fil (checksum-fejl-fallback,
+  succes, launch-fejl) efterlod en temp-mappe — de 2 fejl-scenarier
+  (download-fejl, dårlig checksum) ryddede korrekt op.
+- **W8 lokal verifikation (2026-09-15, Linux) — regression:** `from
+  src.app import MainWindow` + fuld app-konstruktion uændret under
+  headless offscreen. Fuld regressions-sweep af alle 26 builds: 0 fejl.
 - **W7 lokal verifikation (2026-09-15, Linux):** headless offscreen.
   Intet-tilgængeligt-tilfælde: "Update Now" forbliver skjult
   (`isHidden()`), og et fremtvunget kald til `_on_update_now_clicked`
@@ -311,6 +423,48 @@ Output: `dist/Diablo4Companion/` (onedir), inkl.
 
 Ingen.
 
+## W8 — Windows-runner-verifikation: BESTÅET
+
+Kørt og overvåget live via `gh workflow run` + `gh run watch`, én
+iteration, grøn på første forsøg:
+
+- **Run `35003233658`** (auto-udløst af push af commit `1f38fce`
+  til `feature/dashboard-v2`): **✓ success.** Alle steps grønne, inkl.
+  de eksisterende W2/W3/W4-tjek uændret bestået, samt de to nye W8-
+  specifikke steps:
+  - "Compute installer SHA256 checksum": `Get-FileHash` kørt mod
+    `installer\Output\Diablo4Companion-Setup.exe`, reel SHA256
+    (`fd8dda30a775bc91d9dd78e35bc5378b23f6ef3ba29957d6ed5112b238a2cb97`
+    i denne kørsel) skrevet til `.sha256`-sidecar-filen og uploadet
+    sammen med `Diablo4Companion-Setup`-artifact'en.
+  - Eksisterende W3 silent-install-verifikation stadig grøn EFTER
+    `[Run]`-sektionen blev tilføjet til `.iss`-filen: exe fundet, alle
+    26 `builds/*.json` fundet, uninstaller fundet — bekræfter
+    `/VERYSILENT` (som `skipifsilent` er lavet til at respektere)
+    stadig korrekt undertrykker den nye "launch after install"-adfærd
+    under den automatiserede install-check, ingen regression.
+  - Eksisterende launch-check (exe startet, forblev kørende 8s,
+    stoppet) stadig grøn.
+  - Ny "Test launch_installer() against a real Windows executable":
+    `src.updater.launch_installer()` kaldt mod `notepad.exe` på
+    runneren — `subprocess.Popen(..., shell=False)`-mekanismen bevist
+    at virke reelt på Windows uden at kaste, helt afkoblet fra
+    GitHub Releases.
+
+**Dette er en reel, observeret, autoritativ verifikation af selve W8-
+mekanismerne (checksum-beregning, installer-`[Run]`-sektion uden
+regression på silent-install, ægte processtart) — ikke antaget.**
+Ingen retry nødvendig, kørsel bestod på første forsøg.
+
+**Hvad denne kørsel IKKE beviser (og ikke kan, uden en rigtig
+publiceret Release, jf. hard constraint):** den fulde
+`_on_update_now_clicked`-flow end-to-end mod et ægte
+`_pending_update_release`, den interaktive Inno Setup-wizard
+gennemført af en bruger, at den gamle app-proces' fil-locks reelt
+frigives rent, at "Launch Diablo 4 Companion"-checkboxen reelt starter
+den nyinstallerede version, eller at Settings derefter rapporterer den
+nye version. Se "Manuelle Windows-tests der mangler" nedenfor.
+
 ## W4 — Windows-runner-verifikation: BESTÅET
 
 Kørt og overvåget live via `gh workflow run` + `gh run watch`, to
@@ -380,9 +534,34 @@ kørsel og dens root-cause-analyse er bevidst dokumenteret her i stedet
 for skjult, jf. instruktionen om aldrig at fabrikere et bestået
 resultat.
 
+## Manuelle Windows-tests der mangler
+
+Kan bevidst ikke testes fra dette Linux dev-miljø, og ikke fra
+Windows-CI-runneren heller, jf. hard constraint (ingen rigtig GitHub
+Release må oprettes i denne fase) — dette er forventet og efter
+brugerens eget valg, ikke en skjult mangel:
+
+- Den fulde `_on_update_now_clicked`-flow end-to-end mod et ÆGTE
+  `_pending_update_release` (findes ikke, og er ikke oprettet).
+- Selve download-hastighed/-oplevelse mod et rigtigt, stort
+  installer-asset (kun testet mod en lille fil, `requirements.txt`).
+- At gennemføre den interaktive Inno Setup-wizard som bruger.
+- At den gamle app-proces' fil-locks (exe/DLL'er) reelt frigives rent
+  når appen lukker via `QApplication.quit()`, så installeren kan
+  overskrive dem.
+- At "Launch Diablo 4 Companion"-checkboxen i wizarden (den nye
+  `[Run]`-sektion) reelt starter den nyinstallerede version.
+- At Settings-siden derefter rapporterer den nye version
+  (`current_version_label`) korrekt efter en ægte opgradering.
+
+Alt dette kræver brugerens egen hånd på en rigtig Windows-maskine mod
+en rigtig publiceret Release — begge dele bevidst uden for denne fases
+scope.
+
 ## Next phase
 
-Ingen planlagt. W7 er DONE. Vent på konkret instruktion fra
+Ingen planlagt. W8 er DONE. **W9 (safe rollback) og W10 (Build Data
+updater) er begge IKKE STARTET.** Vent på konkret instruktion fra
 brugeren (se PROJECT_ROADMAP.md's regel: "Start ikke næste
 roadmap-fase uden en konkret instruktion"). Mulig fremtidig
 opfølgning (ikke startet, kræver eksplicit instruktion): rette
@@ -391,6 +570,12 @@ opfølgning (ikke startet, kræver eksplicit instruktion): rette
 
 ## Kort changelog (seneste faser, nyeste øverst)
 
+- `1f38fce` — Windows Product Phase W8: reelt Download → Verify →
+  Install → Restart. Ny `src/updater.py` (find/download/verify/launch),
+  `_on_update_now_clicked` udvidet til fuld pipeline, Inno Setup
+  `[Run]`-sektion (genstart via Inno Setups egen mekanisme), CI beregner
+  og uploader en reel SHA256-sidecar. Ingen GitHub Release
+  oprettet/publiceret, jf. hard constraint.
 - `fb7ae9e` — Windows Product Phase W7: "Update Now"-knap + intern
   `_pending_update_release`-target, som W8 kobler download/install/
   restart på. Intet download/install/restart/rollback endnu.
