@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 
 
 class LevelingManager:
@@ -63,10 +64,22 @@ class LevelingManager:
 
     def __init__(self, builds_dir: str | None = None):
 
-        # repo_root/src/managers/leveling_manager.py -> repo_root
-        repo_root = os.path.dirname(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        )
+        # Windows Product Phase W2: once frozen by PyInstaller (onedir mode),
+        # ``__file__``-relative lookups are not guaranteed correct (frozen
+        # module paths resolve unpredictably depending on onedir/onefile
+        # mode and PyInstaller version). Standard, documented PyInstaller
+        # pattern: check ``sys.frozen`` and resolve relative to
+        # ``sys.executable``'s directory instead - the spec file's
+        # ``datas`` places ``builds/`` right next to the exe in onedir
+        # mode. Running from source (the only case before this phase)
+        # keeps the original ``__file__``-based behavior unchanged.
+        if getattr(sys, "frozen", False):
+            repo_root = os.path.dirname(os.path.abspath(sys.executable))
+        else:
+            # repo_root/src/managers/leveling_manager.py -> repo_root
+            repo_root = os.path.dirname(
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            )
 
         if builds_dir is None:
             builds_dir = os.path.join(repo_root, "builds")

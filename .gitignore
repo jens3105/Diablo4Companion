@@ -24,5 +24,6 @@ Desktop.ini
 build/
 dist/
 
-# PyInstaller
+# PyInstaller (diablo4companion.spec is intentionally committed - W2 phase)
 *.spec
+!diablo4companion.spec
