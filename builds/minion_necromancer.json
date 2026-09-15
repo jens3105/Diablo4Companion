@@ -2376,18 +2376,60 @@
       {
         "slot": "Helm",
         "item_name": "The Undercrown",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Rune_Condition_Summons",
+            "kind": "rune",
+            "name": "Nagu (Tyrannical)",
+            "effect_text": "Maintain at least 1 active Summon for 5 seconds, gaining Offering for each up to 5 Summon."
+          },
+          {
+            "slug": "Rune_Effect_Druid_EarthenBulwark",
+            "kind": "rune",
+            "name": "Que (Fortress)",
+            "effect_text": "Invoke the Druid's Earthen Bulwark Skill for {s1} seconds, granting yourself a Barrier."
+          }
+        ]
       },
       {
         "slot": "Chest",
         "item_name": "Runic Mail",
         "rarity": "Legendary",
-        "aspect": "Aspect of Heavenly Strength"
+        "aspect": "Aspect of Heavenly Strength",
+        "sockets": [
+          {
+            "slug": "Rune_Condition_Bomb",
+            "kind": "rune",
+            "name": "Igni (Bomber)",
+            "effect_text": "Stores Offering every 0.3 |4second:seconds;. Cast a Non-Basic Skill to gain the stored Offering. (Up to 500 Offering)."
+          },
+          {
+            "slug": "Rune_Effect_SummonSpiritWolf",
+            "kind": "rune",
+            "name": "Ceh (Alpha Canid)",
+            "effect_text": "Summon a Spirit Wolf Companion to attack enemies for 8 seconds."
+          }
+        ]
       },
       {
         "slot": "Weapon — Scythe (Two-Handed)",
         "item_name": "Bloodless Scream",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Amethyst_09",
+            "kind": "gem",
+            "name": "Flawless Horadric Amethyst",
+            "effect_text": "x[{value}*100|%|] Shadow Damage Multiplier"
+          },
+          {
+            "slug": "Gem_Amethyst_09",
+            "kind": "gem",
+            "name": "Flawless Horadric Amethyst",
+            "effect_text": "x[{value}*100|%|] Shadow Damage Multiplier"
+          }
+        ]
       },
       {
         "slot": "Gloves",
@@ -2397,7 +2439,21 @@
       {
         "slot": "Pants",
         "item_name": "Blood Moon Breeches",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Topaz_09",
+            "kind": "gem",
+            "name": "Flawless Horadric Topaz",
+            "effect_text": "[{value}|~|] Intelligence"
+          },
+          {
+            "slug": "Gem_Topaz_09",
+            "kind": "gem",
+            "name": "Flawless Horadric Topaz",
+            "effect_text": "[{value}|~|] Intelligence"
+          }
+        ]
       },
       {
         "slot": "Boots",
@@ -2408,19 +2464,43 @@
       {
         "slot": "Ring 1",
         "item_name": "Pact of Bone",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Diamond_09",
+            "kind": "gem",
+            "name": "Flawless Horadric Diamond",
+            "effect_text": "+[{value}||] Resistance to All Elements"
+          }
+        ]
       },
       {
         "slot": "Ring 2",
         "item_name": "Soulwatch Hoop",
         "rarity": "Legendary",
-        "aspect": "Hellbent Commander Aspect"
+        "aspect": "Hellbent Commander Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Diamond_09",
+            "kind": "gem",
+            "name": "Flawless Horadric Diamond",
+            "effect_text": "+[{value}||] Resistance to All Elements"
+          }
+        ]
       },
       {
         "slot": "Amulet",
         "item_name": "Ocelot's Eye",
         "rarity": "Legendary",
-        "aspect": "Aspect of Reanimation, Aspect of the Void"
+        "aspect": "Aspect of Reanimation, Aspect of the Void",
+        "sockets": [
+          {
+            "slug": "Gem_Topaz_09",
+            "kind": "gem",
+            "name": "Flawless Horadric Topaz",
+            "effect_text": "+[{value}||] Lightning Resistance"
+          }
+        ]
       },
       {
         "slot": "Talisman (Seal)",

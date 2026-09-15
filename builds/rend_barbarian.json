@@ -2345,35 +2345,107 @@
       {
         "slot": "Helm",
         "item_name": "Tuskhelm of Joritz the Mighty",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Rune_Condition_AllSkillsOnCD",
+            "kind": "rune",
+            "name": "Yul (Pugilistic)",
+            "effect_text": "Cast a Skill with a Cooldown."
+          },
+          {
+            "slug": "Rune_Effect_Barbarian_WarCry",
+            "kind": "rune",
+            "name": "Ohm (Call to Arms)",
+            "effect_text": "Invoke the Barbarian's War Cry Skill, increasing your damage dealt by 7.5% for {s1} seconds."
+          }
+        ]
       },
       {
         "slot": "Chest",
         "item_name": "Rage of Harrogath",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Rune_Condition_OnStutterStep",
+            "kind": "rune",
+            "name": "Moni (Alacrity)",
+            "effect_text": "Cast 2 Mobility or Macabre Skills."
+          },
+          {
+            "slug": "Rune_Effect_Druid_EarthenBulwark",
+            "kind": "rune",
+            "name": "Que (Fortress)",
+            "effect_text": "Invoke the Druid's Earthen Bulwark Skill for {s1} seconds, granting yourself a Barrier."
+          }
+        ]
       },
       {
         "slot": "Weapon — Mace (Two-Handed)",
         "item_name": "Bonebreaker",
         "rarity": "Legendary",
-        "aspect": "Crushing Aspect"
+        "aspect": "Crushing Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Skull_07",
+            "kind": "gem",
+            "name": "Grand Skull",
+            "effect_text": "x[{value}*100|%|] Physical Damage Multiplier"
+          },
+          {
+            "slug": "Gem_Skull_07",
+            "kind": "gem",
+            "name": "Grand Skull",
+            "effect_text": "x[{value}*100|%|] Physical Damage Multiplier"
+          }
+        ]
       },
       {
         "slot": "Weapon — Polearm",
         "item_name": "Shattered Vow",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Skull_07",
+            "kind": "gem",
+            "name": "Grand Skull",
+            "effect_text": "x[{value}*100|%|] Physical Damage Multiplier"
+          },
+          {
+            "slug": "Gem_Skull_07",
+            "kind": "gem",
+            "name": "Grand Skull",
+            "effect_text": "x[{value}*100|%|] Physical Damage Multiplier"
+          }
+        ]
       },
       {
         "slot": "Weapon — Axe",
         "item_name": "Bearded Axe",
         "rarity": "Legendary",
-        "aspect": "Cut to the Bone Aspect"
+        "aspect": "Cut to the Bone Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Skull_07",
+            "kind": "gem",
+            "name": "Grand Skull",
+            "effect_text": "x[{value}*100|%|] Physical Damage Multiplier"
+          }
+        ]
       },
       {
         "slot": "Weapon — Mace",
         "item_name": "Skullsplitter",
         "rarity": "Legendary",
-        "aspect": "Conceited Aspect"
+        "aspect": "Conceited Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Skull_07",
+            "kind": "gem",
+            "name": "Grand Skull",
+            "effect_text": "x[{value}*100|%|] Physical Damage Multiplier"
+          }
+        ]
       },
       {
         "slot": "Gloves",
@@ -2384,7 +2456,21 @@
       {
         "slot": "Pants",
         "item_name": "Chainscourged Mail",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Ruby_07",
+            "kind": "gem",
+            "name": "Grand Ruby",
+            "effect_text": "[{value}|~|] Strength"
+          },
+          {
+            "slug": "Gem_Ruby_07",
+            "kind": "gem",
+            "name": "Grand Ruby",
+            "effect_text": "[{value}|~|] Strength"
+          }
+        ]
       },
       {
         "slot": "Boots",
@@ -2396,18 +2482,42 @@
         "slot": "Ring 1",
         "item_name": "Soulwatch Hoop",
         "rarity": "Legendary",
-        "aspect": "Wanton Rupture Aspect"
+        "aspect": "Wanton Rupture Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Skull_07",
+            "kind": "gem",
+            "name": "Grand Skull",
+            "effect_text": "+[{value}||] Physical Resistance"
+          }
+        ]
       },
       {
         "slot": "Ring 2",
         "item_name": "Ring of the Ravenous",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Topaz_07",
+            "kind": "gem",
+            "name": "Grand Topaz",
+            "effect_text": "+[{value}||] Lightning Resistance"
+          }
+        ]
       },
       {
         "slot": "Amulet",
         "item_name": "Ocelot's Eye",
         "rarity": "Legendary",
-        "aspect": "Aspect of Heavenly Strength, Battle-Mad Aspect"
+        "aspect": "Aspect of Heavenly Strength, Battle-Mad Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Ruby_07",
+            "kind": "gem",
+            "name": "Grand Ruby",
+            "effect_text": "+[{value}||] Fire Resistance"
+          }
+        ]
       },
       {
         "slot": "Talisman (Seal)",

@@ -2362,23 +2362,67 @@
       {
         "slot": "Helm",
         "item_name": "Crown of Lucion",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Rune_Condition_Summons",
+            "kind": "rune",
+            "name": "Nagu (Tyrannical)",
+            "effect_text": "Maintain at least 1 active Summon for 5 seconds, gaining Offering for each up to 5 Summon."
+          },
+          {
+            "slug": "Rune_Effect_Warlock_ChainPrison",
+            "kind": "rune",
+            "name": "Prid (Imprisoning)",
+            "effect_text": "Invoke the Warlock's Dark Prison Skill, tethering enemies to the area for 3 seconds."
+          }
+        ]
       },
       {
         "slot": "Chest",
         "item_name": "Ae'grom's Schism",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Rune_Condition_OnMove",
+            "kind": "rune",
+            "name": "Bac (Selachian)",
+            "effect_text": "Travel {s1} meters."
+          },
+          {
+            "slug": "Rune_Effect_Sorcerer_Teleport",
+            "kind": "rune",
+            "name": "Jah (Enigma)",
+            "effect_text": "Replace your next Evade with the Sorcerer's Teleport Skill, blinking further, dealing damage, and becoming Unstoppable."
+          }
+        ]
       },
       {
         "slot": "Offhand (Focus)",
         "item_name": "Eye of Baal",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Skull_07",
+            "kind": "gem",
+            "name": "Grand Skull",
+            "effect_text": "x[{value}*100|%|] Physical Damage Multiplier / +[{value}*100|1%|] Healing Received / +[{value}||] Physical Resistance"
+          }
+        ]
       },
       {
         "slot": "Weapon — Sword",
         "item_name": "Obsidian Blade",
         "rarity": "Legendary",
-        "aspect": "Malicious Aspect"
+        "aspect": "Malicious Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Skull_07",
+            "kind": "gem",
+            "name": "Grand Skull",
+            "effect_text": "x[{value}*100|%|] Physical Damage Multiplier"
+          }
+        ]
       },
       {
         "slot": "Gloves",
@@ -2389,7 +2433,21 @@
       {
         "slot": "Pants",
         "item_name": "Bindings of Attrition",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Sapphire_07",
+            "kind": "gem",
+            "name": "Grand Sapphire",
+            "effect_text": "[{value}|~|] Willpower"
+          },
+          {
+            "slug": "Gem_Sapphire_07",
+            "kind": "gem",
+            "name": "Grand Sapphire",
+            "effect_text": "[{value}|~|] Willpower"
+          }
+        ]
       },
       {
         "slot": "Boots",
@@ -2401,19 +2459,43 @@
         "slot": "Ring 1",
         "item_name": "Soulwatch Hoop",
         "rarity": "Legendary",
-        "aspect": "Hellbent Commander Aspect"
+        "aspect": "Hellbent Commander Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Diamond_07",
+            "kind": "gem",
+            "name": "Grand Diamond",
+            "effect_text": "+[{value}||] Resistance to All Elements"
+          }
+        ]
       },
       {
         "slot": "Ring 2",
         "item_name": "Soulwatch Hoop",
         "rarity": "Legendary",
-        "aspect": "Demonic Aspect"
+        "aspect": "Demonic Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Diamond_07",
+            "kind": "gem",
+            "name": "Grand Diamond",
+            "effect_text": "+[{value}||] Resistance to All Elements"
+          }
+        ]
       },
       {
         "slot": "Amulet",
         "item_name": "Seed of Horazon",
         "rarity": "Mythic",
-        "aspect": "Sadistic Aspect"
+        "aspect": "Sadistic Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Diamond_07",
+            "kind": "gem",
+            "name": "Grand Diamond",
+            "effect_text": "+[{value}||] Resistance to All Elements"
+          }
+        ]
       },
       {
         "slot": "Talisman (Seal)",

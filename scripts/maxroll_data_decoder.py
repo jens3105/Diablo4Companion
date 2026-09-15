@@ -42,6 +42,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 
 import requests
@@ -431,6 +432,147 @@ def _aspect_display_name(affix_def: dict) -> str | None:
     return None
 
 
+# ---------------------------------------------------------
+# Sockets (Gems System phase)
+#
+# Each equipped item *instance* in a Maxroll planner profile (``data
+# ["items"][<instance_id>]``, the same catalog ``decode_gear`` already
+# resolves ``equipped[slot_idx]`` against) carries its own ``sockets``
+# list - real, per-build guide data: exactly which gem/rune slug the
+# guide author actually socketed in each of that item's sockets. This
+# was already being fetched but silently ignored before this phase.
+# ---------------------------------------------------------
+
+# ``data_dict["items"][<slug>]["type"]`` values whose gem-socket effect
+# is unambiguous - D4's own well-known (non-Maxroll-specific) mechanic:
+# every real gem's ``socketedEffects`` list has exactly 3 entries, in a
+# fixed [Weapon, Armor, Jewelry] order - checked exhaustively against
+# all 64 real gem definitions in data.min.json as of this writing (not
+# just a handful sampled), every one carrying exactly 3 entries with
+# ``type`` 0/1/2 in that same order. Armor pieces get index 1 (a flat/
+# percent attribute bonus), Jewelry gets index 2 (a resistance bonus).
+_GEM_ARMOR_ITEM_TYPES = {"Helm", "ChestArmor", "Gloves", "Legs", "Boots"}
+_GEM_JEWELRY_ITEM_TYPES = {"Amulet", "Ring"}
+
+# Item types where the Weapon/Armor/Jewelry mapping above is NOT safely
+# inferable: offhand items (Shield/Focus/Totem-style, plus the Warlock's
+# "FocusBookOffHand" grimoire - same off-hand-caster-item family as
+# Focus, just not in ``_OFFHAND_TYPES``'s label set since
+# ``_humanize_item_type`` happens to fall through to a generic "Weapon -
+# ..." label for it - do carry real sockets in practice, confirmed
+# against actual equipped data, but D4 doesn't document which of the 3
+# categories their gem effect follows, and this decoder has no per-item
+# confirmation of it) plus Quiver/Charm/HoradricSeal (which never carry
+# sockets in practice, but are excluded here too rather than assumed).
+# Never guessed - see ``_gem_slot_category``.
+_GEM_AMBIGUOUS_ITEM_TYPES = {
+    "Quiver",
+    "HoradricSeal",
+    "Charm",
+    "FocusBookOffHand",
+} | _OFFHAND_TYPES
+
+_GEM_CATEGORY_INDEX = {"weapon": 0, "armor": 1, "jewelry": 2}
+
+# Cosmetic Maxroll/game markup tags (color spans, underline) seen in raw
+# rune ``desc`` text, e.g. "{c_RuneEffect}Restore {c_number}{s1}{/c}
+# Primary Resource.{/c}" - the exact tag vocabulary used across all 55
+# real rune ``desc`` strings in data.min.json as of this writing (opening
+# "{c_Word}" tags, the bare "{/c}" closing tag - no underscore - and
+# "{u}"/"{/u}"), checked exhaustively, not sampled. Strips only these tag
+# wrappers - a real dynamic-value placeholder like "{s1}" is left as-is
+# (it's an actual data reference this decoder has no per-rank value for,
+# not markup - never fabricated with a computed number).
+_RUNE_MARKUP_RE = re.compile(r"\{c_[A-Za-z]*\}|\{/c\}|\{/?u\}", re.IGNORECASE)
+
+
+def _strip_rune_markup(text: str) -> str:
+    return _RUNE_MARKUP_RE.sub("", text).strip()
+
+
+def _gem_slot_category(item_type: str) -> str | None:
+    """Which of a gem's 3 ``socketedEffects`` entries (see the comment
+    above) applies to a host item of ``item_type``, or ``None`` when
+    that mapping isn't safely inferable - in which case the caller must
+    not pick one index and should show every effect generically
+    instead."""
+
+    if item_type in _GEM_ARMOR_ITEM_TYPES:
+        return "armor"
+    if item_type in _GEM_JEWELRY_ITEM_TYPES:
+        return "jewelry"
+    if not item_type or item_type in _GEM_AMBIGUOUS_ITEM_TYPES:
+        return None
+    # Anything else (Sword, Sword2H, Axe, Bow, Wand, Staff2H, Glaive,
+    # ...) is a real weapon type - same fallback ``_humanize_item_type``
+    # already uses for "not armor/accessory/offhand -> Weapon".
+    return "weapon"
+
+
+def _resolve_socket_content(slug: str, host_item_type: str, data_dict: dict) -> dict:
+    """Resolve one socket-content slug (an entry of an equipped item
+    instance's ``sockets`` list) into ``{slug, kind, name, effect_text}``.
+
+    ``kind`` is ``"gem"`` (``data_dict["items"][slug]["type"] ==
+    "Gem"``), ``"rune"`` (``type`` in ``("ConditionRune",
+    "EffectRune")`` - the Runeword system's two rune families, treated
+    uniformly here per the roadmap phase spec), or ``"unknown"`` when
+    the slug has no entry in ``data_dict["items"]`` at all - confirmed
+    to happen for Season 15's "Soul Splinter" boss-material slugs
+    (``S15_SoulSplinter_*``), which are a newer game mechanic this
+    cached decoder dictionary simply doesn't carry data for yet. Never
+    fabricated - the caller shows "DATA UNAVAILABLE" for these.
+
+    For a gem, ``effect_text`` is the correctly slot-indexed
+    ``socketedEffects[label]`` when ``host_item_type`` maps to a known
+    category (see ``_gem_slot_category``) AND this gem has exactly 3
+    effects (true for every real gem as of this writing); otherwise
+    every effect label this gem lists is joined, unlabeled by
+    slot-type, rather than risking a wrong pick.
+
+    For a rune, ``effect_text`` is ``rune["desc"]`` with cosmetic markup
+    tags stripped (see ``_strip_rune_markup``), and ``name`` folds in
+    the rune's real ``prefix``/``suffix`` word when present (D4's own
+    Runeword naming convention, e.g. base name "Cem" + prefix
+    "Acrobatic")."""
+
+    item_def = data_dict["items"].get(slug)
+
+    if not item_def:
+        return {"slug": slug, "kind": "unknown", "name": None, "effect_text": None}
+
+    item_type = item_def.get("type")
+    name = item_def.get("name")
+
+    if item_type == "Gem":
+        effects = item_def.get("socketedEffects") or []
+        category = _gem_slot_category(host_item_type)
+        idx = _GEM_CATEGORY_INDEX.get(category) if category else None
+
+        if idx is not None and len(effects) == 3:
+            effect_text = effects[idx].get("label")
+        else:
+            labels = [e.get("label") for e in effects if e.get("label")]
+            effect_text = " / ".join(labels) if labels else None
+
+        return {"slug": slug, "kind": "gem", "name": name, "effect_text": effect_text}
+
+    if item_type in ("ConditionRune", "EffectRune"):
+        rune = item_def.get("rune") or {}
+        desc = rune.get("desc")
+        effect_text = _strip_rune_markup(desc) if desc else None
+
+        descriptor = rune.get("prefix") or rune.get("suffix")
+        display_name = f"{name} ({descriptor})" if name and descriptor else name
+
+        return {"slug": slug, "kind": "rune", "name": display_name, "effect_text": effect_text}
+
+    # A real item_def exists but isn't a known Gem/Rune type - a future
+    # game-data addition this decoder doesn't understand yet. Don't
+    # guess what it is.
+    return {"slug": slug, "kind": "unknown", "name": name, "effect_text": None}
+
+
 def decode_gear(data: dict, profile: dict, data_dict: dict) -> list[dict]:
     """Decode ``profile["items"]`` (slot index -> item id, referencing
     the planner-link-wide item catalog at ``data["items"]``) into the
@@ -445,6 +587,16 @@ def decode_gear(data: dict, profile: dict, data_dict: dict) -> list[dict]:
     by the aspect's numeric ``nid`` against ``data_dict["affixes"]``
     (grouped by their own ``id`` field - affixes are keyed by slug in
     the raw dict, not by this id).
+
+    Each item instance also carries a ``sockets`` list (one entry per
+    physical socket - ``None`` for a socket the guide left unfilled,
+    never actually seen on an equipped item as of this writing but
+    skipped rather than assumed impossible). Each filled entry is
+    resolved (see ``_resolve_socket_content``) into
+    ``{slug, kind, name, effect_text}`` and attached as this gear
+    entry's own ``sockets`` list, only when non-empty (same additive
+    convention as ``aspect``) - real, per-build "expected gem/rune in
+    each socket" data, not guessed.
 
     Items with no resolvable base definition/name are skipped rather
     than guessed. Duplicate slot labels (both Rings, dual-wielded
@@ -479,12 +631,20 @@ def decode_gear(data: dict, profile: dict, data_dict: dict) -> list[dict]:
             if name:
                 aspect_names.append(name)
 
+        item_type = item_def.get("type", "")
+        sockets = [
+            _resolve_socket_content(content_slug, item_type, data_dict)
+            for content_slug in (instance.get("sockets") or [])
+            if content_slug
+        ]
+
         resolved.append(
             {
-                "slot_label": _humanize_item_type(item_def.get("type", "")),
+                "slot_label": _humanize_item_type(item_type),
                 "item_name": item_def["name"],
                 "rarity": _resolve_item_rarity(instance, item_def),
                 "aspect": ", ".join(aspect_names) if aspect_names else None,
+                "sockets": sockets,
             }
         )
 
@@ -503,6 +663,8 @@ def decode_gear(data: dict, profile: dict, data_dict: dict) -> list[dict]:
         gear_entry = {"slot": label, "item_name": entry["item_name"], "rarity": entry["rarity"]}
         if entry["aspect"]:
             gear_entry["aspect"] = entry["aspect"]
+        if entry["sockets"]:
+            gear_entry["sockets"] = entry["sockets"]
 
         result.append(gear_entry)
 

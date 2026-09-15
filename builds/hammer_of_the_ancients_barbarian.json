@@ -1322,36 +1322,108 @@
       {
         "slot": "Helm",
         "item_name": "Heir of Perdition",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Rune_Condition_CastRepeatSkill",
+            "kind": "rune",
+            "name": "Cir (Lethargic)",
+            "effect_text": "Cast 5 Skills then become exhausted for 3 seconds."
+          },
+          {
+            "slug": "Rune_Effect_SummonSpiritWolf",
+            "kind": "rune",
+            "name": "Ceh (Alpha Canid)",
+            "effect_text": "Summon a Spirit Wolf Companion to attack enemies for 8 seconds."
+          }
+        ]
       },
       {
         "slot": "Chest",
         "item_name": "The Relentless Heart",
-        "rarity": "Unique"
+        "rarity": "Unique",
+        "sockets": [
+          {
+            "slug": "Rune_Condition_Bomb",
+            "kind": "rune",
+            "name": "Igni (Bomber)",
+            "effect_text": "Stores Offering every 0.3 |4second:seconds;. Cast a Non-Basic Skill to gain the stored Offering. (Up to 500 Offering)."
+          },
+          {
+            "slug": "Rune_Effect_CritBuff",
+            "kind": "rune",
+            "name": "Gar (Precision)",
+            "effect_text": "Gain {s1}% Critical Strike Chance for 5 seconds, up to 10%."
+          }
+        ]
       },
       {
         "slot": "Weapon — Mace (Two-Handed)",
         "item_name": "Bonebreaker",
         "rarity": "Legendary",
-        "aspect": "Tidal Aspect"
+        "aspect": "Tidal Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Ruby_07",
+            "kind": "gem",
+            "name": "Grand Ruby",
+            "effect_text": "x[{value}*100|%|] Fire and Holy Damage Multiplier"
+          },
+          {
+            "slug": "Gem_Ruby_07",
+            "kind": "gem",
+            "name": "Grand Ruby",
+            "effect_text": "x[{value}*100|%|] Fire and Holy Damage Multiplier"
+          }
+        ]
       },
       {
         "slot": "Weapon — Sword (Two-Handed)",
         "item_name": "Demonblade",
         "rarity": "Legendary",
-        "aspect": "Aspect of Limitless Rage"
+        "aspect": "Aspect of Limitless Rage",
+        "sockets": [
+          {
+            "slug": "Gem_Ruby_07",
+            "kind": "gem",
+            "name": "Grand Ruby",
+            "effect_text": "x[{value}*100|%|] Fire and Holy Damage Multiplier"
+          },
+          {
+            "slug": "Gem_Ruby_07",
+            "kind": "gem",
+            "name": "Grand Ruby",
+            "effect_text": "x[{value}*100|%|] Fire and Holy Damage Multiplier"
+          }
+        ]
       },
       {
         "slot": "Weapon — Mace 1",
         "item_name": "Skullsplitter",
         "rarity": "Legendary",
-        "aspect": "Hellbent Commander Aspect"
+        "aspect": "Hellbent Commander Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Ruby_07",
+            "kind": "gem",
+            "name": "Grand Ruby",
+            "effect_text": "x[{value}*100|%|] Fire and Holy Damage Multiplier"
+          }
+        ]
       },
       {
         "slot": "Weapon — Mace 2",
         "item_name": "Skullsplitter",
         "rarity": "Legendary",
-        "aspect": "Progenitor's Aspect"
+        "aspect": "Progenitor's Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Ruby_07",
+            "kind": "gem",
+            "name": "Grand Ruby",
+            "effect_text": "x[{value}*100|%|] Fire and Holy Damage Multiplier"
+          }
+        ]
       },
       {
         "slot": "Gloves",
@@ -1363,7 +1435,21 @@
         "slot": "Pants",
         "item_name": "Runic Leggings",
         "rarity": "Legendary",
-        "aspect": "Aspect of Glynn's Anvil"
+        "aspect": "Aspect of Glynn's Anvil",
+        "sockets": [
+          {
+            "slug": "Gem_Ruby_07",
+            "kind": "gem",
+            "name": "Grand Ruby",
+            "effect_text": "[{value}|~|] Strength"
+          },
+          {
+            "slug": "Gem_Ruby_07",
+            "kind": "gem",
+            "name": "Grand Ruby",
+            "effect_text": "[{value}|~|] Strength"
+          }
+        ]
       },
       {
         "slot": "Boots",
@@ -1374,19 +1460,43 @@
       {
         "slot": "Ring 1",
         "item_name": "Ring of Starless Skies",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Topaz_07",
+            "kind": "gem",
+            "name": "Grand Topaz",
+            "effect_text": "+[{value}||] Lightning Resistance"
+          }
+        ]
       },
       {
         "slot": "Ring 2",
         "item_name": "Soulwatch Hoop",
         "rarity": "Legendary",
-        "aspect": "Aspect of Inner Calm"
+        "aspect": "Aspect of Inner Calm",
+        "sockets": [
+          {
+            "slug": "Gem_Skull_07",
+            "kind": "gem",
+            "name": "Grand Skull",
+            "effect_text": "+[{value}||] Physical Resistance"
+          }
+        ]
       },
       {
         "slot": "Amulet",
         "item_name": "Banished Lord's Talisman",
         "rarity": "Unique",
-        "aspect": "Battle Fervor's Aspect"
+        "aspect": "Battle Fervor's Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Ruby_07",
+            "kind": "gem",
+            "name": "Grand Ruby",
+            "effect_text": "+[{value}||] Fire Resistance"
+          }
+        ]
       },
       {
         "slot": "Talisman (Seal)",

@@ -4,8 +4,8 @@ Build Guide's status widget and the Dashboard's Current Build card
 already compute - ``MainWindow._compute_build_status`` for the Skills/
 Leveling/Paragon/Gear percentage rollup, ``MainWindow._advisor_next_
 action`` for the single unified next step, and ``MainWindow._pending_
-skill_actions``/``_pending_paragon_actions``/``_pending_gear_actions``
-for a short "what's missing" list per category.
+skill_actions``/``_pending_paragon_actions``/``_pending_gear_actions``/
+``_pending_gem_actions`` for a short "what's missing" list per category.
 
 No new validation logic lives here - this module is presentation only,
 same as ``CurrentBuildCard``/``LevelingCard``'s Build Status widget."""
@@ -25,9 +25,9 @@ from src import theme
 from src.base_card import BaseCard, ClickableStrongBodyLabel
 
 # Display order + label for each pending-actions category - matches the
-# Skills -> Paragon -> Gear priority order ``MainWindow._advisor_pending_
-# actions`` already unifies them in.
-_CATEGORIES = ["Skills", "Paragon", "Gear"]
+# Skills -> Paragon -> Gear -> Gems priority order ``MainWindow._advisor_
+# pending_actions`` already unifies them in.
+_CATEGORIES = ["Skills", "Paragon", "Gear", "Gems"]
 
 
 class BuildAdvisorCard(BaseCard):
@@ -35,7 +35,7 @@ class BuildAdvisorCard(BaseCard):
     read-out, plus a capped "what's missing" list per category."""
 
     # Emits the pending action's category
-    # ("leveling"/"skill"/"paragon"/"paragon_node"/"gear") when the NEXT ACTION line is
+    # ("leveling"/"skill"/"paragon"/"paragon_node"/"gear"/"gem") when the NEXT ACTION line is
     # clicked, so MainWindow can jump to the right page/tab - see
     # MainWindow._navigate_to_next_action. Never emitted when there's
     # nothing to act on (no build, or "Build complete!") - see
@@ -148,10 +148,10 @@ class BuildAdvisorCard(BaseCard):
         ``next_action_text``/``next_action_kind`` are
         ``MainWindow._advisor_next_action``'s result - ``next_action_kind``
         is one of ``"leveling"``/``"skill"``/``"paragon"``/``"paragon_node"``/
-        ``"gear"`` or
+        ``"gear"``/``"gem"`` or
         ``None`` when there's nothing to act on, and decides whether the
         NEXT ACTION line is click-to-navigate right now. ``pending_by_category`` maps
-        each of ``Skills``/``Paragon``/``Gear`` to ``(capped_texts,
+        each of ``Skills``/``Paragon``/``Gear``/``Gems`` to ``(capped_texts,
         total_count)`` - already capped by the caller (see
         ``MainWindow._advisor_missing_summary``) so this widget never has
         to decide the cap itself."""

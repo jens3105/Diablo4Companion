@@ -2348,24 +2348,68 @@
       {
         "slot": "Helm",
         "item_name": "Deathless Visage",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Rune_Condition_Bomb",
+            "kind": "rune",
+            "name": "Igni (Bomber)",
+            "effect_text": "Stores Offering every 0.3 |4second:seconds;. Cast a Non-Basic Skill to gain the stored Offering. (Up to 500 Offering)."
+          },
+          {
+            "slug": "Rune_Effect_CritBuff",
+            "kind": "rune",
+            "name": "Gar (Precision)",
+            "effect_text": "Gain {s1}% Critical Strike Chance for 5 seconds, up to 10%."
+          }
+        ]
       },
       {
         "slot": "Chest",
         "item_name": "Runic Mail",
         "rarity": "Legendary",
-        "aspect": "Aspect of Glynn's Anvil"
+        "aspect": "Aspect of Glynn's Anvil",
+        "sockets": [
+          {
+            "slug": "Rune_Condition_OnCastCoreSkill",
+            "kind": "rune",
+            "name": "Tam (Essential)",
+            "effect_text": "Cast a non-Channeled Core Skill."
+          },
+          {
+            "slug": "Rune_Effect_Necromancer_Decrepify",
+            "kind": "rune",
+            "name": "Wat (Disdain)",
+            "effect_text": "Invoke the Necromancer's Decrepify Skill, Weakening and Slowing enemies."
+          }
+        ]
       },
       {
         "slot": "Offhand (Shield)",
         "item_name": "Lidless Wall",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Topaz_09",
+            "kind": "gem",
+            "name": "Flawless Horadric Topaz",
+            "effect_text": "x[{value}*100|%|] Lightning Damage Multiplier / [{value}|~|] Intelligence / +[{value}||] Lightning Resistance"
+          }
+        ]
       },
       {
         "slot": "Weapon — Scythe",
         "item_name": "Ossified Scythe",
         "rarity": "Legendary",
-        "aspect": "Splintering Aspect"
+        "aspect": "Splintering Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Skull_09",
+            "kind": "gem",
+            "name": "Flawless Horadric Skull",
+            "effect_text": "x[{value}*100|%|] Physical Damage Multiplier"
+          }
+        ]
       },
       {
         "slot": "Gloves",
@@ -2376,7 +2420,21 @@
       {
         "slot": "Pants",
         "item_name": "Blood Moon Breeches",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Topaz_09",
+            "kind": "gem",
+            "name": "Flawless Horadric Topaz",
+            "effect_text": "[{value}|~|] Intelligence"
+          },
+          {
+            "slug": "Gem_Topaz_09",
+            "kind": "gem",
+            "name": "Flawless Horadric Topaz",
+            "effect_text": "[{value}|~|] Intelligence"
+          }
+        ]
       },
       {
         "slot": "Boots",
@@ -2388,19 +2446,43 @@
         "slot": "Ring 1",
         "item_name": "Soulwatch Hoop",
         "rarity": "Legendary",
-        "aspect": "Aspect of Compound Fracture"
+        "aspect": "Aspect of Compound Fracture",
+        "sockets": [
+          {
+            "slug": "Gem_Diamond_09",
+            "kind": "gem",
+            "name": "Flawless Horadric Diamond",
+            "effect_text": "+[{value}||] Resistance to All Elements"
+          }
+        ]
       },
       {
         "slot": "Ring 2",
         "item_name": "Soulwatch Hoop",
         "rarity": "Legendary",
-        "aspect": "Aspect of Rapid Ossification"
+        "aspect": "Aspect of Rapid Ossification",
+        "sockets": [
+          {
+            "slug": "Gem_Emerald_09",
+            "kind": "gem",
+            "name": "Flawless Horadric Emerald",
+            "effect_text": "+[{value}||] Poison Resistance"
+          }
+        ]
       },
       {
         "slot": "Amulet",
         "item_name": "Ocelot's Eye",
         "rarity": "Legendary",
-        "aspect": "Aspect of Bursting Bones, Exploiter's Aspect"
+        "aspect": "Aspect of Bursting Bones, Exploiter's Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Ruby_09",
+            "kind": "gem",
+            "name": "Flawless Horadric Ruby",
+            "effect_text": "+[{value}||] Fire Resistance"
+          }
+        ]
       },
       {
         "slot": "Talisman (Seal)",

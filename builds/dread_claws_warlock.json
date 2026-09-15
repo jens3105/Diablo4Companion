@@ -2379,24 +2379,68 @@
         "slot": "Helm",
         "item_name": "Runic Skullcap",
         "rarity": "Legendary",
-        "aspect": "Aspect of the Fortress"
+        "aspect": "Aspect of the Fortress",
+        "sockets": [
+          {
+            "slug": "Rune_Condition_Summons",
+            "kind": "rune",
+            "name": "Nagu (Tyrannical)",
+            "effect_text": "Maintain at least 1 active Summon for 5 seconds, gaining Offering for each up to 5 Summon."
+          },
+          {
+            "slug": "Rune_Effect_Druid_EarthenBulwark",
+            "kind": "rune",
+            "name": "Que (Fortress)",
+            "effect_text": "Invoke the Druid's Earthen Bulwark Skill for {s1} seconds, granting yourself a Barrier."
+          }
+        ]
       },
       {
         "slot": "Chest",
         "item_name": "Runic Mail",
         "rarity": "Legendary",
-        "aspect": "Aspect of Might"
+        "aspect": "Aspect of Might",
+        "sockets": [
+          {
+            "slug": "Rune_Condition_Bomb",
+            "kind": "rune",
+            "name": "Igni (Bomber)",
+            "effect_text": "Stores Offering every 0.3 |4second:seconds;. Cast a Non-Basic Skill to gain the stored Offering. (Up to 500 Offering)."
+          },
+          {
+            "slug": "Rune_Effect_Barbarian_ChallengingShout",
+            "kind": "rune",
+            "name": "Lac (Defiance)",
+            "effect_text": "Invoke the Barbarian's Challenging Shout Skill, taunting enemies and reducing your damage taken for {s1} seconds."
+          }
+        ]
       },
       {
         "slot": "Weapon — FocusBookOffHand",
         "item_name": "Enigma Cube",
         "rarity": "Legendary",
-        "aspect": "Duelist's Aspect"
+        "aspect": "Duelist's Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Amethyst_07",
+            "kind": "gem",
+            "name": "Grand Amethyst",
+            "effect_text": "x[{value}*100|%|] Shadow Damage Multiplier / +[{value}*100|1%|] Barrier Generation / +[{value}||] Shadow Resistance"
+          }
+        ]
       },
       {
         "slot": "Weapon — Dagger",
         "item_name": "Litany of Sable",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Amethyst_07",
+            "kind": "gem",
+            "name": "Grand Amethyst",
+            "effect_text": "x[{value}*100|%|] Shadow Damage Multiplier"
+          }
+        ]
       },
       {
         "slot": "Gloves",
@@ -2407,7 +2451,21 @@
         "slot": "Pants",
         "item_name": "Runic Leggings",
         "rarity": "Legendary",
-        "aspect": "Juggernaut's Aspect"
+        "aspect": "Juggernaut's Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Sapphire_07",
+            "kind": "gem",
+            "name": "Grand Sapphire",
+            "effect_text": "[{value}|~|] Willpower"
+          },
+          {
+            "slug": "Gem_Sapphire_07",
+            "kind": "gem",
+            "name": "Grand Sapphire",
+            "effect_text": "[{value}|~|] Willpower"
+          }
+        ]
       },
       {
         "slot": "Boots",
@@ -2417,19 +2475,43 @@
       {
         "slot": "Ring 1",
         "item_name": "Ring of Starless Skies",
-        "rarity": "Unique"
+        "rarity": "Unique",
+        "sockets": [
+          {
+            "slug": "Gem_Diamond_07",
+            "kind": "gem",
+            "name": "Grand Diamond",
+            "effect_text": "+[{value}||] Resistance to All Elements"
+          }
+        ]
       },
       {
         "slot": "Ring 2",
         "item_name": "Soulwatch Hoop",
         "rarity": "Legendary",
-        "aspect": "Aspect of Calamity"
+        "aspect": "Aspect of Calamity",
+        "sockets": [
+          {
+            "slug": "Gem_Diamond_07",
+            "kind": "gem",
+            "name": "Grand Diamond",
+            "effect_text": "+[{value}||] Resistance to All Elements"
+          }
+        ]
       },
       {
         "slot": "Amulet",
         "item_name": "Seed of Horazon",
         "rarity": "Mythic",
-        "aspect": "Aspect of Rallying Reversal"
+        "aspect": "Aspect of Rallying Reversal",
+        "sockets": [
+          {
+            "slug": "Gem_Ruby_07",
+            "kind": "gem",
+            "name": "Grand Ruby",
+            "effect_text": "+[{value}||] Fire Resistance"
+          }
+        ]
       },
       {
         "slot": "Talisman (Seal)",

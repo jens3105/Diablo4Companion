@@ -2327,25 +2327,69 @@
       {
         "slot": "Helm",
         "item_name": "Judicant's Glaivehelm",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Ruby_07",
+            "kind": "gem",
+            "name": "Grand Ruby",
+            "effect_text": "[{value}|~|] Strength"
+          },
+          {
+            "slug": "Gem_Ruby_07",
+            "kind": "gem",
+            "name": "Grand Ruby",
+            "effect_text": "[{value}|~|] Strength"
+          }
+        ]
       },
       {
         "slot": "Chest",
         "item_name": "Runic Mail",
         "rarity": "Legendary",
-        "aspect": "Aspect of Firm Decree"
+        "aspect": "Aspect of Firm Decree",
+        "sockets": [
+          {
+            "slug": "Rune_Condition_OnSpendResource",
+            "kind": "rune",
+            "name": "Poc (Voracious)",
+            "effect_text": "Spend {s1}% of your Maximum Resource.{/c]"
+          },
+          {
+            "slug": "Rune_Effect_CritBuff",
+            "kind": "rune",
+            "name": "Gar (Precision)",
+            "effect_text": "Gain {s1}% Critical Strike Chance for 5 seconds, up to 10%."
+          }
+        ]
       },
       {
         "slot": "Offhand (Shield)",
         "item_name": "Bone Shield",
         "rarity": "Legendary",
-        "aspect": "Crushing Aspect"
+        "aspect": "Crushing Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Ruby_07",
+            "kind": "gem",
+            "name": "Grand Ruby",
+            "effect_text": "x[{value}*100|%|] Fire and Holy Damage Multiplier / [{value}|~|] Strength / +[{value}||] Fire Resistance"
+          }
+        ]
       },
       {
         "slot": "Weapon — Sword",
         "item_name": "Obsidian Blade",
         "rarity": "Legendary",
-        "aspect": "Aspect of Holy Punishment"
+        "aspect": "Aspect of Holy Punishment",
+        "sockets": [
+          {
+            "slug": "Gem_Ruby_07",
+            "kind": "gem",
+            "name": "Grand Ruby",
+            "effect_text": "x[{value}*100|%|] Fire and Holy Damage Multiplier"
+          }
+        ]
       },
       {
         "slot": "Gloves",
@@ -2357,7 +2401,21 @@
         "slot": "Pants",
         "item_name": "Runic Leggings",
         "rarity": "Legendary",
-        "aspect": "Aspect of Glynn's Anvil"
+        "aspect": "Aspect of Glynn's Anvil",
+        "sockets": [
+          {
+            "slug": "Rune_Condition_Bomb",
+            "kind": "rune",
+            "name": "Igni (Bomber)",
+            "effect_text": "Stores Offering every 0.3 |4second:seconds;. Cast a Non-Basic Skill to gain the stored Offering. (Up to 500 Offering)."
+          },
+          {
+            "slug": "Rune_Effect_SummonSpiritWolf",
+            "kind": "rune",
+            "name": "Ceh (Alpha Canid)",
+            "effect_text": "Summon a Spirit Wolf Companion to attack enemies for 8 seconds."
+          }
+        ]
       },
       {
         "slot": "Boots",
@@ -2369,18 +2427,42 @@
         "slot": "Ring 1",
         "item_name": "Soulwatch Hoop",
         "rarity": "Legendary",
-        "aspect": "Aspect of Celestial Strife"
+        "aspect": "Aspect of Celestial Strife",
+        "sockets": [
+          {
+            "slug": "Gem_Topaz_07",
+            "kind": "gem",
+            "name": "Grand Topaz",
+            "effect_text": "+[{value}||] Lightning Resistance"
+          }
+        ]
       },
       {
         "slot": "Ring 2",
         "item_name": "Seal of the Second Trumpet",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Emerald_07",
+            "kind": "gem",
+            "name": "Grand Emerald",
+            "effect_text": "+[{value}||] Poison Resistance"
+          }
+        ]
       },
       {
         "slot": "Amulet",
         "item_name": "Ocelot's Eye",
         "rarity": "Legendary",
-        "aspect": "Aspect of the Golden Hour"
+        "aspect": "Aspect of the Golden Hour",
+        "sockets": [
+          {
+            "slug": "Gem_Ruby_07",
+            "kind": "gem",
+            "name": "Grand Ruby",
+            "effect_text": "+[{value}||] Fire Resistance"
+          }
+        ]
       },
       {
         "slot": "Talisman (Seal)",

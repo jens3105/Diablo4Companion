@@ -2372,29 +2372,87 @@
       {
         "slot": "Helm",
         "item_name": "Deathmask of Nirmitruq",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Rune_Condition_OnStutterStep",
+            "kind": "rune",
+            "name": "Moni (Alacrity)",
+            "effect_text": "Cast 2 Mobility or Macabre Skills."
+          },
+          {
+            "slug": "Rune_Effect_Rogue_DarkShroud",
+            "kind": "rune",
+            "name": "Mot (Shadow)",
+            "effect_text": "Gain {s1} |4 shadow:shadows;, from the Rogue's Dark Shroud Skill, reducing damage taken per shadow."
+          }
+        ]
       },
       {
         "slot": "Chest",
         "item_name": "Runic Mail",
         "rarity": "Legendary",
-        "aspect": "Aspect of Debilitating Toxins"
+        "aspect": "Aspect of Debilitating Toxins",
+        "sockets": [
+          {
+            "slug": "Rune_Condition_CastRepeatSkill",
+            "kind": "rune",
+            "name": "Cir (Lethargic)",
+            "effect_text": "Cast 5 Skills then become exhausted for 3 seconds."
+          },
+          {
+            "slug": "Rune_Effect_CritBuff",
+            "kind": "rune",
+            "name": "Gar (Precision)",
+            "effect_text": "Gain {s1}% Critical Strike Chance for 5 seconds, up to 10%."
+          }
+        ]
       },
       {
         "slot": "Weapon — Crossbow (Two-Handed)",
         "item_name": "Warcaster",
         "rarity": "Legendary",
-        "aspect": "Aspect of Frozen Memories"
+        "aspect": "Aspect of Frozen Memories",
+        "sockets": [
+          {
+            "slug": "Gem_Sapphire_07",
+            "kind": "gem",
+            "name": "Grand Sapphire",
+            "effect_text": "x[{value}*100|%|] Cold Damage Multiplier"
+          },
+          {
+            "slug": "Gem_Sapphire_07",
+            "kind": "gem",
+            "name": "Grand Sapphire",
+            "effect_text": "x[{value}*100|%|] Cold Damage Multiplier"
+          }
+        ]
       },
       {
         "slot": "Weapon — Dagger",
         "item_name": "Etna's Lost Dagger",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Sapphire_07",
+            "kind": "gem",
+            "name": "Grand Sapphire",
+            "effect_text": "x[{value}*100|%|] Cold Damage Multiplier"
+          }
+        ]
       },
       {
         "slot": "Weapon — Sword",
         "item_name": "Azurewrath",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Sapphire_07",
+            "kind": "gem",
+            "name": "Grand Sapphire",
+            "effect_text": "x[{value}*100|%|] Cold Damage Multiplier"
+          }
+        ]
       },
       {
         "slot": "Gloves",
@@ -2404,7 +2462,21 @@
       {
         "slot": "Pants",
         "item_name": "Shrouded Gift",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Emerald_07",
+            "kind": "gem",
+            "name": "Grand Emerald",
+            "effect_text": "[{value}|~|] Dexterity"
+          },
+          {
+            "slug": "Gem_Emerald_07",
+            "kind": "gem",
+            "name": "Grand Emerald",
+            "effect_text": "[{value}|~|] Dexterity"
+          }
+        ]
       },
       {
         "slot": "Boots",
@@ -2416,19 +2488,43 @@
         "slot": "Ring 1",
         "item_name": "Soulwatch Hoop",
         "rarity": "Legendary",
-        "aspect": "Aspect of Encircling Blades"
+        "aspect": "Aspect of Encircling Blades",
+        "sockets": [
+          {
+            "slug": "Gem_Diamond_07",
+            "kind": "gem",
+            "name": "Grand Diamond",
+            "effect_text": "+[{value}||] Resistance to All Elements"
+          }
+        ]
       },
       {
         "slot": "Ring 2",
         "item_name": "Soulwatch Hoop",
         "rarity": "Legendary",
-        "aspect": "Neurotoxic Aspect"
+        "aspect": "Neurotoxic Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Ruby_07",
+            "kind": "gem",
+            "name": "Grand Ruby",
+            "effect_text": "+[{value}||] Fire Resistance"
+          }
+        ]
       },
       {
         "slot": "Amulet",
         "item_name": "Ocelot's Eye",
         "rarity": "Legendary",
-        "aspect": "Aspect of Imitated Imbuement, Aspect of Biting Cold"
+        "aspect": "Aspect of Imitated Imbuement, Aspect of Biting Cold",
+        "sockets": [
+          {
+            "slug": "Gem_Topaz_07",
+            "kind": "gem",
+            "name": "Grand Topaz",
+            "effect_text": "+[{value}||] Lightning Resistance"
+          }
+        ]
       },
       {
         "slot": "Talisman (Seal)",

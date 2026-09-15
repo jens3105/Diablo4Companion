@@ -2342,24 +2342,68 @@
         "slot": "Helm",
         "item_name": "Runic Skullcap",
         "rarity": "Legendary",
-        "aspect": "Aspect of Layered Wards"
+        "aspect": "Aspect of Layered Wards",
+        "sockets": [
+          {
+            "slug": "Rune_Condition_Bomb",
+            "kind": "rune",
+            "name": "Igni (Bomber)",
+            "effect_text": "Stores Offering every 0.3 |4second:seconds;. Cast a Non-Basic Skill to gain the stored Offering. (Up to 500 Offering)."
+          },
+          {
+            "slug": "Rune_Effect_Sorcerer_Teleport",
+            "kind": "rune",
+            "name": "Jah (Enigma)",
+            "effect_text": "Replace your next Evade with the Sorcerer's Teleport Skill, blinking further, dealing damage, and becoming Unstoppable."
+          }
+        ]
       },
       {
         "slot": "Chest",
         "item_name": "Runic Mail",
         "rarity": "Legendary",
-        "aspect": "Aspect of Glynn's Anvil"
+        "aspect": "Aspect of Glynn's Anvil",
+        "sockets": [
+          {
+            "slug": "Rune_Condition_OnStutterStep",
+            "kind": "rune",
+            "name": "Moni (Alacrity)",
+            "effect_text": "Cast 2 Mobility or Macabre Skills."
+          },
+          {
+            "slug": "Rune_Effect_CritBuff",
+            "kind": "rune",
+            "name": "Gar (Precision)",
+            "effect_text": "Gain {s1}% Critical Strike Chance for 5 seconds, up to 10%."
+          }
+        ]
       },
       {
         "slot": "Offhand (Shield)",
         "item_name": "Bone Shield",
         "rarity": "Legendary",
-        "aspect": "Revelator's Aspect"
+        "aspect": "Revelator's Aspect",
+        "sockets": [
+          {
+            "slug": "Gem_Ruby_09",
+            "kind": "gem",
+            "name": "Flawless Horadric Ruby",
+            "effect_text": "x[{value}*100|%|] Fire and Holy Damage Multiplier / [{value}|~|] Strength / +[{value}||] Fire Resistance"
+          }
+        ]
       },
       {
         "slot": "Weapon — Flail",
         "item_name": "Light's Rebuke",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Skull_07",
+            "kind": "gem",
+            "name": "Grand Skull",
+            "effect_text": "x[{value}*100|%|] Physical Damage Multiplier"
+          }
+        ]
       },
       {
         "slot": "Gloves",
@@ -2369,7 +2413,21 @@
       {
         "slot": "Pants",
         "item_name": "Tibault's Will",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Ruby_09",
+            "kind": "gem",
+            "name": "Flawless Horadric Ruby",
+            "effect_text": "[{value}|~|] Strength"
+          },
+          {
+            "slug": "Gem_Ruby_09",
+            "kind": "gem",
+            "name": "Flawless Horadric Ruby",
+            "effect_text": "[{value}|~|] Strength"
+          }
+        ]
       },
       {
         "slot": "Boots",
@@ -2380,19 +2438,43 @@
       {
         "slot": "Ring 1",
         "item_name": "Ring of Starless Skies",
-        "rarity": "Unique"
+        "rarity": "Unique",
+        "sockets": [
+          {
+            "slug": "Gem_Skull_09",
+            "kind": "gem",
+            "name": "Flawless Horadric Skull",
+            "effect_text": "+[{value}||] Physical Resistance"
+          }
+        ]
       },
       {
         "slot": "Ring 2",
         "item_name": "Soulwatch Hoop",
         "rarity": "Legendary",
-        "aspect": "Aspect of the Zealot's Covenant"
+        "aspect": "Aspect of the Zealot's Covenant",
+        "sockets": [
+          {
+            "slug": "Gem_Topaz_09",
+            "kind": "gem",
+            "name": "Flawless Horadric Topaz",
+            "effect_text": "+[{value}||] Lightning Resistance"
+          }
+        ]
       },
       {
         "slot": "Amulet",
         "item_name": "Ocelot's Eye",
         "rarity": "Legendary",
-        "aspect": "Aspect of Redirected Force, Aspect of Interdiction"
+        "aspect": "Aspect of Redirected Force, Aspect of Interdiction",
+        "sockets": [
+          {
+            "slug": "Gem_Ruby_09",
+            "kind": "gem",
+            "name": "Flawless Horadric Ruby",
+            "effect_text": "+[{value}||] Fire Resistance"
+          }
+        ]
       },
       {
         "slot": "Talisman (Seal)",

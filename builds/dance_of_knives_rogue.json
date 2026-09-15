@@ -2348,29 +2348,87 @@
       {
         "slot": "Helm",
         "item_name": "Cowl of the Nameless",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Rune_Condition_OnMove",
+            "kind": "rune",
+            "name": "Bac (Selachian)",
+            "effect_text": "Travel {s1} meters."
+          },
+          {
+            "slug": "Rune_Effect_Druid_EarthenBulwark",
+            "kind": "rune",
+            "name": "Que (Fortress)",
+            "effect_text": "Invoke the Druid's Earthen Bulwark Skill for {s1} seconds, granting yourself a Barrier."
+          }
+        ]
       },
       {
         "slot": "Chest",
         "item_name": "Runic Mail",
         "rarity": "Legendary",
-        "aspect": "Aspect of Debilitating Toxins"
+        "aspect": "Aspect of Debilitating Toxins",
+        "sockets": [
+          {
+            "slug": "Rune_Condition_OnPotion",
+            "kind": "rune",
+            "name": "Yax (Imbibing)",
+            "effect_text": "Drink a Healing Potion."
+          },
+          {
+            "slug": "Rune_Effect_BonusToAllSkills",
+            "kind": "rune",
+            "name": "Vex (Heart of the Oak)",
+            "effect_text": "Gain +1 to all Skills for 10 seconds."
+          }
+        ]
       },
       {
         "slot": "Weapon — Crossbow (Two-Handed)",
         "item_name": "Warcaster",
         "rarity": "Legendary",
-        "aspect": "Aspect of Channeling"
+        "aspect": "Aspect of Channeling",
+        "sockets": [
+          {
+            "slug": "Gem_Emerald_07",
+            "kind": "gem",
+            "name": "Grand Emerald",
+            "effect_text": "x[{value}*100|%|] Poison Damage Multiplier"
+          },
+          {
+            "slug": "Gem_Emerald_07",
+            "kind": "gem",
+            "name": "Grand Emerald",
+            "effect_text": "x[{value}*100|%|] Poison Damage Multiplier"
+          }
+        ]
       },
       {
         "slot": "Weapon — Dagger 1",
         "item_name": "Asheara's Khanjar",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Emerald_07",
+            "kind": "gem",
+            "name": "Grand Emerald",
+            "effect_text": "x[{value}*100|%|] Poison Damage Multiplier"
+          }
+        ]
       },
       {
         "slot": "Weapon — Dagger 2",
         "item_name": "Etna's Lost Dagger",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Emerald_07",
+            "kind": "gem",
+            "name": "Grand Emerald",
+            "effect_text": "x[{value}*100|%|] Poison Damage Multiplier"
+          }
+        ]
       },
       {
         "slot": "Gloves",
@@ -2381,7 +2439,21 @@
       {
         "slot": "Pants",
         "item_name": "Shrouded Gift",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "sockets": [
+          {
+            "slug": "Gem_Emerald_07",
+            "kind": "gem",
+            "name": "Grand Emerald",
+            "effect_text": "[{value}|~|] Dexterity"
+          },
+          {
+            "slug": "Gem_Emerald_07",
+            "kind": "gem",
+            "name": "Grand Emerald",
+            "effect_text": "[{value}|~|] Dexterity"
+          }
+        ]
       },
       {
         "slot": "Boots",
@@ -2393,13 +2465,29 @@
         "slot": "Ring",
         "item_name": "Soulwatch Hoop",
         "rarity": "Legendary",
-        "aspect": "Aspect of Alchemical Advantage"
+        "aspect": "Aspect of Alchemical Advantage",
+        "sockets": [
+          {
+            "slug": "S15_SoulSplinter_Duriel_04",
+            "kind": "unknown",
+            "name": null,
+            "effect_text": null
+          }
+        ]
       },
       {
         "slot": "Amulet",
         "item_name": "Ocelot's Eye",
         "rarity": "Legendary",
-        "aspect": "Crushing Aspect, Exploiter's Aspect"
+        "aspect": "Crushing Aspect, Exploiter's Aspect",
+        "sockets": [
+          {
+            "slug": "S15_SoulSplinter_NaKrul_04",
+            "kind": "unknown",
+            "name": null,
+            "effect_text": null
+          }
+        ]
       },
       {
         "slot": "Talisman (Seal)",

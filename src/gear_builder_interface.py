@@ -8,12 +8,25 @@ real field for one slot at a time, in comfortably large text" view.
 
 Data boundary (see ``src/gear_planner.py``'s module docstring and the
 build JSON itself): ``verified_build.gear`` is Maxroll planner data,
-already fully decoded, and it is ONLY ``{slot, item_name, rarity,
-aspect}`` per entry - there is no stats/affix/socket/gem/tempering/
-masterworking data anywhere in the source. Every card here shows those 4
-real fields when present, and a literal "DATA UNAVAILABLE" row for each
-of Affixes/Stats, Sockets/Gems, Tempering and Masterworking - on every
-single item, with no exceptions. This is expected, not a bug.
+already fully decoded, and each entry is
+``{slot, item_name, rarity, aspect, sockets}`` - there is still no
+stats/affix/tempering/masterworking data anywhere in the source. Every
+card here shows the real fields when present, and a literal "DATA
+UNAVAILABLE" row for each of Affixes/Stats, Sockets/Gems (only when the
+item genuinely has none), Tempering and Masterworking. This is expected,
+not a bug.
+
+Sockets/Gems (Gems System phase): when an item's ``sockets`` list is
+non-empty (see ``scripts/maxroll_data_decoder.py``'s ``decode_gear``),
+the "Sockets/Gems" row becomes a real, concise summary instead - each
+socket's resolved gem/rune name plus a ✓/❌ read out of the exact same
+``gear/<build>/socketed_gems`` toggle set the dedicated Gems page
+(``src/gems_interface.py``) owns, so the two pages can never disagree.
+This row is read-only here (no toggle) - the Gems page is where a
+socket actually gets marked done; a socket whose content couldn't be
+resolved at all (``kind == "unknown"`` - e.g. Season 15 Soul Splinter
+boss materials) shows literally "DATA UNAVAILABLE" for that one socket,
+never a fabricated name.
 
 Builds with no ``verified_build`` at all (today, only Heartseeker Rogue -
 its guide predates the Maxroll planner decode and only has prose-derived
@@ -92,8 +105,17 @@ class GearSlotCard(QFrame):
 
     owned_toggled = Signal(str, bool)  # (key, checked)
 
-    def __init__(self, entry: SlotEntry, parent=None):
+    def __init__(
+        self,
+        entry: SlotEntry,
+        sockets: list[dict] | None = None,
+        socketed_gems: set[str] | None = None,
+        parent=None,
+    ):
         super().__init__(parent)
+
+        self._sockets = sockets or []
+        self._socketed_gems = socketed_gems or set()
 
         self.entry = entry
         self.setObjectName("gearBuilderCard")
@@ -147,12 +169,41 @@ class GearSlotCard(QFrame):
             outer.addWidget(note)
 
         # ---- Fields this data source never has - shown honestly, not
-        # skipped, so nobody mistakes "not decoded" for "not present". ----
+        # skipped, so nobody mistakes "not decoded" for "not present".
+        # Sockets/Gems is the one exception once an item genuinely has
+        # sockets (see module docstring) - a real, concise summary row
+        # instead of the placeholder. ----
 
         for field_name in _UNAVAILABLE_FIELDS:
-            outer.addWidget(self._field_row(field_name, "DATA UNAVAILABLE", muted=True))
+            if field_name == "Sockets / Gems" and self._sockets:
+                outer.addWidget(self._sockets_summary_row(entry.slot_label))
+            else:
+                outer.addWidget(self._field_row(field_name, "DATA UNAVAILABLE", muted=True))
 
         self._apply_style()
+
+    def _sockets_summary_row(self, slot_label: str) -> QWidget:
+        """Concise real-data summary for the Sockets/Gems row, e.g.
+        "2 sockets — Topaz ✓, Nagu (Acrobatic) ❌" - read-only here (the
+        Gems page owns the actual toggle, see module docstring), so this
+        is purely a formatted read-out of ``self._socketed_gems``, the
+        exact same set ``src/gems_interface.py``'s page reads/writes."""
+
+        parts = []
+        for idx, socket in enumerate(self._sockets):
+            name = socket.get("name")
+            kind = socket.get("kind")
+
+            if kind in ("gem", "rune") and name:
+                key = f"{slot_label}:{idx}"
+                glyph = "✓" if key in self._socketed_gems else "❌"
+                parts.append(f"{name} {glyph}")
+            else:
+                parts.append("DATA UNAVAILABLE")
+
+        count = len(self._sockets)
+        label = f"{count} socket{'s' if count != 1 else ''}"
+        return self._field_row("Sockets / Gems", f"{label} — " + ", ".join(parts))
 
     def _field_row(self, label: str, value: str, muted: bool = False) -> QWidget:
 
@@ -279,12 +330,21 @@ class GearBuilderCard(BaseCard):
     # Population
     # ---------------------------------------------------------
 
-    def set_gear(self, owned_names: set[str], verified_build: dict | None):
+    def set_gear(
+        self,
+        owned_names: set[str],
+        verified_build: dict | None,
+        socketed_gems: set[str] | None = None,
+    ):
         """``verified_build`` is ``LeveleingManager.get_verified_build``'s
         return value. Only its ``gear`` list drives this page (see module
         docstring for why the legacy ``key_items``/``key_aspects`` path
         isn't used here) - a build with none gets the top-level DATA
-        UNAVAILABLE state instead."""
+        UNAVAILABLE state instead. ``socketed_gems`` is ``MainWindow.
+        _load_socketed_gems``'s set for this build - only used to render
+        each item's real Sockets/Gems summary row (see
+        ``GearSlotCard._sockets_summary_row``); omit it and every item
+        just shows its sockets as all-missing."""
 
         self._clear_cards()
 
@@ -302,16 +362,29 @@ class GearBuilderCard(BaseCard):
         for entry in entries:
             by_bucket.setdefault(entry.bucket, []).append(entry)
 
+        # Keyed by slot label (unique per entry, including the " 1"/" 2"
+        # suffix decode_gear already applies to duplicate slots - see its
+        # docstring) so each card gets exactly its own item's sockets,
+        # never another Ring/weapon's.
+        sockets_by_slot = {
+            item["slot"]: item["sockets"] for item in verified_gear if item.get("sockets")
+        }
+
         owned_count = sum(1 for entry in verified_gear if entry["item_name"] in owned_names)
         self.rollup_label.setText(f"{owned_count} / {len(verified_gear)} items equipped")
 
         for bucket in _CARD_BUCKET_ORDER:
             for entry in by_bucket.get(bucket, []):
-                self._add_card(entry)
+                self._add_card(entry, sockets_by_slot.get(entry.slot_label), socketed_gems)
 
-    def _add_card(self, entry: SlotEntry):
+    def _add_card(
+        self,
+        entry: SlotEntry,
+        sockets: list[dict] | None = None,
+        socketed_gems: set[str] | None = None,
+    ):
 
-        card = GearSlotCard(entry, self._cards_container)
+        card = GearSlotCard(entry, sockets, socketed_gems, self._cards_container)
         card.owned_toggled.connect(self.item_owned_changed)
         self._cards_layout.insertWidget(self._cards_layout.count() - 1, card)
         self._cards.append(card)

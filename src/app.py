@@ -35,6 +35,7 @@ from src.character_interface import CharacterCard, CharacterInterface
 from src.compact_window import CompactWindow
 from src.dashboard import DashboardWidget
 from src.gear_builder_interface import GearBuilderCard, GearBuilderInterface
+from src.gems_interface import GemsCard, GemsInterface
 from src.leveling_card import LevelingCard
 from src.managers.leveling_manager import LevelingManager
 from src.paragon_interface import RARITY_LABELS, ParagonCard, ParagonInterface
@@ -372,6 +373,20 @@ class MainWindow(FluentWindow):
         self.gear_builder_interface = GearBuilderInterface(self.gear_builder_card)
         self.gear_builder_interface.setObjectName("gearBuilderInterface")
 
+        # Gems page: per-socket tracking of each equipped slot's real
+        # expected gem/rune (see src/gems_interface.py's module
+        # docstring) - built on the same verified_build.gear entries the
+        # Gear Builder page above just started reading, now additionally
+        # carrying each item's real ``sockets`` list (see
+        # scripts/maxroll_data_decoder.py's decode_gear). Same "owns no
+        # build selector" pattern, and shares its ``gear/<build>/
+        # socketed_gems`` toggle set with the Gear Builder page's own
+        # per-item socket summary - one tracked state, two read-outs.
+        self.gems_card = GemsCard()
+
+        self.gems_interface = GemsInterface(self.gems_card)
+        self.gems_interface.setObjectName("gemsInterface")
+
         # Build Advisor page: a bigger, standalone read-out of the exact
         # same Build Status + next-action + pending-actions data the
         # Dashboard's Current Build card and Compact Mode already use.
@@ -387,6 +402,7 @@ class MainWindow(FluentWindow):
         self.addSubInterface(self.builds_interface, FIF.GAME, "Build Guide")
         self.addSubInterface(self.character_interface, FIF.FINGERPRINT, "Character")
         self.addSubInterface(self.gear_builder_interface, FIF.SHOPPING_CART, "Gear Builder")
+        self.addSubInterface(self.gems_interface, FIF.CERTIFICATE, "Gems")
         self.addSubInterface(self.paragon_interface, FIF.TILES, "Paragon")
         self.addSubInterface(self.advisor_interface, FIF.ROBOT, "Build Advisor")
         self.addSubInterface(
@@ -458,6 +474,7 @@ class MainWindow(FluentWindow):
         self.leveling_card.mark_board_done.connect(self.on_mark_board_done)
         self.character_card.gear_owned_changed.connect(self.on_gear_owned_changed)
         self.gear_builder_card.item_owned_changed.connect(self.on_gear_owned_changed)
+        self.gems_card.socket_owned_changed.connect(self.on_gem_socket_toggled)
         self.leveling_card.character_changed.connect(self.on_character_changed)
         self.leveling_card.add_character_requested.connect(self.on_add_character)
         self.leveling_card.rename_character_requested.connect(self.on_rename_character)
@@ -516,6 +533,7 @@ class MainWindow(FluentWindow):
             self.leveling_card,
             self.character_card,
             self.gear_builder_card,
+            self.gems_card,
             self.paragon_card,
             self.advisor_card,
         ):
@@ -1319,7 +1337,10 @@ class MainWindow(FluentWindow):
     def _refresh_gear(self):
         """Rebuild the Character page's equipment planner for the
         current build, combining its (level-independent) key items/
-        aspects data with the persisted set of owned item/aspect names."""
+        aspects data with the persisted set of owned item/aspect names.
+        Also pushes the same ``verified_build``/socketed-gems state onto
+        the Gems page (see ``_refresh_gems``) - both pages move together
+        since they read the exact same data, one call site is enough."""
 
         build_name = self.leveling_manager.current_build_name
 
@@ -1329,9 +1350,11 @@ class MainWindow(FluentWindow):
         gear = self.leveling_manager.get_gear_data(build_name)
         owned = self._load_owned_items(build_name)
         verified_build = self.leveling_manager.get_verified_build(build_name)
+        socketed = self._load_socketed_gems(build_name)
 
         self.character_card.set_gear(gear, owned, verified_build)
-        self.gear_builder_card.set_gear(owned, verified_build)
+        self.gear_builder_card.set_gear(owned, verified_build, socketed)
+        self._refresh_gems(verified_build, socketed)
 
     def on_gear_owned_changed(self, name: str, owned: bool):
 
@@ -1348,6 +1371,86 @@ class MainWindow(FluentWindow):
             owned_names.discard(name)
 
         self._save_owned_items(build_name, owned_names)
+
+        self._refresh_gear()
+        self._refresh_build_status()
+
+    # ---------------------------------------------------------
+    # BUILD-GUIDE / GEMS (Gems System phase)
+    #
+    # A finer-grained toggle set than ``owned_items`` above: which
+    # specific EXPECTED sockets (one entry per equipped item's real
+    # verified_build.gear[].sockets[] slot - see scripts/
+    # maxroll_data_decoder.py's decode_gear) the player has confirmed
+    # are actually socketed on their real character. Its own QSettings
+    # key, separate from ``owned_items`` for the same reason
+    # ``completed_paragon_nodes`` is separate from ``completed_boards``:
+    # this is a toggle (can go backwards - a gem swapped out), keyed
+    # per-socket, not per-item.
+    #
+    # Shared verbatim by the Gems page (src/gems_interface.py) and the
+    # Gear Builder page's per-item "Sockets/Gems" summary row (src/
+    # gear_builder_interface.py) - one tracked state, two read-outs,
+    # exactly like Gear's owned_items is shared by the Character page
+    # and the Gear Builder page.
+    # ---------------------------------------------------------
+
+    def _socketed_gems_key(self, build_name: str) -> str:
+        return f"{self._char_prefix()}/gear/{build_name}/socketed_gems"
+
+    def _load_socketed_gems(self, build_name: str) -> set[str]:
+
+        raw = self.settings.value(self._socketed_gems_key(build_name), [], type=list)
+        return {str(v) for v in raw}
+
+    def _save_socketed_gems(self, build_name: str, socketed: set[str]):
+
+        self.settings.setValue(self._socketed_gems_key(build_name), sorted(socketed))
+
+    @staticmethod
+    def _gem_socket_key(slot_label: str, socket_index: int) -> str:
+        return f"{slot_label}:{socket_index}"
+
+    def _refresh_gems(self, verified_build: dict | None = None, socketed: set[str] | None = None):
+        """Push the current build's socket data onto the Gems page.
+        Called from ``_refresh_gear`` (every trigger that can move
+        gear's needle also moves this) - accepts already-looked-up
+        ``verified_build``/``socketed`` purely so that caller doesn't
+        have to fetch them twice; falls back to loading them itself so
+        this method stays usable on its own too."""
+
+        build_name = self.leveling_manager.current_build_name
+
+        if not build_name:
+            return
+
+        if verified_build is None:
+            verified_build = self.leveling_manager.get_verified_build(build_name)
+        if socketed is None:
+            socketed = self._load_socketed_gems(build_name)
+
+        self.gems_card.set_gems(verified_build, socketed)
+
+    def on_gem_socket_toggled(self, key: str, confirmed: bool):
+        """A socket's "Have it" switch was flipped - either on the Gems
+        page itself, or (in principle - see ``gear_builder_interface``'s
+        module docstring, today that row is read-only text) anywhere
+        else reading the same store. Mirrors ``on_gear_owned_changed``'s
+        shape exactly."""
+
+        build_name = self.leveling_manager.current_build_name
+
+        if not build_name:
+            return
+
+        socketed = self._load_socketed_gems(build_name)
+
+        if confirmed:
+            socketed.add(key)
+        else:
+            socketed.discard(key)
+
+        self._save_socketed_gems(build_name, socketed)
 
         self._refresh_gear()
         self._refresh_build_status()
@@ -1710,13 +1813,54 @@ class MainWindow(FluentWindow):
 
         return actions
 
+    def _pending_gem_actions(self, build_name: str) -> list[tuple[str, str, object]]:
+        """Every not-yet-confirmed expected socket content, in order
+        (item by item, then socket by socket), as ``(kind, text, key)`` -
+        ``kind`` is ``"gem"``, ``key`` is ``"<slot_label>:<socket_index>"``
+        (exactly what ``on_gem_socket_toggled`` expects). Mirrors
+        ``_pending_paragon_actions``'s style - this is the finest-
+        grained, lowest-priority layer (see ``_advisor_pending_actions``'s
+        ordering comment - appended after Gear, since a socketed gem
+        matters even less than owning the item it lives in).
+
+        Sockets whose content couldn't be resolved to a real gem/rune
+        name at all (``kind == "unknown"`` - see ``decode_gear``'s
+        docstring; today only Season 15's Soul Splinter boss-material
+        slugs, which this decoder's game-data dictionary has no entries
+        for) never become an action - there's nothing honest to tell the
+        player to do about a socket whose expected content this app
+        can't identify."""
+
+        verified_build = self.leveling_manager.get_verified_build(build_name)
+        verified_gear = (verified_build or {}).get("gear") or []
+
+        if not verified_gear:
+            return []
+
+        socketed = self._load_socketed_gems(build_name)
+        actions = []
+
+        for item in verified_gear:
+            slot = item.get("slot", "?")
+            for idx, socket in enumerate(item.get("sockets") or []):
+                if socket.get("kind") not in ("gem", "rune") or not socket.get("name"):
+                    continue
+                key = self._gem_socket_key(slot, idx)
+                if key in socketed:
+                    continue
+                kind_label = "Gem" if socket.get("kind") == "gem" else "Rune"
+                actions.append(("gem", f"Socket {socket['name']} ({kind_label}) in {slot}", key))
+
+        return actions
+
     def _advisor_pending_actions(self, build_name: str) -> list[tuple[str, str, object]]:
         """The full unified Build Advisor list for ``build_name``: every
         pending Leveling action, then every pending Skills action, then
-        every pending Paragon action, then every pending Gear action (see
-        the priority-order comment above) - each item ``(kind, text,
-        key)``. The single source of truth for "what's next" shared by
-        ``_advisor_next_action`` (Dashboard's Current Build card) and
+        every pending Paragon action, then every pending Gear action,
+        then every pending Gem-socket action (see the priority-order
+        comment above) - each item ``(kind, text, key)``. The single
+        source of truth for "what's next" shared by ``_advisor_next_
+        action`` (Dashboard's Current Build card) and
         ``_compact_next_action`` (Compact Mode), so both surfaces always
         agree."""
 
@@ -1725,6 +1869,7 @@ class MainWindow(FluentWindow):
             + self._pending_skill_actions(build_name)
             + self._pending_paragon_actions(build_name)
             + self._pending_gear_actions(build_name)
+            + self._pending_gem_actions(build_name)
         )
 
     def _advisor_next_action(self, build_name: str) -> tuple[str | None, str]:
@@ -1735,7 +1880,7 @@ class MainWindow(FluentWindow):
 
         Returns ``(kind, text)`` - ``kind`` is whichever pending-action
         helper produced the action (``"leveling"``/``"skill"``/
-        ``"paragon"``/``"gear"``, already tagged on every tuple
+        ``"paragon"``/``"gear"``/``"gem"``, already tagged on every tuple
         ``_advisor_pending_actions`` returns), or ``None`` when nothing
         is left. Lets click-to-navigate (``MainWindow._navigate_to_
         next_action``) jump to the right page/tab without any separate
@@ -1768,6 +1913,7 @@ class MainWindow(FluentWindow):
             self.dashboard.build_card.set_paragon_summary(None)
             self.character_card.set_header(char_name, "", 0)
             self.gear_builder_card.set_header(char_name, "", 0)
+            self.gems_card.set_header(char_name, "", 0)
             self.paragon_card.set_paragon("", "", 0, None, set(), set(), None)
             self.advisor_card.set_advisor("", 0, [], "", False, "", None, {})
             self._refresh_compact_window()
@@ -1783,6 +1929,7 @@ class MainWindow(FluentWindow):
         )
         self.character_card.set_header(char_name, build_name, level)
         self.gear_builder_card.set_header(char_name, build_name, level)
+        self.gems_card.set_header(char_name, build_name, level)
         # rows[2] is the "Paragon" row - see _compute_build_status - so
         # the Paragon page's overall % is the exact same figure, never a
         # second computation of it.
@@ -1867,6 +2014,7 @@ class MainWindow(FluentWindow):
             "Skills": self._pending_skill_actions(build_name),
             "Paragon": self._pending_paragon_actions(build_name),
             "Gear": self._pending_gear_actions(build_name),
+            "Gems": self._pending_gem_actions(build_name),
         }
 
         return {
@@ -1884,12 +2032,18 @@ class MainWindow(FluentWindow):
         Paragon page's board detail view for that exact node's board
         (Phase 11/12), ``"gear"`` -> the Character page (the Equipment
         Planner has no per-item anchor to jump further into - landing on
-        the page is the achievable minimum there). Uses the same
+        the page is the achievable minimum there), ``"gem"`` -> the
+        dedicated Gems page (same "landing on the page is enough" as
+        gear - no per-socket anchor exists there either). Uses the same
         ``switchTo`` pattern already wired for the Dashboard card's
         whole-card click."""
 
         if kind == "gear":
             self.switchTo(self.character_interface)
+            return
+
+        if kind == "gem":
+            self.switchTo(self.gems_interface)
             return
 
         if kind == "paragon_node":
@@ -1935,10 +2089,11 @@ class MainWindow(FluentWindow):
 
         Returns ``(current_text, preview_text, kind, key)`` - ``kind`` is
         ``None`` when there is nothing left to mark, otherwise one of
-        ``"leveling"``/``"skill"``/``"paragon"``/``"gear"`` telling
-        ``on_compact_done`` which existing handler (``on_mark_done``/
-        ``on_mark_board_done``/``on_gear_owned_changed``) to route the
-        Done button through, with ``key`` as that handler's argument."""
+        ``"leveling"``/``"skill"``/``"paragon"``/``"gear"``/``"gem"``
+        telling ``on_compact_done`` which existing handler
+        (``on_mark_done``/``on_mark_board_done``/``on_gear_owned_
+        changed``/``on_gem_socket_toggled``) to route the Done button
+        through, with ``key`` as that handler's argument."""
 
         pending = self._advisor_pending_actions(build_name)
 
@@ -2004,11 +2159,13 @@ class MainWindow(FluentWindow):
     def on_compact_done(self):
         """Compact window's Done button - routes through whichever
         existing handler (``on_mark_done``/``on_mark_board_done``/
-        ``on_gear_owned_changed``) owns the advisor's current action, so
-        the main window's Leveling/Skills/Paragon/Gear tabs and Build
-        Status update immediately too, not just Compact Mode's own view.
-        Marking a Gear action "done" here means "equip it" - it flips the
-        same one-way toggle a "Have it" switch in the Gear planner would.
+        ``on_gear_owned_changed``/``on_gem_socket_toggled``) owns the
+        advisor's current action, so the main window's Leveling/Skills/
+        Paragon/Gear/Gems tabs and Build Status update immediately too,
+        not just Compact Mode's own view. Marking a Gear or Gem action
+        "done" here means "equip it"/"confirm it's socketed" - it flips
+        the same one-way-from-here toggle a "Have it" switch on that
+        page would.
 
         ``"leveling"`` routes through the exact same ``on_mark_done`` as
         ``"skill"`` - a Leveling action's key is a milestone position
@@ -2027,6 +2184,8 @@ class MainWindow(FluentWindow):
             self.on_paragon_node_toggled(self._compact_action_key, True)
         elif self._compact_action_kind == "gear":
             self.on_gear_owned_changed(self._compact_action_key, True)
+        elif self._compact_action_kind == "gem":
+            self.on_gem_socket_toggled(self._compact_action_key, True)
 
     def on_class_changed(self, class_name: str):
         """Step-1 class selector changed: rebuild the step-2 build
