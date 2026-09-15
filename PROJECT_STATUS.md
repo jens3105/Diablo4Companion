@@ -4,15 +4,27 @@ _Sidst opdateret: 2026-09-15_
 
 ## Current phase
 
-**Windows Product Phase W5 — GitHub Releases** — GitHub Releases er nu
-den centrale kilde til app-versions-/opdateringsinformation for
-Windows-produktet; git-checkout-afhængigheden i Settings' update-check
-er fjernet helt. **DONE.**
+**Windows Product Phase W6 — Check for Updates** — **DONE.** Ved
+inspektion viste det sig at W5's implementering allerede opfyldte
+samtlige W6-krav 1:1 (Check for Updates-knap, GitHub Releases-opslag,
+versionssammenligning, tydelig status for alle udfald, ingen
+git-tekst, ingen unødvendig gemt state, intet download/install). Denne
+fase tilføjede derfor **ingen ny kode** — kun en udtømmende eksplicit
+testkørsel af de scenarier W6 selv efterspurgte, for at bekræfte det
+ærligt i stedet for at antage det.
 
-Ingen Check-for-Updates-UI-redesign (W6), ingen Update Now (W7), ingen
-download/verify/install/restart (W8), ingen rollback (W9), ingen Build
-Data-updater (W10), ingen Character State, ingen Diablo-feature-arbejde
-i denne fase.
+Ingen Update Now (W7), ingen download/verify/install/restart (W8),
+ingen rollback (W9), ingen Build Data-updater (W10), ingen Character
+State, ingen Diablo-feature-arbejde i denne fase.
+
+### W6 — hvad er lavet
+
+Ingen kode-ændring. Testet eksplicit (se "Tests" nedenfor) at
+`src/app.py`'s eksisterende `_on_check_updates_clicked`
+(implementeret i W5) korrekt håndterer: current==latest, current<
+latest, netværksfejl, manglende `tag_name`, ugyldig JSON, og
+HTTP 5xx — alle uden crash, alle med en tydelig, korrekt status-tekst,
+og ingen af dem skriver ny QSettings-state.
 
 ### W5 — hvad er lavet
 
@@ -205,6 +217,15 @@ Output: `dist/Diablo4Companion/` (onedir), inkl.
 
 ## Tests
 
+- **W6 lokal verifikation (2026-09-15, Linux):** headless offscreen,
+  mod den eksisterende `_on_check_updates_clicked` (uændret siden W5):
+  current==latest ("Up to date (version 1.0.0)."), current<latest
+  ("A newer version is available: v1.5.0 (currently on 1.0.0)."),
+  simuleret netværksfejl, manglende `tag_name`, ugyldig JSON-krop, og
+  HTTP 500 — alle 6 håndteret gracefully med en klar statustekst,
+  ingen crash, knappen genaktiveres hver gang. Bekræftet ingen ny
+  QSettings-nøgle skrives af et Check for Updates-klik (`allKeys()`
+  før/efter identisk). App-opstart bekræftet uændret.
 - **W5 lokal verifikation (2026-09-15, Linux):** headless offscreen-
   smoke-test — app starter uændret, `current_version_label` viser
   "Current version: 1.0.0". `_parse_semver` testet med `"v1.2.3"`,
@@ -330,7 +351,7 @@ resultat.
 
 ## Next phase
 
-Ingen planlagt. W5 er DONE. Vent på konkret instruktion fra
+Ingen planlagt. W6 er DONE. Vent på konkret instruktion fra
 brugeren (se PROJECT_ROADMAP.md's regel: "Start ikke næste
 roadmap-fase uden en konkret instruktion"). Mulig fremtidig
 opfølgning (ikke startet, kræver eksplicit instruktion): rette
@@ -339,6 +360,9 @@ opfølgning (ikke startet, kræver eksplicit instruktion): rette
 
 ## Kort changelog (seneste faser, nyeste øverst)
 
+- Windows Product Phase W6 — Check for Updates: ingen ny kode (W5
+  opfyldte allerede alle krav), udtømmende test af 6 scenarier
+  bekræftede det.
 - `a2ef4d7` — Windows Product Phase W5: GitHub Releases erstatter
   git-checkout-baseret version/update-check; "Not a git checkout"
   kan ikke længere vises.
