@@ -214,12 +214,28 @@ class SettingsInterface(QWidget):
         self.update_status_label.hide()
         layout.addWidget(self.update_status_label)
 
+        # Windows Product Phase W7: the confirmed newer-release payload
+        # (the full GitHub Releases API object, not just its tag) once
+        # _on_check_updates_clicked finds one - the target W8's actual
+        # download/verify/install/restart pipeline will consume. ``None``
+        # whenever there is nothing safe to update to (no check run yet,
+        # up to date, check failed, or an unparseable/ambiguous release)
+        # - "Update Now" is only ever enabled/visible when this is set,
+        # and _on_update_now_clicked refuses to act if it somehow isn't.
+        self._pending_update_release: dict | None = None
+
         check_row = QHBoxLayout()
         check_row.setSpacing(10)
 
         self.check_updates_button = PrimaryPushButton("Check for Updates", self)
         self.check_updates_button.clicked.connect(self._on_check_updates_clicked)
         check_row.addWidget(self.check_updates_button)
+
+        self.update_now_button = PrimaryPushButton("Update Now", self)
+        self.update_now_button.clicked.connect(self._on_update_now_clicked)
+        self.update_now_button.hide()
+        check_row.addWidget(self.update_now_button)
+
         check_row.addStretch(1)
 
         layout.addLayout(check_row)
@@ -242,6 +258,13 @@ class SettingsInterface(QWidget):
         self.check_updates_button.setText("Checking...")
         self.update_status_label.setText("Checking GitHub Releases for updates...")
         self.update_status_label.show()
+        # Windows Product Phase W7: every check starts by clearing any
+        # previously-confirmed update target and hiding "Update Now" -
+        # re-armed below only if THIS check finds a genuinely newer
+        # release. Never leaves a stale target visible/actionable from
+        # an earlier click.
+        self._pending_update_release = None
+        self.update_now_button.hide()
         # Force the "Checking..." state to actually paint before the
         # (blocking) network call below - same synchronous-call style
         # DiabloAPI.get_schedule uses, just with the UI given a chance to
@@ -272,7 +295,8 @@ class SettingsInterface(QWidget):
             local_version = _parse_semver(__version__)
 
             if remote_version is None or local_version is None:
-                # Can't safely compare - never guess which is newer.
+                # Can't safely compare - never guess which is newer, and
+                # never offer "Update Now" for an unconfirmed target.
                 self.update_status_label.setText(
                     f"Latest release: {remote_tag} (current: {__version__}) - "
                     f"could not compare versions automatically."
@@ -283,6 +307,10 @@ class SettingsInterface(QWidget):
                     f"A newer version is available: {release_name} "
                     f"(currently on {__version__})."
                 )
+                # W7: this is the ONLY branch that ever arms "Update Now" -
+                # a confirmed newer release, nothing else.
+                self._pending_update_release = data
+                self.update_now_button.show()
             else:
                 self.update_status_label.setText(f"Up to date (version {__version__}).")
 
@@ -295,6 +323,29 @@ class SettingsInterface(QWidget):
         finally:
             self.check_updates_button.setEnabled(True)
             self.check_updates_button.setText("Check for Updates")
+
+    def _on_update_now_clicked(self):
+        """Windows Product Phase W7: the update *action*, stopping short
+        of W8's actual download/verify/install/restart pipeline - this
+        method is the seam W8 extends. Refuses to act (defensively,
+        even though the button is only ever shown/enabled right after
+        ``_on_check_updates_clicked`` confirms a genuinely newer release)
+        unless ``_pending_update_release`` is a real, confirmed target -
+        never starts an update on a guess."""
+
+        release = self._pending_update_release
+        if not release:
+            return
+
+        release_name = (release.get("name") or release.get("tag_name") or "").strip()
+
+        self.update_now_button.setEnabled(False)
+        self.update_status_label.setText(
+            f"Update to {release_name} confirmed. Automatic download and "
+            f"installation aren't available in this version yet - please "
+            f"download it manually from the GitHub Releases page for now."
+        )
+        self.update_now_button.setEnabled(True)
 
 
 class MainWindow(FluentWindow):
