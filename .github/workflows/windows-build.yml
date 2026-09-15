@@ -3,6 +3,12 @@ name: Windows Build
 # Windows Product Phase W2 — proves the app can be reliably built into a
 # Windows PyInstaller onedir executable via GitHub Actions.
 #
+# Windows Product Phase W3 (added later, same workflow) — extends the W2
+# onedir build with an Inno Setup installer (installer/diablo4companion.iss),
+# compiled and silently installed on the same windows-latest runner as an
+# authoritative correctness check (exe + all 26 builds/*.json + uninstaller
+# present post-install, app launches without immediately crashing).
+#
 # Trigger choice: manual (workflow_dispatch) plus push to this repo's only
 # branch (feature/dashboard-v2, there is no main) when build-relevant
 # paths change. This phase explicitly excludes release automation /
@@ -19,6 +25,7 @@ on:
       - "requirements.txt"
       - "diablo4companion.spec"
       - "builds/**"
+      - "installer/**"
       - ".github/workflows/windows-build.yml"
 
 jobs:
@@ -47,3 +54,82 @@ jobs:
           name: Diablo4Companion-windows
           path: dist/Diablo4Companion/
           if-no-files-found: error
+
+      # --- Windows Product Phase W3: Inno Setup installer -----------------
+
+      - name: Locate or install Inno Setup (ISCC)
+        shell: pwsh
+        run: |
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            Write-Host "ISCC.exe not found at default pre-installed path, installing via choco..."
+            choco install innosetup -y --no-progress
+          }
+          if (-not (Test-Path $iscc)) {
+            throw "ISCC.exe still not found after choco install at expected path: $iscc"
+          }
+          Write-Host "Using ISCC at: $iscc"
+          echo "ISCC_PATH=$iscc" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Compile installer with Inno Setup
+        shell: pwsh
+        run: |
+          & "$env:ISCC_PATH" "installer\diablo4companion.iss"
+          if ($LASTEXITCODE -ne 0) { throw "ISCC.exe failed with exit code $LASTEXITCODE" }
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Diablo4Companion-Setup
+          path: installer/Output/Diablo4Companion-Setup.exe
+          if-no-files-found: error
+
+      - name: Silent-install the installer for verification
+        shell: pwsh
+        run: |
+          $installDir = Join-Path $env:RUNNER_TEMP "D4CInstallTest"
+          $setupExe = "installer\Output\Diablo4Companion-Setup.exe"
+          Start-Process -FilePath $setupExe `
+            -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/DIR=$installDir" `
+            -Wait -PassThru | Out-Null
+          echo "INSTALL_DIR=$installDir" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Verify installed files and uninstaller
+        shell: pwsh
+        run: |
+          $installDir = $env:INSTALL_DIR
+          Write-Host "Verifying install at: $installDir"
+
+          $exe = Join-Path $installDir "Diablo4Companion.exe"
+          if (-not (Test-Path $exe)) {
+            throw "Diablo4Companion.exe not found at $exe after silent install"
+          }
+          Write-Host "OK: Diablo4Companion.exe present."
+
+          $buildsDir = Join-Path $installDir "builds"
+          $jsonFiles = Get-ChildItem -Path $buildsDir -Filter "*.json" -File -ErrorAction SilentlyContinue
+          $jsonCount = if ($jsonFiles) { $jsonFiles.Count } else { 0 }
+          if ($jsonCount -ne 26) {
+            throw "Expected 26 builds/*.json files in $buildsDir, found $jsonCount"
+          }
+          Write-Host "OK: found all 26 builds/*.json files."
+
+          $uninst = Get-ChildItem -Path $installDir -Filter "unins*.exe" -File -ErrorAction SilentlyContinue
+          if (-not $uninst) {
+            throw "No unins*.exe uninstaller found in $installDir"
+          }
+          Write-Host "OK: uninstaller present ($($uninst.Name))."
+
+      - name: Launch-check installed exe (offscreen smoke test)
+        shell: pwsh
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          $exe = Join-Path $env:INSTALL_DIR "Diablo4Companion.exe"
+          $proc = Start-Process -FilePath $exe -PassThru
+          Start-Sleep -Seconds 8
+          if ($proc.HasExited) {
+            throw "Diablo4Companion.exe exited immediately (exit code $($proc.ExitCode)) instead of staying running"
+          }
+          Write-Host "OK: process still running after 8s (PID $($proc.Id)); stopping it now."
+          Stop-Process -Id $proc.Id -Force
