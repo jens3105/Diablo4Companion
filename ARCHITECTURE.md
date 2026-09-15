@@ -8,6 +8,20 @@ Persistence: `QSettings("Diablo4Companion", "DesktopCompanion")` — the
 **only** persistence layer in the app (no database, no separate config
 files besides the OS-native Qt settings store).
 
+## Versioning — the single source of truth
+
+`src/version.py`'s `__version__` (currently `"1.0.0"`, semantic
+versioning) is the one place a human bumps the app's version — there
+is no second hardcoded copy anywhere. The app imports it as normal
+Python code (not a bundled data file), so it works identically from
+source and once frozen by PyInstaller. `.github/workflows/windows-build.yml`
+reads it and passes it into the Inno Setup compile
+(`installer/diablo4companion.iss`) via `/DMyAppVersion`, so the
+installer's `AppVersion` always matches. See `PROJECT_STATUS.md`'s
+Windows Product Phase W4 for the full rationale, including why this
+avoids the PyInstaller onedir `_internal/` data-bundling gotcha found
+in W3.
+
 ## Canonical Build Definition — the single source of truth
 
 Every build lives as one JSON file in `builds/*.json` (26 files, loaded
