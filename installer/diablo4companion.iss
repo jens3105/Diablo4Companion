@@ -58,12 +58,26 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-; The entire W2 onedir output, preserved as-is (Diablo4Companion.exe,
-; the builds/ subfolder with all 26 builds/*.json files, and every
-; PySide6/Qt runtime DLL PyInstaller's COLLECT step gathered). No
-; dev-only files exist in dist/Diablo4Companion/ to exclude — that
-; folder only ever contains the built onedir bundle.
+; The entire W2 onedir output, preserved exactly as PyInstaller produced
+; it (Diablo4Companion.exe plus its _internal\ folder containing all
+; PySide6/Qt runtime DLLs and the bundled builds\*.json data files under
+; _internal\builds\). No dev-only files exist in dist/Diablo4Companion/
+; to exclude — that folder only ever contains the built onedir bundle.
 Source: "..\dist\Diablo4Companion\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+; PyInstaller 6.x's default onedir layout places bundled datas under
+; _internal\ (e.g. _internal\builds\*.json), not directly beside the
+; exe. src/managers/leveling_manager.py's sys.frozen branch (out of
+; scope for this installer-only phase to modify) resolves builds/ as a
+; sibling of sys.executable's directory - i.e. {app}\builds, not
+; {app}\_internal\builds. Rather than rearranging PyInstaller's own
+; output (forbidden by this phase's scope) or touching src/ code
+; (also out of scope), this second Files entry additionally places a
+; copy of the same builds/*.json files directly under {app}\builds so
+; the already-shipped frozen-path logic actually finds them at
+; runtime. This is additive only - it does not remove or relocate
+; anything from the untouched onedir tree above.
+Source: "..\dist\Diablo4Companion\_internal\builds\*.json"; DestDir: "{app}\builds"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
