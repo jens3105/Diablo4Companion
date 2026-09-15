@@ -2418,13 +2418,13 @@
             "slug": "Gem_Sapphire_07",
             "kind": "gem",
             "name": "Grand Sapphire",
-            "effect_text": "x[{value}*100|%|] Cold Damage Multiplier"
+            "effect_text": "x24% Cold Damage Multiplier"
           },
           {
             "slug": "Gem_Sapphire_07",
             "kind": "gem",
             "name": "Grand Sapphire",
-            "effect_text": "x[{value}*100|%|] Cold Damage Multiplier"
+            "effect_text": "x24% Cold Damage Multiplier"
           }
         ]
       },
@@ -2437,7 +2437,7 @@
             "slug": "Gem_Sapphire_07",
             "kind": "gem",
             "name": "Grand Sapphire",
-            "effect_text": "x[{value}*100|%|] Cold Damage Multiplier"
+            "effect_text": "x24% Cold Damage Multiplier"
           }
         ]
       },
@@ -2450,7 +2450,7 @@
             "slug": "Gem_Sapphire_07",
             "kind": "gem",
             "name": "Grand Sapphire",
-            "effect_text": "x[{value}*100|%|] Cold Damage Multiplier"
+            "effect_text": "x24% Cold Damage Multiplier"
           }
         ]
       },
@@ -2468,13 +2468,13 @@
             "slug": "Gem_Emerald_07",
             "kind": "gem",
             "name": "Grand Emerald",
-            "effect_text": "[{value}|~|] Dexterity"
+            "effect_text": "~90 Dexterity"
           },
           {
             "slug": "Gem_Emerald_07",
             "kind": "gem",
             "name": "Grand Emerald",
-            "effect_text": "[{value}|~|] Dexterity"
+            "effect_text": "~90 Dexterity"
           }
         ]
       },
@@ -2494,7 +2494,7 @@
             "slug": "Gem_Diamond_07",
             "kind": "gem",
             "name": "Grand Diamond",
-            "effect_text": "+[{value}||] Resistance to All Elements"
+            "effect_text": "+375 Resistance to All Elements"
           }
         ]
       },
@@ -2508,7 +2508,7 @@
             "slug": "Gem_Ruby_07",
             "kind": "gem",
             "name": "Grand Ruby",
-            "effect_text": "+[{value}||] Fire Resistance"
+            "effect_text": "+2625 Fire Resistance"
           }
         ]
       },
@@ -2522,7 +2522,7 @@
             "slug": "Gem_Topaz_07",
             "kind": "gem",
             "name": "Grand Topaz",
-            "effect_text": "+[{value}||] Lightning Resistance"
+            "effect_text": "+2625 Lightning Resistance"
           }
         ]
       },

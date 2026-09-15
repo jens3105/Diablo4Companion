@@ -2388,13 +2388,13 @@
             "slug": "Gem_Emerald_07",
             "kind": "gem",
             "name": "Grand Emerald",
-            "effect_text": "x[{value}*100|%|] Poison Damage Multiplier"
+            "effect_text": "x24% Poison Damage Multiplier"
           },
           {
             "slug": "Gem_Emerald_07",
             "kind": "gem",
             "name": "Grand Emerald",
-            "effect_text": "x[{value}*100|%|] Poison Damage Multiplier"
+            "effect_text": "x24% Poison Damage Multiplier"
           }
         ]
       },
@@ -2407,7 +2407,7 @@
             "slug": "Gem_Emerald_07",
             "kind": "gem",
             "name": "Grand Emerald",
-            "effect_text": "x[{value}*100|%|] Poison Damage Multiplier"
+            "effect_text": "x24% Poison Damage Multiplier"
           }
         ]
       },
@@ -2420,7 +2420,7 @@
             "slug": "Gem_Emerald_07",
             "kind": "gem",
             "name": "Grand Emerald",
-            "effect_text": "x[{value}*100|%|] Poison Damage Multiplier"
+            "effect_text": "x24% Poison Damage Multiplier"
           }
         ]
       },
@@ -2439,13 +2439,13 @@
             "slug": "Gem_Emerald_07",
             "kind": "gem",
             "name": "Grand Emerald",
-            "effect_text": "[{value}|~|] Dexterity"
+            "effect_text": "~90 Dexterity"
           },
           {
             "slug": "Gem_Emerald_07",
             "kind": "gem",
             "name": "Grand Emerald",
-            "effect_text": "[{value}|~|] Dexterity"
+            "effect_text": "~90 Dexterity"
           }
         ]
       },
@@ -2465,7 +2465,7 @@
             "slug": "Gem_Diamond_07",
             "kind": "gem",
             "name": "Grand Diamond",
-            "effect_text": "+[{value}||] Resistance to All Elements"
+            "effect_text": "+375 Resistance to All Elements"
           }
         ]
       },
@@ -2479,7 +2479,7 @@
             "slug": "Gem_Diamond_07",
             "kind": "gem",
             "name": "Grand Diamond",
-            "effect_text": "+[{value}||] Resistance to All Elements"
+            "effect_text": "+375 Resistance to All Elements"
           }
         ]
       },
@@ -2493,7 +2493,7 @@
             "slug": "Gem_Diamond_07",
             "kind": "gem",
             "name": "Grand Diamond",
-            "effect_text": "+[{value}||] Resistance to All Elements"
+            "effect_text": "+375 Resistance to All Elements"
           }
         ]
       },

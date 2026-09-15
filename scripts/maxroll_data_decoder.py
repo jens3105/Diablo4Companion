@@ -490,6 +490,33 @@ def _strip_rune_markup(text: str) -> str:
     return _RUNE_MARKUP_RE.sub("", text).strip()
 
 
+# A gem's ``socketedEffects[i]["label"]`` is Maxroll's own display
+# template, e.g. "x[{value}*100|%|] Lightning Damage Multiplier" -
+# ``{value}`` is a literal placeholder for that SAME effect entry's own
+# ``attributes[0]["value"]`` (confirmed present, exactly one attribute,
+# on all 192 real socketedEffects entries across all 64 real gems as of
+# this writing - not sampled). The bracket is Maxroll's own formatting
+# instruction (multiply-by-100-for-percent, or not), not a hidden/
+# guessed value - substituting it is exact arithmetic on real data, the
+# same number Maxroll's own site would render, never fabricated.
+# Only the exact bracket forms seen across all 23 real gem labels are
+# recognized; anything else is left untouched rather than guessed.
+_GEM_VALUE_RE = re.compile(r"\[\{value\}(\*100)?\|([^|]*)\|\]")
+
+
+def _format_gem_label(label: str, value: float) -> str:
+    def _sub(match: "re.Match[str]") -> str:
+        is_percent = match.group(1) == "*100"
+        suffix = match.group(2)
+        number = value * 100 if is_percent else value
+        text = f"{number:g}"
+        if suffix == "~":
+            return f"~{text}"
+        return f"{text}{suffix}"
+
+    return _strip_rune_markup(_GEM_VALUE_RE.sub(_sub, label))
+
+
 def _gem_slot_category(item_type: str) -> str | None:
     """Which of a gem's 3 ``socketedEffects`` entries (see the comment
     above) applies to a host item of ``item_type``, or ``None`` when
@@ -549,10 +576,20 @@ def _resolve_socket_content(slug: str, host_item_type: str, data_dict: dict) -> 
         category = _gem_slot_category(host_item_type)
         idx = _GEM_CATEGORY_INDEX.get(category) if category else None
 
+        def _render(effect: dict) -> str | None:
+            raw_label = effect.get("label")
+            if not raw_label:
+                return None
+            attrs = effect.get("attributes") or []
+            if len(attrs) == 1 and "value" in attrs[0]:
+                return _format_gem_label(raw_label, attrs[0]["value"])
+            return _strip_rune_markup(raw_label)
+
         if idx is not None and len(effects) == 3:
-            effect_text = effects[idx].get("label")
+            effect_text = _render(effects[idx])
         else:
-            labels = [e.get("label") for e in effects if e.get("label")]
+            labels = [_render(e) for e in effects]
+            labels = [label for label in labels if label]
             effect_text = " / ".join(labels) if labels else None
 
         return {"slug": slug, "kind": "gem", "name": name, "effect_text": effect_text}

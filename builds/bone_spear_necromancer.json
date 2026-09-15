@@ -2393,7 +2393,7 @@
             "slug": "Gem_Topaz_09",
             "kind": "gem",
             "name": "Flawless Horadric Topaz",
-            "effect_text": "x[{value}*100|%|] Lightning Damage Multiplier / [{value}|~|] Intelligence / +[{value}||] Lightning Resistance"
+            "effect_text": "x32% Lightning Damage Multiplier / ~150 Intelligence / +4375 Lightning Resistance"
           }
         ]
       },
@@ -2407,7 +2407,7 @@
             "slug": "Gem_Skull_09",
             "kind": "gem",
             "name": "Flawless Horadric Skull",
-            "effect_text": "x[{value}*100|%|] Physical Damage Multiplier"
+            "effect_text": "x32% Physical Damage Multiplier"
           }
         ]
       },
@@ -2426,13 +2426,13 @@
             "slug": "Gem_Topaz_09",
             "kind": "gem",
             "name": "Flawless Horadric Topaz",
-            "effect_text": "[{value}|~|] Intelligence"
+            "effect_text": "~150 Intelligence"
           },
           {
             "slug": "Gem_Topaz_09",
             "kind": "gem",
             "name": "Flawless Horadric Topaz",
-            "effect_text": "[{value}|~|] Intelligence"
+            "effect_text": "~150 Intelligence"
           }
         ]
       },
@@ -2452,7 +2452,7 @@
             "slug": "Gem_Diamond_09",
             "kind": "gem",
             "name": "Flawless Horadric Diamond",
-            "effect_text": "+[{value}||] Resistance to All Elements"
+            "effect_text": "+625 Resistance to All Elements"
           }
         ]
       },
@@ -2466,7 +2466,7 @@
             "slug": "Gem_Emerald_09",
             "kind": "gem",
             "name": "Flawless Horadric Emerald",
-            "effect_text": "+[{value}||] Poison Resistance"
+            "effect_text": "+4375 Poison Resistance"
           }
         ]
       },
@@ -2480,7 +2480,7 @@
             "slug": "Gem_Ruby_09",
             "kind": "gem",
             "name": "Flawless Horadric Ruby",
-            "effect_text": "+[{value}||] Fire Resistance"
+            "effect_text": "+4375 Fire Resistance"
           }
         ]
       },

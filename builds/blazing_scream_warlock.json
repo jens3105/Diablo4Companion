@@ -2403,13 +2403,13 @@
             "slug": "Gem_Ruby_07",
             "kind": "gem",
             "name": "Grand Ruby",
-            "effect_text": "x[{value}*100|%|] Fire and Holy Damage Multiplier"
+            "effect_text": "x24% Fire and Holy Damage Multiplier"
           },
           {
             "slug": "Gem_Ruby_07",
             "kind": "gem",
             "name": "Grand Ruby",
-            "effect_text": "x[{value}*100|%|] Fire and Holy Damage Multiplier"
+            "effect_text": "x24% Fire and Holy Damage Multiplier"
           }
         ]
       },
@@ -2428,13 +2428,13 @@
             "slug": "Gem_Sapphire_07",
             "kind": "gem",
             "name": "Grand Sapphire",
-            "effect_text": "[{value}|~|] Willpower"
+            "effect_text": "~90 Willpower"
           },
           {
             "slug": "Gem_Sapphire_07",
             "kind": "gem",
             "name": "Grand Sapphire",
-            "effect_text": "[{value}|~|] Willpower"
+            "effect_text": "~90 Willpower"
           }
         ]
       },
@@ -2453,7 +2453,7 @@
             "slug": "Gem_Ruby_07",
             "kind": "gem",
             "name": "Grand Ruby",
-            "effect_text": "+[{value}||] Fire Resistance"
+            "effect_text": "+2625 Fire Resistance"
           }
         ]
       },
@@ -2467,7 +2467,7 @@
             "slug": "Gem_Diamond_07",
             "kind": "gem",
             "name": "Grand Diamond",
-            "effect_text": "+[{value}||] Resistance to All Elements"
+            "effect_text": "+375 Resistance to All Elements"
           }
         ]
       },
@@ -2481,7 +2481,7 @@
             "slug": "Gem_Diamond_07",
             "kind": "gem",
             "name": "Grand Diamond",
-            "effect_text": "+[{value}||] Resistance to All Elements"
+            "effect_text": "+375 Resistance to All Elements"
           }
         ]
       },

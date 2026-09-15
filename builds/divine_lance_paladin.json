@@ -2388,7 +2388,7 @@
             "slug": "Gem_Ruby_09",
             "kind": "gem",
             "name": "Flawless Horadric Ruby",
-            "effect_text": "x[{value}*100|%|] Fire and Holy Damage Multiplier / [{value}|~|] Strength / +[{value}||] Fire Resistance"
+            "effect_text": "x32% Fire and Holy Damage Multiplier / ~150 Strength / +4375 Fire Resistance"
           }
         ]
       },
@@ -2401,7 +2401,7 @@
             "slug": "Gem_Skull_07",
             "kind": "gem",
             "name": "Grand Skull",
-            "effect_text": "x[{value}*100|%|] Physical Damage Multiplier"
+            "effect_text": "x24% Physical Damage Multiplier"
           }
         ]
       },
@@ -2419,13 +2419,13 @@
             "slug": "Gem_Ruby_09",
             "kind": "gem",
             "name": "Flawless Horadric Ruby",
-            "effect_text": "[{value}|~|] Strength"
+            "effect_text": "~150 Strength"
           },
           {
             "slug": "Gem_Ruby_09",
             "kind": "gem",
             "name": "Flawless Horadric Ruby",
-            "effect_text": "[{value}|~|] Strength"
+            "effect_text": "~150 Strength"
           }
         ]
       },
@@ -2444,7 +2444,7 @@
             "slug": "Gem_Skull_09",
             "kind": "gem",
             "name": "Flawless Horadric Skull",
-            "effect_text": "+[{value}||] Physical Resistance"
+            "effect_text": "+4375 Physical Resistance"
           }
         ]
       },
@@ -2458,7 +2458,7 @@
             "slug": "Gem_Topaz_09",
             "kind": "gem",
             "name": "Flawless Horadric Topaz",
-            "effect_text": "+[{value}||] Lightning Resistance"
+            "effect_text": "+4375 Lightning Resistance"
           }
         ]
       },
@@ -2472,7 +2472,7 @@
             "slug": "Gem_Ruby_09",
             "kind": "gem",
             "name": "Flawless Horadric Ruby",
-            "effect_text": "+[{value}||] Fire Resistance"
+            "effect_text": "+4375 Fire Resistance"
           }
         ]
       },

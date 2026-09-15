@@ -2406,7 +2406,7 @@
             "slug": "Gem_Skull_07",
             "kind": "gem",
             "name": "Grand Skull",
-            "effect_text": "x[{value}*100|%|] Physical Damage Multiplier / +[{value}*100|1%|] Healing Received / +[{value}||] Physical Resistance"
+            "effect_text": "x24% Physical Damage Multiplier / +22.51% Healing Received / +2625 Physical Resistance"
           }
         ]
       },
@@ -2420,7 +2420,7 @@
             "slug": "Gem_Skull_07",
             "kind": "gem",
             "name": "Grand Skull",
-            "effect_text": "x[{value}*100|%|] Physical Damage Multiplier"
+            "effect_text": "x24% Physical Damage Multiplier"
           }
         ]
       },
@@ -2439,13 +2439,13 @@
             "slug": "Gem_Sapphire_07",
             "kind": "gem",
             "name": "Grand Sapphire",
-            "effect_text": "[{value}|~|] Willpower"
+            "effect_text": "~90 Willpower"
           },
           {
             "slug": "Gem_Sapphire_07",
             "kind": "gem",
             "name": "Grand Sapphire",
-            "effect_text": "[{value}|~|] Willpower"
+            "effect_text": "~90 Willpower"
           }
         ]
       },
@@ -2465,7 +2465,7 @@
             "slug": "Gem_Diamond_07",
             "kind": "gem",
             "name": "Grand Diamond",
-            "effect_text": "+[{value}||] Resistance to All Elements"
+            "effect_text": "+375 Resistance to All Elements"
           }
         ]
       },
@@ -2479,7 +2479,7 @@
             "slug": "Gem_Diamond_07",
             "kind": "gem",
             "name": "Grand Diamond",
-            "effect_text": "+[{value}||] Resistance to All Elements"
+            "effect_text": "+375 Resistance to All Elements"
           }
         ]
       },
@@ -2493,7 +2493,7 @@
             "slug": "Gem_Diamond_07",
             "kind": "gem",
             "name": "Grand Diamond",
-            "effect_text": "+[{value}||] Resistance to All Elements"
+            "effect_text": "+375 Resistance to All Elements"
           }
         ]
       },

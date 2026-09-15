@@ -2421,13 +2421,13 @@
             "slug": "Gem_Amethyst_09",
             "kind": "gem",
             "name": "Flawless Horadric Amethyst",
-            "effect_text": "x[{value}*100|%|] Shadow Damage Multiplier"
+            "effect_text": "x32% Shadow Damage Multiplier"
           },
           {
             "slug": "Gem_Amethyst_09",
             "kind": "gem",
             "name": "Flawless Horadric Amethyst",
-            "effect_text": "x[{value}*100|%|] Shadow Damage Multiplier"
+            "effect_text": "x32% Shadow Damage Multiplier"
           }
         ]
       },
@@ -2445,13 +2445,13 @@
             "slug": "Gem_Topaz_09",
             "kind": "gem",
             "name": "Flawless Horadric Topaz",
-            "effect_text": "[{value}|~|] Intelligence"
+            "effect_text": "~150 Intelligence"
           },
           {
             "slug": "Gem_Topaz_09",
             "kind": "gem",
             "name": "Flawless Horadric Topaz",
-            "effect_text": "[{value}|~|] Intelligence"
+            "effect_text": "~150 Intelligence"
           }
         ]
       },
@@ -2470,7 +2470,7 @@
             "slug": "Gem_Diamond_09",
             "kind": "gem",
             "name": "Flawless Horadric Diamond",
-            "effect_text": "+[{value}||] Resistance to All Elements"
+            "effect_text": "+625 Resistance to All Elements"
           }
         ]
       },
@@ -2484,7 +2484,7 @@
             "slug": "Gem_Diamond_09",
             "kind": "gem",
             "name": "Flawless Horadric Diamond",
-            "effect_text": "+[{value}||] Resistance to All Elements"
+            "effect_text": "+625 Resistance to All Elements"
           }
         ]
       },
@@ -2498,7 +2498,7 @@
             "slug": "Gem_Topaz_09",
             "kind": "gem",
             "name": "Flawless Horadric Topaz",
-            "effect_text": "+[{value}||] Lightning Resistance"
+            "effect_text": "+4375 Lightning Resistance"
           }
         ]
       },

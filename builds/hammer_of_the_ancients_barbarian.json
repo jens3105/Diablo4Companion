@@ -1367,13 +1367,13 @@
             "slug": "Gem_Ruby_07",
             "kind": "gem",
             "name": "Grand Ruby",
-            "effect_text": "x[{value}*100|%|] Fire and Holy Damage Multiplier"
+            "effect_text": "x24% Fire and Holy Damage Multiplier"
           },
           {
             "slug": "Gem_Ruby_07",
             "kind": "gem",
             "name": "Grand Ruby",
-            "effect_text": "x[{value}*100|%|] Fire and Holy Damage Multiplier"
+            "effect_text": "x24% Fire and Holy Damage Multiplier"
           }
         ]
       },
@@ -1387,13 +1387,13 @@
             "slug": "Gem_Ruby_07",
             "kind": "gem",
             "name": "Grand Ruby",
-            "effect_text": "x[{value}*100|%|] Fire and Holy Damage Multiplier"
+            "effect_text": "x24% Fire and Holy Damage Multiplier"
           },
           {
             "slug": "Gem_Ruby_07",
             "kind": "gem",
             "name": "Grand Ruby",
-            "effect_text": "x[{value}*100|%|] Fire and Holy Damage Multiplier"
+            "effect_text": "x24% Fire and Holy Damage Multiplier"
           }
         ]
       },
@@ -1407,7 +1407,7 @@
             "slug": "Gem_Ruby_07",
             "kind": "gem",
             "name": "Grand Ruby",
-            "effect_text": "x[{value}*100|%|] Fire and Holy Damage Multiplier"
+            "effect_text": "x24% Fire and Holy Damage Multiplier"
           }
         ]
       },
@@ -1421,7 +1421,7 @@
             "slug": "Gem_Ruby_07",
             "kind": "gem",
             "name": "Grand Ruby",
-            "effect_text": "x[{value}*100|%|] Fire and Holy Damage Multiplier"
+            "effect_text": "x24% Fire and Holy Damage Multiplier"
           }
         ]
       },
@@ -1441,13 +1441,13 @@
             "slug": "Gem_Ruby_07",
             "kind": "gem",
             "name": "Grand Ruby",
-            "effect_text": "[{value}|~|] Strength"
+            "effect_text": "~90 Strength"
           },
           {
             "slug": "Gem_Ruby_07",
             "kind": "gem",
             "name": "Grand Ruby",
-            "effect_text": "[{value}|~|] Strength"
+            "effect_text": "~90 Strength"
           }
         ]
       },
@@ -1466,7 +1466,7 @@
             "slug": "Gem_Topaz_07",
             "kind": "gem",
             "name": "Grand Topaz",
-            "effect_text": "+[{value}||] Lightning Resistance"
+            "effect_text": "+2625 Lightning Resistance"
           }
         ]
       },
@@ -1480,7 +1480,7 @@
             "slug": "Gem_Skull_07",
             "kind": "gem",
             "name": "Grand Skull",
-            "effect_text": "+[{value}||] Physical Resistance"
+            "effect_text": "+2625 Physical Resistance"
           }
         ]
       },
@@ -1494,7 +1494,7 @@
             "slug": "Gem_Ruby_07",
             "kind": "gem",
             "name": "Grand Ruby",
-            "effect_text": "+[{value}||] Fire Resistance"
+            "effect_text": "+2625 Fire Resistance"
           }
         ]
       },
