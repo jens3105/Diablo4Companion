@@ -11,7 +11,7 @@ No new validation logic lives here - this module is presentation only,
 same as ``CurrentBuildCard``/``LevelingCard``'s Build Status widget."""
 
 from PySide6.QtCore import Signal
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QColor, QFontMetrics
 from PySide6.QtWidgets import QHBoxLayout, QSizePolicy, QVBoxLayout, QWidget
 
 from qfluentwidgets import (
@@ -165,6 +165,16 @@ class BuildAdvisorCard(BaseCard):
 
         lines = [f"{emoji}  {label:<9}{pct}" for emoji, label, pct in status_rows]
         self.status_rows_label.setText("\n".join(lines))
+        # Qt's word-wrap heightForWidth caching for this label loses track of
+        # one line's worth of height after certain live window-shrink
+        # sequences (reproduced: shrinking 1500px -> 900px wide leaves the
+        # label one line short, so "Gear" silently paints underneath the
+        # footer text below it) - none of these 4 fixed-format rows ever
+        # actually need to wrap, so pin the height explicitly instead of
+        # trusting the buggy wrap-driven size hint.
+        self.status_rows_label.setFixedHeight(
+            QFontMetrics(self.status_rows_label.font()).lineSpacing() * max(1, len(lines))
+        )
 
         self.status_footer_label.setText(footer_text)
         color = QColor(theme.ACCENT_GOLD) if footer_is_ready else QColor(theme.TEXT_MUTED)
