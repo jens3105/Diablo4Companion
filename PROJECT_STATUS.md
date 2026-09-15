@@ -4,13 +4,62 @@ _Sidst opdateret: 2026-09-15_
 
 ## Current phase
 
-**Windows Product Phase W2 — Windows EXE Pipeline** — bevis at appen
-kan bygges pålideligt til en Windows PyInstaller ONEDIR-exe via GitHub
-Actions. **Færdig og bestået** — se "W2 — Windows-runner-verifikation"
-nedenfor.
+**Windows Product Phase W3 — Windows Installer** — pak den allerede
+verificerede W2 PyInstaller ONEDIR-build ind i en rigtig Windows-
+installer (`Diablo4Companion-Setup.exe`) via Inno Setup, og udvid CI-
+workflowet til også at bygge, installere (silent) og verificere den.
+**Færdig og bestået** — se "W3 — Windows-runner-verifikation" nedenfor.
 
-Ingen installer, ingen auto-updater, ingen Release-automation, ingen
-Diablo-feature-arbejde i denne fase.
+Ingen auto-updater, ingen Check-for-Updates-ændringer, ingen Release-
+automation, ingen Build Data-updater, ingen code signing, ingen
+Character State, ingen Diablo-feature-arbejde i denne fase.
+
+### W3 — hvad er lavet
+
+- **`installer/diablo4companion.iss`** (ny fil): Inno Setup-script.
+  Installerer hele det uændrede W2 onedir-output
+  (`dist/Diablo4Companion/*`, inkl. `_internal/`) til
+  `{localappdata}\Diablo4Companion` med `PrivilegesRequired=lowest` —
+  valgt frem for `{autopf}`/Program Files specifikt fordi det aldrig
+  udløser en UAC-prompt, hvilket gør et `/VERYSILENT`-install fuldt
+  non-interaktivt (nødvendigt for automatiseret verifikation på
+  GitHub Actions-runneren, hvor ingen UAC-prompt kan besvares).
+  Opretter Start Menu-genvej, valgfri (unchecked) Desktop-genvej via
+  standard Inno `[Tasks]`, og lader Inno Setups standard
+  uninstaller-registrering være uændret. Konsistent visningsnavn
+  "Diablo 4 Companion" i installer-titel, Start Menu-mappe og
+  Add/Remove Programs. Intet `.ico` findes i repoet — bevidst ikke
+  opfundet, bruger Inno Setups default.
+  - **Vigtig opdagelse under Windows-runner-verifikation:**
+    PyInstaller 6.x's onedir-layout lægger bundlede datas (deriblandt
+    `builds/*.json`) under `_internal/`, ikke direkte ved siden af
+    exe'en som `src/managers/leveling_manager.py`'s `sys.frozen`-gren
+    (fra W2) antager. Da denne fase kun må tilføje nye filer og
+    udvide workflow-filen (ikke røre `src/` eller
+    `diablo4companion.spec`), er dette rettet udelukkende på
+    installer-niveau: en ekstra `[Files]`-linje kopierer
+    `_internal\builds\*.json` også direkte til `{app}\builds`, uden
+    at fjerne eller omrokere noget fra det uændrede onedir-træ. Dette
+    er en reel, verificeret rettelse (bekræftet af den efterfølgende
+    grønne runner-verifikation), ikke en antagelse — men en fremtidig
+    fase bør overveje at rette selve frozen-path-logikken i
+    `leveling_manager.py` til at være `_internal`-bevidst, da dette
+    var et reelt, tidligere upåvist hul i W2's "bestået"-status (W2
+    testede aldrig faktisk frozen-adfærd, kun syntaktisk).
+- **`.github/workflows/windows-build.yml`** (udvidet, ikke erstattet):
+  efter den eksisterende PyInstaller-build tilføjet: find/installer
+  Inno Setup (`C:\Program Files (x86)\Inno Setup 6\ISCC.exe`,
+  pre-installeret på `windows-latest` — bekræftet via selve runnen,
+  ingen choco-fallback var nødvendig), kompilér `.iss`-scriptet,
+  upload resultatet som separat artifact `Diablo4Companion-Setup`,
+  installér derefter installeren silent (`/VERYSILENT
+  /SUPPRESSMSGBOXES /NORESTART /DIR=...`) i en throwaway-mappe, og
+  verificér: `Diablo4Companion.exe` findes, alle 26 `builds/*.json`
+  findes under `{app}\builds`, `unins000.exe` findes, og exe'en
+  starter og forbliver kørende i 8 sekunder
+  (`QT_QPA_PLATFORM=offscreen`, headless runner) uden at crashe
+  øjeblikkeligt — hver check fejler workflow'et synligt hvis den
+  ikke består.
 
 ### W2 — hvad er lavet
 
@@ -82,10 +131,10 @@ Build Advisor (denne fase).
 
 ## Last commit
 
-`fd9306a` — "Add Windows PyInstaller build workflow (W2)" (pushet).
-Fulde W2-commit-kæde: `0e06451` (spec-fil + frozen-path-fix) →
-`6e72328` (status-opdatering) → `fd9306a` (workflow-fil, efter
-`workflow`-scope-godkendelse).
+`4d0eff0` — "W3 fix: also place builds/*.json directly beside the
+installed exe" (pushet). Fulde W3-commit-kæde: `c86595a` (Inno Setup-
+script + workflow-udvidelse) → `4d0eff0` (fix efter første
+runner-verifikation fandt `_internal/`-lag-problemet, se ovenfor).
 
 Branch: `feature/dashboard-v2` (repoets eneste/default branch — der er
 ikke noget `main`, det er normalt for dette repo).
@@ -132,10 +181,7 @@ Output: `dist/Diablo4Companion/` (onedir), inkl.
 
 ## Blockers
 
-Ingen. (Den tidligere `gh`-token-scope-blokering — manglende
-`workflow`-scope til at pushe `.github/workflows/`-filer — er løst:
-brugeren godkendte `gh auth refresh -s workflow` via device-flow.
-Workflow-filen er nu pushet, commit `fd9306a`.)
+Ingen.
 
 ## W2 — Windows-runner-verifikation: BESTÅET
 
@@ -152,14 +198,54 @@ Kørt og overvåget live via `gh workflow run` + `gh run watch`:
 antaget.** W2's mål (bevise at appen kan bygges pålideligt til en
 Windows PyInstaller ONEDIR-exe via GitHub Actions) er opfyldt.
 
+## W3 — Windows-runner-verifikation: BESTÅET
+
+Kørt og overvåget live via `gh workflow run` + `gh run watch`, to
+iterationer:
+
+- **Run `34972569676`** (første forsøg, commit `c86595a`): PyInstaller-
+  build, Inno Setup-kompilering og silent-install lykkedes alle, men
+  post-install-filverifikationen **fejlede reelt** — `{app}\builds`
+  indeholdt 0 filer. Root cause fundet ved at downloade artifact'et og
+  inspicere strukturen direkte: PyInstaller 6.22.3's onedir-layout
+  lægger `builds/*.json` under `_internal\builds\`, ikke direkte ved
+  siden af exe'en som `leveling_manager.py`'s (uændrede, out-of-scope)
+  `sys.frozen`-gren forventer. Dette blev IKKE gemt/pyntet væk — se
+  fix i commit `4d0eff0` ovenfor.
+- **Run `34973162693`** (efter fix, commit `4d0eff0`): **✓ success,
+  2m51s**. Alle steps grønne, inkl.:
+  - `Diablo4Companion.exe` fundet efter silent install.
+  - Alle 26 `builds/*.json` fundet under `{app}\builds`.
+  - `unins000.exe` (Inno Setup-uninstalleren) fundet.
+  - Exe'en startet (`QT_QPA_PLATFORM=offscreen`) og forblev kørende i
+    8 sekunder uden at crashe, derefter stoppet.
+  - Artifacts uploadet: `Diablo4Companion-Setup` (38 812 621 bytes,
+    ~37 MB) og `Diablo4Companion-windows` (56 188 780 bytes, ~53.6 MB,
+    uændret onedir-build).
+
+**Dette er en reel, observeret, autoritativ installer-build +
+silent-install-verifikation — ikke antaget.** Den første fejlende
+kørsel og dens root-cause-analyse er bevidst dokumenteret her i stedet
+for skjult, jf. instruktionen om aldrig at fabrikere et bestået
+resultat.
+
 ## Next phase
 
-Ingen planlagt. W2 er fuldt bestået. Vent på konkret instruktion fra
+Ingen planlagt. W3 er fuldt bestået. Vent på konkret instruktion fra
 brugeren (se PROJECT_ROADMAP.md's regel: "Start ikke næste
-roadmap-fase uden en konkret instruktion").
+roadmap-fase uden en konkret instruktion"). Mulig fremtidig
+opfølgning (ikke startet, kræver eksplicit instruktion): rette
+`leveling_manager.py`'s frozen-path-logik til selv at være
+`_internal`-bevidst i stedet for at kompensere på installer-niveau.
 
 ## Kort changelog (seneste faser, nyeste øverst)
 
+- `4d0eff0` — W3-fix: kopiér `builds/*.json` til `{app}\builds` i
+  installeren (kompenserer for PyInstaller 6.x's `_internal/`-layout,
+  fundet af den første Windows-runner-verifikation).
+- `c86595a` — Windows Product Phase W3: Inno Setup-installer
+  (`installer/diablo4companion.iss`) + CI-udvidelse (kompilér, silent
+  install, post-install-verifikation).
 - `0e06451` — Windows Product Phase W2: PyInstaller onedir spec +
   `sys.frozen`-path-fix i `LevelingManager` (Windows-runner-
   verifikation pending, se Blockers).
