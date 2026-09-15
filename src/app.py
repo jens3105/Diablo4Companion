@@ -19,6 +19,8 @@ from qfluentwidgets import (
     ComboBox,
     FluentIcon as FIF,
     FluentWindow,
+    InfoBar,
+    InfoBarPosition,
     NavigationItemPosition,
     PrimaryPushButton,
     StrongBodyLabel,
@@ -440,6 +442,17 @@ class MainWindow(FluentWindow):
         self.timer.timeout.connect(self.update_countdown)
         self.timer.start(1000)
 
+        # Phase 16b: build-change notices. LevelingManager already diffed
+        # the just-loaded builds/*.json against the last-seen snapshot (and
+        # refreshed that snapshot, so this is a one-shot "tell the user"
+        # step, not something to recompute). Surfaced as a dismissible
+        # InfoBar on the Dashboard - the first page shown on launch, so it
+        # gets noticed without a blocking dialog interrupting startup.
+        # Deferred one tick so it appears once the window is actually
+        # shown, rather than racing main.py's ``window.show()``.
+        if self.leveling_manager.build_changes:
+            QTimer.singleShot(300, self._show_build_change_notices)
+
     # ---------------------------------------------------------
     # Theme / appearance
     # ---------------------------------------------------------
@@ -477,6 +490,35 @@ class MainWindow(FluentWindow):
         # character" flow used on every build/level/character switch is
         # the simplest way to redraw them with the new colors too.
         self._apply_active_character()
+
+    # ---------------------------------------------------------
+    # Build-change notices (Phase 16b)
+    # ---------------------------------------------------------
+
+    def _show_build_change_notices(self):
+        """Show one dismissible InfoBar per build whose data changed since
+        the last run (see ``LevelingManager._compute_and_refresh_changes``).
+        The snapshot was already refreshed at load time, so these changes
+        won't be reported again on the next launch regardless of whether
+        the user dismisses the InfoBar or lets it time out."""
+
+        for entry in self.leveling_manager.build_changes:
+
+            changes = entry["changes"]
+            preview = "; ".join(changes[:3])
+
+            if len(changes) > 3:
+                preview += f" (+{len(changes) - 3} more)"
+
+            InfoBar.info(
+                title=f"{entry['build']} updated",
+                content=preview,
+                orient=Qt.Vertical,
+                isClosable=True,
+                position=InfoBarPosition.TOP_RIGHT,
+                duration=10000,
+                parent=self,
+            )
 
     # ---------------------------------------------------------
     # Window sizing

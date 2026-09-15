@@ -58,12 +58,21 @@ class LevelingManager:
 
     def __init__(self, builds_dir: str | None = None):
 
+        # repo_root/src/managers/leveling_manager.py -> repo_root
+        repo_root = os.path.dirname(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        )
+
         if builds_dir is None:
-            # repo_root/src/managers/leveling_manager.py -> repo_root/builds
-            repo_root = os.path.dirname(
-                os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            )
             builds_dir = os.path.join(repo_root, "builds")
+
+        # Phase 16b: build-change detection. The snapshot lives under the
+        # repo's existing gitignored ``.cache/`` dir (same one
+        # scripts/maxroll_data_decoder.py already uses) regardless of
+        # ``builds_dir`` - it tracks "what the app last saw", which is a
+        # repo-level concept, not tied to wherever builds happened to be
+        # loaded from.
+        self._snapshot_path = os.path.join(repo_root, ".cache", "build_snapshot.json")
 
         self.builds_dir = builds_dir
         self._builds = {}
@@ -77,6 +86,12 @@ class LevelingManager:
                 self.current_build_name = self._builds[default_key]["build_name"]
             else:
                 self.current_build_name = next(iter(self._builds.values()))["build_name"]
+
+        # Compare freshly-loaded build data against the last snapshot taken
+        # (e.g. before the user's last ``git pull``) and record concrete,
+        # human-readable changes. Cheap (~26 small JSON dicts) so doing it
+        # once here at startup is fine - see ``_compute_and_refresh_changes``.
+        self.build_changes = self._compute_and_refresh_changes()
 
     # ---------------------------------------------------------
     # Loading
@@ -327,3 +342,249 @@ class LevelingManager:
             "paragon": build.get("paragon", {"boards": [], "glyphs": [], "note": ""}),
             "gear": build.get("gear"),
         }
+
+    # ---------------------------------------------------------
+    # Build-change detection (Phase 16b)
+    # ---------------------------------------------------------
+    #
+    # Compares the build data just loaded from ``builds/*.json`` against a
+    # small cached snapshot of the same data from the last time the app
+    # ran, so a manual ``git pull`` + restart can be surfaced as concrete
+    # "what changed" bullets (e.g. "Blazing Scream: 4/5 -> 5/5") instead of
+    # just the generic "newer commit available" check in Settings. This is
+    # deliberately field-specific rather than a generic deep-diff engine:
+    # ``verified_build`` (skill ranks/upgrades, paragon glyphs/nodes, gear)
+    # for builds that have real decoded profile data, and ``role``/
+    # ``milestones`` for the rest.
+
+    @staticmethod
+    def _snapshot_fields_for_build(build: dict) -> dict:
+        """Reduce one build's JSON down to just the fields this phase
+        tracks for change detection, keyed so a diff can be taken field by
+        field. Builds with a ``verified_build`` are tracked at that
+        (richer, decoded-from-a-real-profile) level of detail; builds
+        without one fall back to ``role``/``milestones``, the only fields
+        that carry meaningful "what changed" info for them."""
+
+        verified = build.get("verified_build")
+
+        if verified:
+            return {
+                "kind": "verified",
+                "skill_allocation": {
+                    s["skill"]: {
+                        "rank": s.get("rank"),
+                        "max_rank": s.get("max_rank"),
+                        "upgrades": list(s.get("upgrades_chosen") or []),
+                    }
+                    for s in verified.get("skill_allocation", [])
+                },
+                "paragon_boards": {
+                    pb["board"]: {
+                        "glyph": pb.get("glyph"),
+                        "glyph_level": pb.get("glyph_level"),
+                        "nodes": list(pb.get("nodes") or []),
+                    }
+                    for pb in verified.get("paragon_boards", [])
+                },
+                "gear": {
+                    g.get("slot"): {
+                        "item_name": g.get("item_name"),
+                        "rarity": g.get("rarity"),
+                        "aspect": g.get("aspect"),
+                    }
+                    for g in verified.get("gear", [])
+                },
+            }
+
+        return {
+            "kind": "guide",
+            "role": build.get("role", ""),
+            "milestones": {
+                str(m["level"]): m.get("skill", "") for m in build.get("milestones", [])
+            },
+        }
+
+    def _current_snapshot(self) -> dict:
+        return {
+            build["build_name"]: self._snapshot_fields_for_build(build)
+            for build in self._builds.values()
+        }
+
+    def _load_snapshot(self) -> dict | None:
+        try:
+            with open(self._snapshot_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except (OSError, json.JSONDecodeError):
+            return None
+
+    def _save_snapshot(self, snapshot: dict):
+        try:
+            os.makedirs(os.path.dirname(self._snapshot_path), exist_ok=True)
+            with open(self._snapshot_path, "w", encoding="utf-8") as f:
+                json.dump(snapshot, f, indent=2, sort_keys=True)
+        except OSError as exc:
+            print(f"Kunne ikke gemme build-snapshot: {exc}")
+
+    @staticmethod
+    def _diff_verified(old: dict, new: dict) -> list[str]:
+
+        changes = []
+
+        old_skills = old.get("skill_allocation", {})
+        new_skills = new.get("skill_allocation", {})
+
+        for skill, new_info in new_skills.items():
+            old_info = old_skills.get(skill)
+
+            if old_info is None:
+                changes.append(f"{skill}: added to build")
+                continue
+
+            if old_info.get("rank") != new_info.get("rank"):
+                max_rank = new_info.get("max_rank") or old_info.get("max_rank") or "?"
+                changes.append(
+                    f"{skill}: {old_info.get('rank')}/{max_rank} -> "
+                    f"{new_info.get('rank')}/{max_rank}"
+                )
+
+            old_upgrades = set(old_info.get("upgrades") or [])
+            new_upgrades = set(new_info.get("upgrades") or [])
+
+            for added in sorted(new_upgrades - old_upgrades):
+                changes.append(f"{skill}: added upgrade '{added}'")
+            for removed in sorted(old_upgrades - new_upgrades):
+                changes.append(f"{skill}: removed upgrade '{removed}'")
+
+        for skill in old_skills:
+            if skill not in new_skills:
+                changes.append(f"{skill}: removed from build")
+
+        old_boards = old.get("paragon_boards", {})
+        new_boards = new.get("paragon_boards", {})
+
+        for board, new_info in new_boards.items():
+            old_info = old_boards.get(board)
+            label = new_info.get("glyph") or board
+
+            if old_info is None:
+                changes.append(f"{label} board: added to paragon")
+                continue
+
+            if old_info.get("glyph") != new_info.get("glyph"):
+                changes.append(
+                    f"Paragon board: glyph {old_info.get('glyph')} -> {new_info.get('glyph')}"
+                )
+
+            if old_info.get("glyph_level") != new_info.get("glyph_level"):
+                changes.append(
+                    f"{label}: glyph level {old_info.get('glyph_level')} -> "
+                    f"{new_info.get('glyph_level')}"
+                )
+
+            old_nodes = set(old_info.get("nodes") or [])
+            new_nodes = set(new_info.get("nodes") or [])
+
+            for added in sorted(new_nodes - old_nodes):
+                changes.append(f"{label}: added node '{added}'")
+            for removed in sorted(old_nodes - new_nodes):
+                changes.append(f"{label}: removed node '{removed}'")
+
+        for board in old_boards:
+            if board not in new_boards:
+                label = old_boards[board].get("glyph") or board
+                changes.append(f"{label} board: removed from paragon")
+
+        old_gear = old.get("gear", {})
+        new_gear = new.get("gear", {})
+
+        for slot, new_info in new_gear.items():
+            old_info = old_gear.get(slot)
+
+            if old_info is None:
+                changes.append(f"{slot}: added ({new_info.get('item_name')})")
+                continue
+
+            if old_info.get("item_name") != new_info.get("item_name"):
+                changes.append(
+                    f"{slot}: {old_info.get('item_name')} -> {new_info.get('item_name')}"
+                )
+            elif old_info.get("aspect") != new_info.get("aspect"):
+                changes.append(
+                    f"{slot} ({new_info.get('item_name')}): aspect "
+                    f"{old_info.get('aspect')} -> {new_info.get('aspect')}"
+                )
+            elif old_info.get("rarity") != new_info.get("rarity"):
+                changes.append(
+                    f"{slot} ({new_info.get('item_name')}): rarity "
+                    f"{old_info.get('rarity')} -> {new_info.get('rarity')}"
+                )
+
+        for slot in old_gear:
+            if slot not in new_gear:
+                changes.append(f"{slot}: removed from gear")
+
+        return changes
+
+    @staticmethod
+    def _diff_guide(old: dict, new: dict) -> list[str]:
+
+        changes = []
+
+        if old.get("role") != new.get("role"):
+            changes.append(f"Role: {old.get('role')} -> {new.get('role')}")
+
+        old_milestones = old.get("milestones", {})
+        new_milestones = new.get("milestones", {})
+
+        for level, skill in new_milestones.items():
+            old_skill = old_milestones.get(level)
+
+            if old_skill is None:
+                changes.append(f"Level {level}: added milestone '{skill}'")
+            elif old_skill != skill:
+                changes.append(f"Level {level}: {old_skill} -> {skill}")
+
+        for level in old_milestones:
+            if level not in new_milestones:
+                changes.append(f"Level {level}: removed milestone '{old_milestones[level]}'")
+
+        return changes
+
+    def _compute_and_refresh_changes(self) -> list[dict]:
+        """Diff the just-loaded build data against the cached snapshot,
+        then always rewrite the snapshot to match current data (whether or
+        not there were changes) so the next launch compares against
+        *this* run's state and never re-reports the same change twice.
+
+        Returns a list of ``{"build": name, "changes": [str, ...]}`` -
+        empty on the very first run (no snapshot yet) or when nothing
+        changed."""
+
+        new_snapshot = self._current_snapshot()
+        old_snapshot = self._load_snapshot()
+
+        results = []
+
+        if old_snapshot is not None:
+            for build_name, new_fields in new_snapshot.items():
+                old_fields = old_snapshot.get(build_name)
+
+                if old_fields is None:
+                    continue
+
+                if new_fields.get("kind") == "verified" and old_fields.get("kind") == "verified":
+                    changes = self._diff_verified(old_fields, new_fields)
+                elif new_fields.get("kind") != "verified" and old_fields.get("kind") != "verified":
+                    changes = self._diff_guide(old_fields, new_fields)
+                else:
+                    # A build gained/lost its verified_build entirely -
+                    # too structural to render as field bullets, skip.
+                    changes = []
+
+                if changes:
+                    results.append({"build": build_name, "changes": changes})
+
+        self._save_snapshot(new_snapshot)
+
+        return results
