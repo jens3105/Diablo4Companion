@@ -20,10 +20,17 @@ page respects:
   that would imply a confirmed path that was never actually decoded.
 * A node's rarity is a fixed int (0=Normal, 2=Magic, 3=Rare,
   4=Legendary) - hardcoded here as documented data, not invented.
-* Every node this app can show is, by definition, a *taken* node (the
-  data has no "available but not yet taken" or "locked" node list) - so
-  a node's detail popup always shows a plain "✓ Taken" status, never a
-  fabricated "locked next" state.
+* Every node this app can show is, by definition, an *expected* node -
+  one the guide's verified build actually uses (the data has no
+  "locked"/unreachable node list). Phase 11 adds real Expected-vs-
+  Current on top of that: whether the player has actually taken it yet
+  is a separate, manually self-reported "Have it" toggle
+  (``MainWindow._load_completed_paragon_nodes`` /
+  ``on_paragon_node_toggled`` - the same one-way-toggle pattern as the
+  Gear planner's "Have it" switches, not a one-way completion flag), so
+  the grid always shows both the target (this node) and the gap
+  (not toggled on yet) - it never hides an expected-but-not-yet-taken
+  node.
 * Builds with no ``verified_build`` (currently only Heartseeker Rogue)
   have no board/grid data at all - the Overview shows a clean
   "DATA UNAVAILABLE" message instead of an empty or broken page.
@@ -67,6 +74,7 @@ from qfluentwidgets import (
     PushButton,
     SingleDirectionScrollArea,
     StrongBodyLabel,
+    SwitchButton,
 )
 
 from src import theme
@@ -92,13 +100,17 @@ def _node_color(rarity) -> str:
 
 
 class NodeDetailDialog(MessageBoxBase):
-    """Detail popup for one taken Paragon node - only real, decoded
-    fields (name, rarity, board, grid id). Status is always a plain
-    "✓ Taken" - see module docstring for why no other status is ever
-    possible with this data."""
+    """Detail popup for one expected Paragon node - real, decoded fields
+    (name, rarity, board, grid id) plus a "Have it" ``SwitchButton`` for
+    the player's own self-reported "have I actually taken this" state
+    (Phase 11) - the same toggle pattern ``gear_planner.SlotDetailDialog``
+    uses for gear ownership, not a one-way completion flag."""
 
-    def __init__(self, node: dict, board_index: int, parent=None):
+    def __init__(self, node: dict, board_index: int, node_key: str, is_taken: bool, parent=None):
         super().__init__(parent)
+
+        self.node_key = node_key
+        self.owned_changed_callback = None
 
         title = StrongBodyLabel(node.get("name") or node.get("slug") or "?", self)
         title.setWordWrap(True)
@@ -118,35 +130,62 @@ class NodeDetailDialog(MessageBoxBase):
         if slug and slug != node.get("name"):
             add_field("ID", slug)
 
-        status_row = BodyLabel("Status: ✓ Taken", self)
-        status_row.setTextColor(QColor("#3fa860"), QColor("#3fa860"))
-        self.viewLayout.addWidget(status_row)
+        toggle_row = QHBoxLayout()
+        toggle_label = CaptionLabel("Have it:", self)
+        self.toggle = SwitchButton(self)
+        self.toggle.setOnText("Have it")
+        self.toggle.setOffText("Missing")
+        self.toggle.setChecked(is_taken)
+        self.toggle.checkedChanged.connect(self._on_toggled)
+        toggle_row.addWidget(toggle_label)
+        toggle_row.addWidget(self.toggle)
+        toggle_row.addStretch(1)
+        self.viewLayout.addLayout(toggle_row)
 
         self.hideCancelButton()
         self.yesButton.setText("Close")
         self.widget.setMinimumWidth(280)
 
+    def _on_toggled(self, checked: bool):
+        if self.owned_changed_callback is not None:
+            self.owned_changed_callback(self.node_key, checked)
+
 
 class ParagonBoardGrid(QWidget):
     """Custom-painted grid of one board's ~441 possible node slots
     (``board_width`` x ``board_width``). Only renders what the data
-    actually contains: taken nodes at their real ``(x, y)`` (derived from
-    ``index``/``board_width``, no other layout math), plus the glyph
+    actually contains: expected nodes at their real ``(x, y)`` (derived
+    from ``index``/``board_width``, no other layout math), plus the glyph
     socket and start node as outlined markers. No line/path is ever
-    drawn between nodes - see module docstring."""
+    drawn between nodes - see module docstring.
+
+    Phase 11: each expected node now renders in one of 2 states - a
+    solid-filled square (the player has toggled "Have it" on for that
+    node, per ``completed_nodes``) or a hollow, outlined-only square
+    (still real/expected data, just not yet confirmed taken) - the gap
+    between the verified build's target and the player's actual progress
+    is the whole point, so an untaken node is dimmed, never hidden."""
 
     CELL = 18
 
-    node_clicked = Signal(dict)
+    # Emits (node dict, node_key str, is_taken bool).
+    node_clicked = Signal(dict, str, bool)
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._board = None
+        self._board_id = ""
+        self._completed_nodes: set[str] = set()
         self._nodes_by_index = {}
         self.setCursor(Qt.ArrowCursor)
 
-    def set_board(self, board: dict | None):
+    def _node_key(self, index) -> str:
+        return f"{self._board_id}:{index}"
+
+    def set_board(self, board: dict | None, board_id: str = "", completed_nodes: set | None = None):
         self._board = board
+        self._board_id = board_id
+        self._completed_nodes = completed_nodes or set()
         self._nodes_by_index = {}
 
         if board:
@@ -180,7 +219,8 @@ class ParagonBoardGrid(QWidget):
             index = self._index_at(event.position().toPoint())
             node = self._nodes_by_index.get(index) if index is not None else None
             if node:
-                self.node_clicked.emit(node)
+                node_key = self._node_key(index)
+                self.node_clicked.emit(node, node_key, node_key in self._completed_nodes)
         super().mousePressEvent(event)
 
     def paintEvent(self, event):
@@ -198,7 +238,15 @@ class ParagonBoardGrid(QWidget):
             x = (index % width) * self.CELL
             y = (index // width) * self.CELL
             color = _node_color(node.get("rarity", 0))
-            painter.fillRect(x + 1, y + 1, self.CELL - 2, self.CELL - 2, QColor(color))
+
+            if self._node_key(index) in self._completed_nodes:
+                painter.fillRect(x + 1, y + 1, self.CELL - 2, self.CELL - 2, QColor(color))
+            else:
+                pen = QPen(QColor(color))
+                pen.setWidth(2)
+                painter.setPen(pen)
+                painter.setBrush(Qt.NoBrush)
+                painter.drawRect(x + 2, y + 2, self.CELL - 4, self.CELL - 4)
 
         # Glyph socket / start node markers - drawn as outlines on top,
         # since both may or may not coincide with an already-colored
@@ -274,7 +322,23 @@ class BoardSummaryRow(QWidget):
 
 class ParagonCard(BaseCard):
     """Overview (board list + overall %) and Board detail (Prev/Next +
-    grid) for the active character/build - see module docstring."""
+    grid) for the active character/build - see module docstring.
+
+    Board-level ✓/→/○ status (Overview rows and the detail header) is
+    derived from node-level completion (``_board_fully_taken`` - all of
+    a board's expected nodes are in ``completed_nodes``) rather than the
+    separate, older ``completed_boards`` manual checkbox, for every
+    build with real node data. ``completed_boards`` is only still read
+    here as a fallback (see ``_board_fully_taken``) for the one build
+    with no verified node data at all (Heartseeker Rogue) - which never
+    reaches this page anyway (``unavailable_label`` shows instead, see
+    ``set_paragon``)."""
+
+    # Emits (node_key, is_taken) when a node's "Have it" switch is
+    # flipped in its detail popup - MainWindow routes this straight into
+    # on_paragon_node_toggled, the same "dumb pipe" pattern
+    # GearPlannerWidget.item_owned_changed already uses for gear.
+    node_owned_changed = Signal(str, bool)
 
     def __init__(self, parent=None):
         super().__init__("PARAGON", icon=FIF.TILES, parent=parent)
@@ -309,6 +373,7 @@ class ParagonCard(BaseCard):
         self._build_name = ""
         self._boards = []
         self._completed = set()
+        self._completed_nodes = set()
         self._detail_index = None
         self._row_widgets = []
 
@@ -425,15 +490,35 @@ class ParagonCard(BaseCard):
     def _set_legend_text(self):
         self.legend_label.setText(
             "Node colors: Normal (muted) · Magic (blue) · Rare (yellow) · "
-            "Legendary (orange). Gold outline = glyph socket, green "
-            "outline = start node. Only taken nodes and these two markers "
-            "are shown - there is no adjacency/path data, so no route is "
-            "drawn between them."
+            "Legendary (orange). Filled square = taken (\"Have it\" is "
+            "on), hollow outline = expected but not yet taken - click a "
+            "node to toggle it. Gold outline = glyph socket, green "
+            "outline = start node. Every node shown is an expected node "
+            "from the verified build - there is no adjacency/path data, "
+            "so no route is drawn between them."
         )
 
     # ---------------------------------------------------------
     # Population
     # ---------------------------------------------------------
+
+    @staticmethod
+    def _node_key(board_id: str, node_index) -> str:
+        return f"{board_id}:{node_index}"
+
+    @staticmethod
+    def _board_fully_taken(board: dict, board_id: str, completed_nodes: set) -> bool:
+        """Same derivation as ``MainWindow._board_fully_taken`` (kept as
+        its own copy here rather than importing MainWindow, which would
+        be a circular import) - a board counts as done once every one of
+        its expected nodes is in ``completed_nodes``."""
+
+        nodes = board.get("nodes") or []
+        if not nodes:
+            return False
+        return all(
+            ParagonCard._node_key(board_id, n.get("index")) in completed_nodes for n in nodes
+        )
 
     def set_paragon(
         self,
@@ -442,17 +527,20 @@ class ParagonCard(BaseCard):
         level: int,
         verified_build: dict | None,
         completed_boards: set,
+        completed_nodes: set,
         paragon_status_row: tuple[str, str, str] | None,
     ):
         """Populate the header, overall Paragon % and Overview board list
         for the active character/build/level, and keep an already-open
-        Board detail view in sync (e.g. after a level change or a mark-
-        board-done elsewhere).
+        Board detail view in sync (e.g. after a level change or a node
+        "Have it" toggle elsewhere).
 
         ``paragon_status_row`` is exactly the ``("emoji", "Paragon",
         "NN%")`` tuple ``MainWindow._compute_build_status`` already
         produces - displayed as-is, never recomputed here (see module
-        docstring)."""
+        docstring). ``completed_boards`` is kept only for the no-node-
+        data fallback in ``_board_fully_taken``; board-done everywhere
+        else on this page comes from ``completed_nodes``."""
 
         if not build_name:
             self.header_label.setText("No build selected")
@@ -460,6 +548,7 @@ class ParagonCard(BaseCard):
             self._build_name = ""
             self._boards = []
             self._completed = set()
+            self._completed_nodes = set()
             self._detail_index = None
             self._clear_rows()
             self.unavailable_label.hide()
@@ -479,6 +568,7 @@ class ParagonCard(BaseCard):
 
         self._build_name = build_name
         self._completed = completed_boards or set()
+        self._completed_nodes = completed_nodes or set()
         self._boards = (verified_build or {}).get("paragon_boards") or []
 
         if is_new_build:
@@ -508,18 +598,15 @@ class ParagonCard(BaseCard):
 
         self._clear_rows()
 
-        next_index = next(
-            (
-                i
-                for i, board in enumerate(self._boards)
-                if LevelingCard._board_id(board, i) not in self._completed
-            ),
-            None,
-        )
+        board_ids = [LevelingCard._board_id(board, i) for i, board in enumerate(self._boards)]
+        done_flags = [
+            self._board_fully_taken(board, board_ids[i], self._completed_nodes)
+            for i, board in enumerate(self._boards)
+        ]
+        next_index = next((i for i, done in enumerate(done_flags) if not done), None)
 
         for i, board in enumerate(self._boards):
-            board_id = LevelingCard._board_id(board, i)
-            is_done = board_id in self._completed
+            is_done = done_flags[i]
             is_next = i == next_index
 
             if is_done:
@@ -535,10 +622,14 @@ class ParagonCard(BaseCard):
             title = f"{status_prefix} Board {i + 1} — {glyph_text}"
 
             nodes = board.get("nodes") or []
+            board_id = board_ids[i]
+            taken_count = sum(
+                1 for n in nodes if self._node_key(board_id, n.get("index")) in self._completed_nodes
+            )
             width = board.get("board_width") or 0
             pos = board.get("position") or {}
             detail = (
-                f"{len(nodes)} nodes taken on a {width}×{width} grid  •  "
+                f"{taken_count}/{len(nodes)} nodes taken on a {width}×{width} grid  •  "
                 f"Grid offset ({pos.get('x', 0)}, {pos.get('y', 0)})"
             )
 
@@ -575,35 +666,67 @@ class ParagonCard(BaseCard):
 
         board = self._boards[index]
         board_id = LevelingCard._board_id(board, index)
-        is_done = board_id in self._completed
+        is_done = self._board_fully_taken(board, board_id, self._completed_nodes)
 
         glyph = board.get("glyph") or "?"
         glyph_level = board.get("glyph_level")
         glyph_text = f"{glyph} (Lv{glyph_level})" if glyph_level else glyph
-        status_text = "✓ Complete" if is_done else "○ Not marked complete"
+        status_text = "✓ Complete" if is_done else "○ Not complete"
 
         self.board_title_label.setText(f"Board {index + 1} — {glyph_text}")
         self.board_position_label.setText(f"BOARD {index + 1}/{len(self._boards)}")
 
         nodes = board.get("nodes") or []
+        taken_count = sum(
+            1 for n in nodes if self._node_key(board_id, n.get("index")) in self._completed_nodes
+        )
         width = board.get("board_width") or 0
         pos = board.get("position") or {}
 
         self.board_meta_label.setText(
-            f"{status_text}  •  {len(nodes)} nodes taken on a {width}×{width} grid  •  "
-            f"Grid offset ({pos.get('x', 0)}, {pos.get('y', 0)})  •  "
+            f"{status_text}  •  {taken_count}/{len(nodes)} nodes taken on a {width}×{width} "
+            f"grid  •  Grid offset ({pos.get('x', 0)}, {pos.get('y', 0)})  •  "
             f"Rotation {board.get('rotation', 0)}"
         )
 
-        self.grid_widget.set_board(board)
+        self.grid_widget.set_board(board, board_id, self._completed_nodes)
         self._current_detail_board_index = index
 
         self.prev_button.setEnabled(index > 0)
         self.next_button.setEnabled(index < len(self._boards) - 1)
 
-    def _on_node_clicked(self, node: dict):
-        dialog = NodeDetailDialog(node, self._current_detail_board_index, self.window())
+    def _on_node_clicked(self, node: dict, node_key: str, is_taken: bool):
+        dialog = NodeDetailDialog(
+            node, self._current_detail_board_index, node_key, is_taken, self.window()
+        )
+        dialog.owned_changed_callback = self._on_node_toggled
         dialog.exec()
+
+    def _on_node_toggled(self, node_key: str, taken: bool):
+        # Update local state immediately so the grid/overview reflect the
+        # toggle even before MainWindow's round-trip (on_paragon_node_
+        # toggled -> _refresh_build_status -> set_paragon) comes back.
+        if taken:
+            self._completed_nodes.add(node_key)
+        else:
+            self._completed_nodes.discard(node_key)
+
+        if self._detail_index is not None:
+            self._render_detail(self._detail_index)
+
+        self.node_owned_changed.emit(node_key, taken)
+
+    def select_board(self, board_id: str):
+        """Jump straight to a board's detail view by its stable id (see
+        ``LevelingCard._board_id``) - used by ``MainWindow._navigate_to_
+        next_action`` for a ``"paragon_node"`` Build Advisor action, so
+        clicking "Take Rare Node: X (Board N)" lands on that exact
+        board's grid instead of just the Overview."""
+
+        for i, board in enumerate(self._boards):
+            if LevelingCard._board_id(board, i) == board_id:
+                self._go_to_board(i)
+                return
 
     # ---------------------------------------------------------
     # Theme / appearance

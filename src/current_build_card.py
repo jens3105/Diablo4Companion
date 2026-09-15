@@ -11,7 +11,7 @@ from qfluentwidgets import (
 )
 
 from src import theme
-from src.base_card import BaseCard, ClickableBodyLabel
+from src.base_card import BaseCard, ClickableBodyLabel, ClickableStrongBodyLabel
 
 
 class CurrentBuildCard(BaseCard):
@@ -29,13 +29,19 @@ class CurrentBuildCard(BaseCard):
 
     compact_mode_requested = Signal()
     # Emits the pending action's category
-    # ("leveling"/"skill"/"paragon"/"gear") when the NEXT ACTION line is
-    # clicked, so MainWindow can jump to the right page/tab (Build
-    # Guide's Leveling, Skills or Paragon tab, or the Character page) -
-    # see MainWindow._navigate_to_next_action. Never emitted when there's
+    # ("leveling"/"skill"/"paragon"/"paragon_node"/"gear") when the NEXT
+    # ACTION line is clicked, so MainWindow can jump to the right
+    # page/tab (Build Guide's Leveling, Skills or Paragon tab, the
+    # dedicated Paragon page, or the Character page) - see
+    # MainWindow._navigate_to_next_action. Never emitted when there's
     # nothing to act on (no build, or "Build complete!") - see
     # set_build's ``next_action_kind``.
     next_action_clicked = Signal(str)
+    # Phase 13: the compact Paragon block's own click, always active
+    # while a summary is shown - jumps straight to the dedicated Paragon
+    # page, separate from the whole-card ``clicked`` (-> Build Guide) and
+    # the NEXT ACTION line (-> whichever category is next overall).
+    paragon_clicked = Signal()
 
     def __init__(self, parent=None):
         super().__init__("CURRENT BUILD", icon=FIF.GAME, parent=parent)
@@ -91,6 +97,26 @@ class CurrentBuildCard(BaseCard):
         self.next_action_label.clicked.connect(self._on_next_action_clicked)
         self.content_layout.addWidget(self.next_action_label)
 
+        # Phase 13: compact Paragon block - overall %, the board still
+        # in progress, and the next Paragon-specific action (which may
+        # differ from the card-wide NEXT ACTION above if Leveling/Skills/
+        # Gear currently has a higher-priority pending action). Hidden
+        # entirely for builds with no verified Paragon board data (see
+        # ``set_paragon_summary``).
+        self.content_layout.addSpacing(8)
+
+        self.paragon_header = CaptionLabel("PARAGON", self.content)
+        self.paragon_header.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
+        self.content_layout.addWidget(self.paragon_header)
+
+        self.paragon_summary_label = ClickableStrongBodyLabel("", self.content)
+        self.paragon_summary_label.setWordWrap(True)
+        self.paragon_summary_label.clicked.connect(self.paragon_clicked)
+        self.content_layout.addWidget(self.paragon_summary_label)
+
+        self.paragon_header.hide()
+        self.paragon_summary_label.hide()
+
         self.content_layout.addStretch(1)
 
         self._next_action_kind = None
@@ -132,6 +158,28 @@ class CurrentBuildCard(BaseCard):
         self._next_action_kind = next_action_kind
         self.next_action_label.set_active(next_action_kind is not None)
 
+    def set_paragon_summary(self, summary: tuple[str, str, str] | None):
+        """Phase 13: the compact Paragon block - ``summary`` is
+        ``(pct_text, current_board_label, next_paragon_action_text)``
+        from ``MainWindow._paragon_dashboard_summary``, or ``None`` for
+        builds with no verified Paragon board data (Heartseeker Rogue) or
+        no build selected at all, which hides the block entirely rather
+        than showing a misleading "0%"."""
+
+        if not summary:
+            self.paragon_header.hide()
+            self.paragon_summary_label.hide()
+            self.paragon_summary_label.set_active(False)
+            return
+
+        pct_text, current_board_label, next_text = summary
+        self.paragon_summary_label.setText(
+            f"{pct_text}  •  {current_board_label}\nNext: {next_text}"
+        )
+        self.paragon_header.show()
+        self.paragon_summary_label.show()
+        self.paragon_summary_label.set_active(True)
+
     def _on_next_action_clicked(self):
         if self._next_action_kind is not None:
             self.next_action_clicked.emit(self._next_action_kind)
@@ -145,3 +193,4 @@ class CurrentBuildCard(BaseCard):
             f"font-family: monospace; font-size: 12px; color: {theme.TEXT_PRIMARY};"
         )
         self.next_header.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
+        self.paragon_header.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))

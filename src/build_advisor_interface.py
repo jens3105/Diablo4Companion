@@ -35,7 +35,7 @@ class BuildAdvisorCard(BaseCard):
     read-out, plus a capped "what's missing" list per category."""
 
     # Emits the pending action's category
-    # ("leveling"/"skill"/"paragon"/"gear") when the NEXT ACTION line is
+    # ("leveling"/"skill"/"paragon"/"paragon_node"/"gear") when the NEXT ACTION line is
     # clicked, so MainWindow can jump to the right page/tab - see
     # MainWindow._navigate_to_next_action. Never emitted when there's
     # nothing to act on (no build, or "Build complete!") - see
@@ -147,7 +147,8 @@ class BuildAdvisorCard(BaseCard):
         what ``MainWindow._compute_build_status`` returns.
         ``next_action_text``/``next_action_kind`` are
         ``MainWindow._advisor_next_action``'s result - ``next_action_kind``
-        is one of ``"leveling"``/``"skill"``/``"paragon"``/``"gear"`` or
+        is one of ``"leveling"``/``"skill"``/``"paragon"``/``"paragon_node"``/
+        ``"gear"`` or
         ``None`` when there's nothing to act on, and decides whether the
         NEXT ACTION line is click-to-navigate right now. ``pending_by_category`` maps
         each of ``Skills``/``Paragon``/``Gear`` to ``(capped_texts,

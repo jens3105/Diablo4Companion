@@ -36,7 +36,7 @@ from src.compact_window import CompactWindow
 from src.dashboard import DashboardWidget
 from src.leveling_card import LevelingCard
 from src.managers.leveling_manager import LevelingManager
-from src.paragon_interface import ParagonCard, ParagonInterface
+from src.paragon_interface import RARITY_LABELS, ParagonCard, ParagonInterface
 from src.quick_search import QuickSearchDialog
 
 
@@ -397,6 +397,16 @@ class MainWindow(FluentWindow):
         )
         self.advisor_card.next_action_clicked.connect(
             self._navigate_to_next_action
+        )
+
+        # Phase 11: Paragon page's node-detail "Have it" toggle.
+        self.paragon_card.node_owned_changed.connect(self.on_paragon_node_toggled)
+
+        # Phase 13: Dashboard's compact Paragon block jumps straight to
+        # the Paragon page when clicked, same pattern as the whole-card
+        # click above.
+        self.dashboard.build_card.paragon_clicked.connect(
+            lambda: self.switchTo(self.paragon_interface)
         )
 
         # Phase 9: Compact Mode - lazily created on first use, torn down
@@ -1195,6 +1205,81 @@ class MainWindow(FluentWindow):
         self._refresh_build_status()
 
     # ---------------------------------------------------------
+    # PARAGON NODE TRACKING (Phase 11)
+    #
+    # Node-granular Expected-vs-Current, on top of the board-level
+    # ``completed_boards`` boolean above. A toggle state (a node can be
+    # un-checked if the player misclicked or respecced), like
+    # ``owned_items`` below - not the one-way ``completed_boards``/
+    # ``completed_levels`` sets. Keyed by ``"<board_id>:<node_index>"``
+    # (``board_id`` is ``LevelingCard._board_id`` - the exact same stable
+    # id ``completed_boards`` already uses - so a node key always points
+    # at the same board even if a build's board order changes upstream).
+    #
+    # Only meaningful for the 25/26 builds with ``verified_build.
+    # paragon_boards`` node data; Heartseeker Rogue (no verified_build)
+    # never has anything in this set and keeps using the coarser
+    # ``completed_boards`` boolean everywhere below - see
+    # ``_compute_build_status`` and ``_pending_paragon_actions``.
+    # ---------------------------------------------------------
+
+    def _completed_paragon_nodes_key(self, build_name: str) -> str:
+        return f"{self._char_prefix()}/paragon/{build_name}/completed_nodes"
+
+    def _load_completed_paragon_nodes(self, build_name: str) -> set[str]:
+
+        raw = self.settings.value(self._completed_paragon_nodes_key(build_name), [], type=list)
+        return {str(v) for v in raw}
+
+    def _save_completed_paragon_nodes(self, build_name: str, completed: set[str]):
+
+        self.settings.setValue(self._completed_paragon_nodes_key(build_name), sorted(completed))
+
+    @staticmethod
+    def _paragon_node_key(board_id: str, node_index) -> str:
+        return f"{board_id}:{node_index}"
+
+    @staticmethod
+    def _board_fully_taken(board: dict, board_id: str, completed_nodes: set[str]) -> bool:
+        """Whether every expected node on ``board`` is in
+        ``completed_nodes`` - the derived "is this board done" check that
+        replaces the manual ``completed_boards`` checkbox for any build
+        with real node data (see module-level comment above). Falls back
+        to ``False`` for the (currently nonexistent, but not assumed-
+        impossible) case of a verified board with an empty ``nodes``
+        list, since "no expected nodes" isn't the same as "all of them
+        taken"."""
+
+        nodes = board.get("nodes") or []
+        if not nodes:
+            return False
+        return all(
+            MainWindow._paragon_node_key(board_id, n.get("index")) in completed_nodes
+            for n in nodes
+        )
+
+    def on_paragon_node_toggled(self, node_key: str, taken: bool):
+        """A node's "Have it" switch was flipped in the Paragon page's
+        board detail popup (``ParagonCard.node_owned_changed``, wired in
+        __init__)."""
+
+        build_name = self.leveling_manager.current_build_name
+
+        if not build_name:
+            return
+
+        completed_nodes = self._load_completed_paragon_nodes(build_name)
+
+        if taken:
+            completed_nodes.add(node_key)
+        else:
+            completed_nodes.discard(node_key)
+
+        self._save_completed_paragon_nodes(build_name, completed_nodes)
+
+        self._refresh_build_status()
+
+    # ---------------------------------------------------------
     # BUILD-GUIDE / GEAR & POWERS TAB
     # ---------------------------------------------------------
 
@@ -1329,11 +1414,25 @@ class MainWindow(FluentWindow):
         verified_boards = (verified_build or {}).get("paragon_boards") or []
 
         if verified_boards:
-            board_ids = {
-                vb.get("board") or f"verified_board_{i}" for i, vb in enumerate(verified_boards)
-            }
-            paragon_done = sum(1 for v in completed_boards if isinstance(v, str) and v in board_ids)
-            paragon_pct = self._pct(paragon_done, len(verified_boards))
+            # Node-granular, not board-count-based (Phase 11) - the
+            # denominator is every expected node across every board, the
+            # numerator every one of those the player has toggled "Have
+            # it" on. This is now the single source of truth for "is a
+            # board done" for these 25/26 builds too (see
+            # ``_board_fully_taken``) - the older ``completed_boards``
+            # manual checkbox (still settable from the Build Guide's own
+            # Paragon tab) is no longer read here, only kept for
+            # Heartseeker Rogue's fallback below.
+            completed_nodes = self._load_completed_paragon_nodes(build_name)
+            total_nodes = sum(len(vb.get("nodes") or []) for vb in verified_boards)
+            done_nodes = sum(
+                1
+                for i, vb in enumerate(verified_boards)
+                for n in (vb.get("nodes") or [])
+                if self._paragon_node_key(LevelingCard._board_id(vb, i), n.get("index"))
+                in completed_nodes
+            )
+            paragon_pct = self._pct(done_nodes, total_nodes)
         else:
             paragon_done = sum(
                 1 for v in completed_boards if isinstance(v, int) and 0 <= v < len(boards)
@@ -1501,35 +1600,52 @@ class MainWindow(FluentWindow):
         ]
 
     def _pending_paragon_actions(self, build_name: str) -> list[tuple[str, str, object]]:
-        """Every not-yet-completed Paragon board, in order, as ``(kind,
-        text, key)`` - ``key`` is whatever ``on_mark_board_done`` expects
-        (a verified board id, or a board index for builds with no
-        verified data). Mirrors ``LevelingCard.set_paragon``/
-        ``_render_verified_board_checklist`` - verified ``paragon_boards``
-        when present, else the prose ``paragon.boards`` list - and the
-        same shared ``completed_boards`` set."""
+        """Every not-yet-taken Paragon node, in order (board by board,
+        then by node index within a board), as ``(kind, text, key)`` -
+        ``kind`` is ``"paragon_node"``, ``key`` is ``"<board_id>:
+        <node_index>"`` (exactly what ``on_paragon_node_toggled``
+        expects). Mirrors ``_compute_build_status``'s node-granular
+        Paragon math and the same shared ``completed_nodes`` set - see
+        ``_board_fully_taken``.
 
-        completed = self._load_completed_boards(build_name)
+        For Heartseeker Rogue (no ``verified_build``, so no node data to
+        be granular about) this falls back to the older board-level
+        ``"paragon"`` actions against the ``completed_boards`` boolean,
+        exactly as before - the only build that still goes through that
+        path.
+
+        Glyph-level ("Level {glyph} to {glyph_level}") actions are
+        deliberately NOT included here: there's no existing tracking
+        dimension for "glyph level reached" anywhere in the app (only
+        the board-level ``completed_boards`` boolean and, now, per-node
+        ``completed_nodes`` - neither records a glyph's numeric level),
+        and building a whole new tracking axis for just this one action
+        type is out of scope for this pass."""
+
         verified_build = self.leveling_manager.get_verified_build(build_name)
         verified_boards = (verified_build or {}).get("paragon_boards") or []
 
         if verified_boards:
+            completed_nodes = self._load_completed_paragon_nodes(build_name)
             actions = []
+
             for i, board in enumerate(verified_boards):
-                # Fallback format must match LevelingCard._board_id.
-                board_id = board.get("board") or f"verified_board_{i}"
-                if board_id in completed:
-                    continue
-                glyph = board.get("glyph") or "?"
-                # "Board {i + 1}", not the raw Maxroll board id (e.g.
-                # "Paragon_Warlock_00") - matches the label LevelingCard's
-                # own Paragon checklist shows for this same board (see
-                # _render_verified_board_checklist), so the Dashboard/
-                # Build Advisor/Compact Mode next-action text never shows
-                # an internal data key a player wouldn't recognize.
-                actions.append(("paragon", f"Slot {glyph} glyph on Board {i + 1}", board_id))
+                board_id = LevelingCard._board_id(board, i)
+
+                for node in board.get("nodes") or []:
+                    node_key = self._paragon_node_key(board_id, node.get("index"))
+                    if node_key in completed_nodes:
+                        continue
+                    name = node.get("name") or node.get("slug") or "?"
+                    rarity = RARITY_LABELS.get(node.get("rarity", 0), "")
+                    label = f"Take {rarity} Node: {name} (Board {i + 1})" if rarity else (
+                        f"Take Node: {name} (Board {i + 1})"
+                    )
+                    actions.append(("paragon_node", label, node_key))
+
             return actions
 
+        completed = self._load_completed_boards(build_name)
         boards = self.leveling_manager.get_paragon_data(build_name).get("boards") or []
 
         return [
@@ -1631,8 +1747,9 @@ class MainWindow(FluentWindow):
 
         if not build_name:
             self.dashboard.build_card.set_build("", 0, [], "")
+            self.dashboard.build_card.set_paragon_summary(None)
             self.character_card.set_header(char_name, "", 0)
-            self.paragon_card.set_paragon("", "", 0, None, set(), None)
+            self.paragon_card.set_paragon("", "", 0, None, set(), set(), None)
             self.advisor_card.set_advisor("", 0, [], "", False, "", None, {})
             self._refresh_compact_window()
             return
@@ -1642,6 +1759,9 @@ class MainWindow(FluentWindow):
         next_kind, next_action = self._advisor_next_action(build_name)
 
         self.dashboard.build_card.set_build(build_name, level, rows, next_action, next_kind)
+        self.dashboard.build_card.set_paragon_summary(
+            self._paragon_dashboard_summary(build_name, rows[2])
+        )
         self.character_card.set_header(char_name, build_name, level)
         # rows[2] is the "Paragon" row - see _compute_build_status - so
         # the Paragon page's overall % is the exact same figure, never a
@@ -1652,6 +1772,7 @@ class MainWindow(FluentWindow):
             level,
             self.leveling_manager.get_verified_build(build_name),
             self._load_completed_boards(build_name),
+            self._load_completed_paragon_nodes(build_name),
             rows[2],
         )
         self.advisor_card.set_advisor(
@@ -1673,6 +1794,42 @@ class MainWindow(FluentWindow):
         # from this one spot is enough to keep everything live-synced
         # without extra signal wiring.
         self._refresh_compact_window()
+
+    def _paragon_dashboard_summary(
+        self, build_name: str, paragon_status_row: tuple[str, str, str] | None
+    ) -> tuple[str, str, str] | None:
+        """Phase 13: the Dashboard's compact Paragon block - ``(pct_text,
+        current_board_label, next_action_text)``, or ``None`` when this
+        build has no verified board data to summarize (Heartseeker
+        Rogue). Purely a display-formatting pass over data already
+        computed elsewhere - ``paragon_status_row`` is ``_compute_build_
+        status``'s "Paragon" row (same one shown everywhere else) and the
+        next-action text reuses ``_pending_paragon_actions`` - no second
+        Paragon calculation."""
+
+        verified_build = self.leveling_manager.get_verified_build(build_name)
+        verified_boards = (verified_build or {}).get("paragon_boards") or []
+
+        if not verified_boards:
+            return None
+
+        completed_nodes = self._load_completed_paragon_nodes(build_name)
+
+        current_board_label = "All boards complete"
+        for i, board in enumerate(verified_boards):
+            board_id = LevelingCard._board_id(board, i)
+            if not self._board_fully_taken(board, board_id, completed_nodes):
+                current_board_label = f"Board {i + 1}"
+                break
+
+        node_actions = [
+            text for kind, text, _key in self._pending_paragon_actions(build_name)
+            if kind == "paragon_node"
+        ]
+        next_text = node_actions[0] if node_actions else "All paragon nodes taken"
+        pct_text = paragon_status_row[2] if paragon_status_row else "N/A"
+
+        return pct_text, current_board_label, next_text
 
     def _advisor_missing_summary(
         self, build_name: str, cap: int = 5
@@ -1702,14 +1859,29 @@ class MainWindow(FluentWindow):
         clicked - jump to the page (and, for Leveling/Skills/Paragon, the
         exact Build Guide tab) that action lives on: ``"leveling"`` ->
         Build Guide's Leveling tab, ``"skill"`` -> its Skills tab,
-        ``"paragon"`` -> its Paragon tab, ``"gear"`` -> the Character page
-        (the Equipment Planner has no per-item anchor to jump further
-        into - landing on the page is the achievable minimum there). Uses
-        the same ``switchTo`` pattern already wired for the Dashboard
-        card's whole-card click."""
+        ``"paragon"`` -> its Paragon tab (Heartseeker Rogue's board-
+        unlock fallback only), ``"paragon_node"`` -> the dedicated
+        Paragon page's board detail view for that exact node's board
+        (Phase 11/12), ``"gear"`` -> the Character page (the Equipment
+        Planner has no per-item anchor to jump further into - landing on
+        the page is the achievable minimum there). Uses the same
+        ``switchTo`` pattern already wired for the Dashboard card's
+        whole-card click."""
 
         if kind == "gear":
             self.switchTo(self.character_interface)
+            return
+
+        if kind == "paragon_node":
+            self.switchTo(self.paragon_interface)
+
+            build_name = self.leveling_manager.current_build_name
+            pending = self._pending_paragon_actions(build_name) if build_name else []
+
+            if pending:
+                _kind, _text, node_key = pending[0]
+                board_id = str(node_key).rsplit(":", 1)[0]
+                self.paragon_card.select_board(board_id)
             return
 
         self.switchTo(self.builds_interface)
@@ -1831,6 +2003,8 @@ class MainWindow(FluentWindow):
             self.on_mark_done(self._compact_action_key)
         elif self._compact_action_kind == "paragon":
             self.on_mark_board_done(self._compact_action_key)
+        elif self._compact_action_kind == "paragon_node":
+            self.on_paragon_node_toggled(self._compact_action_key, True)
         elif self._compact_action_kind == "gear":
             self.on_gear_owned_changed(self._compact_action_key, True)
 
