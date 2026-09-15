@@ -72,6 +72,11 @@ class LevelingCard(BaseCard):
     character_changed = Signal(str)
     add_character_requested = Signal()
     rename_character_requested = Signal()
+    # Phase 26: favorite/unfavorite the *currently selected* build. No
+    # build name is carried on the signal - MainWindow already knows the
+    # active build (``leveling_manager.current_build_name``), same as
+    # every other build-scoped handler here.
+    favorite_toggle_requested = Signal()
 
     LEVELING_KEY = "leveling"
     SKILLS_KEY = "skills"
@@ -148,14 +153,25 @@ class LevelingCard(BaseCard):
         self.add_widget(self.class_selector)
 
         # -------------------------
-        # Step 2: build selector (scoped to the chosen class)
+        # Step 2: build selector (scoped to the chosen class), plus a
+        # small favorite toggle (Phase 26 - "keep this simple": no new
+        # panel, just a button next to the dropdown it applies to).
         # -------------------------
+
+        build_row = QHBoxLayout()
+        build_row.setSpacing(8)
 
         self.build_combo = ComboBox(self.content)
         self.build_combo.setPlaceholderText("Select a build...")
         self.build_combo.currentIndexChanged.connect(self._on_build_selected)
 
-        self.add_widget(self.build_combo)
+        self.favorite_button = PushButton("☆ Favorite", self.content)
+        self.favorite_button.clicked.connect(self.favorite_toggle_requested)
+
+        build_row.addWidget(self.build_combo, 1)
+        build_row.addWidget(self.favorite_button)
+
+        self.add_layout(build_row)
 
         # -------------------------
         # Level input row
@@ -498,6 +514,15 @@ class LevelingCard(BaseCard):
             self._set_role_tag(selected.get("role", ""))
 
         self.build_combo.blockSignals(False)
+
+    def set_favorite_state(self, is_favorite: bool):
+        """Update the favorite button's label to reflect whether the
+        currently selected build is on the active character's favorites
+        list. Purely a read-out - MainWindow owns the actual persisted
+        state (``characters/<id>/favorite_builds``), same pattern as
+        ``set_build_status``."""
+
+        self.favorite_button.setText("★ Favorited" if is_favorite else "☆ Favorite")
 
     def _on_class_selected(self, class_name: str):
 

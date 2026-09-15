@@ -291,6 +291,7 @@ class MainWindow(FluentWindow):
         self.leveling_card.character_changed.connect(self.on_character_changed)
         self.leveling_card.add_character_requested.connect(self.on_add_character)
         self.leveling_card.rename_character_requested.connect(self.on_rename_character)
+        self.leveling_card.favorite_toggle_requested.connect(self.on_favorite_toggled)
 
         # Settings page's dark/light + seasonal accent-preset picker fires
         # this whenever it changes theme.py's colors, so every already-
@@ -584,6 +585,7 @@ class MainWindow(FluentWindow):
             self.leveling_manager.list_builds_for_class(default_class), default_build
         )
         self.leveling_card.set_level_value(default_level)
+        self.leveling_card.set_favorite_state(self._is_build_favorite(default_build))
         # Don't re-persist what we just loaded back onto this same
         # character.
         self.on_level_changed(default_level, persist=False)
@@ -704,6 +706,78 @@ class MainWindow(FluentWindow):
             f"{self._char_prefix()}/class",
             self.leveling_manager.get_class_for_build(build_name),
         )
+
+        self._record_recent_build(self.leveling_manager.current_build_name)
+        self.leveling_card.set_favorite_state(
+            self._is_build_favorite(self.leveling_manager.current_build_name)
+        )
+
+    # ---------------------------------------------------------
+    # FAVORITES / RECENT BUILDS (Phase 26)
+    #
+    # Two thin, per-character QSettings lists ("keep this simple" per the
+    # roadmap) - no new data, no new page. Favorites are player-curated
+    # (toggled from the Build Guide header); recent is auto-tracked from
+    # the one existing build-switch path (``on_build_changed`` above).
+    # Both are surfaced as extra categories in the Ctrl+K quick search
+    # (see ``_build_quick_search_items``) instead of a dedicated panel.
+    # ---------------------------------------------------------
+
+    RECENT_BUILDS_MAX = 5
+
+    def _favorite_builds_key(self) -> str:
+        return f"{self._char_prefix()}/favorite_builds"
+
+    def _recent_builds_key(self) -> str:
+        return f"{self._char_prefix()}/recent_builds"
+
+    def _load_favorite_builds(self) -> list[str]:
+        return self.settings.value(self._favorite_builds_key(), [], type=list)
+
+    def _load_recent_builds(self) -> list[str]:
+        return self.settings.value(self._recent_builds_key(), [], type=list)
+
+    def _is_build_favorite(self, build_name: str) -> bool:
+        return build_name in self._load_favorite_builds()
+
+    def on_favorite_toggled(self):
+        """Favorite button clicked - flip the *currently active* build's
+        membership in this character's favorites list."""
+
+        build_name = self.leveling_manager.current_build_name
+
+        if not build_name:
+            return
+
+        favorites = self._load_favorite_builds()
+
+        if build_name in favorites:
+            favorites.remove(build_name)
+        else:
+            favorites.append(build_name)
+
+        self.settings.setValue(self._favorite_builds_key(), favorites)
+        self.leveling_card.set_favorite_state(build_name in favorites)
+
+    def _record_recent_build(self, build_name: str):
+        """Push ``build_name`` to the front of this character's recent-
+        builds list, deduping any earlier occurrence and capping the
+        list at ``RECENT_BUILDS_MAX``. Called from ``on_build_changed``
+        only - the one place a build switch actually happens - so
+        there's no second code path to keep in sync."""
+
+        if not build_name:
+            return
+
+        recent = self._load_recent_builds()
+
+        if build_name in recent:
+            recent.remove(build_name)
+
+        recent.insert(0, build_name)
+        recent = recent[: self.RECENT_BUILDS_MAX]
+
+        self.settings.setValue(self._recent_builds_key(), recent)
 
     # ---------------------------------------------------------
     # BUILD-GUIDE / SKILLS TAB
@@ -1576,6 +1650,34 @@ class MainWindow(FluentWindow):
         for label, interface in pages:
             items.append(
                 {"label": label, "category": "Page", "action": lambda i=interface: self.switchTo(i)}
+            )
+
+        # ---- Favorites / Recent (Phase 26) ----
+        #
+        # Stale entries (a favorited/recent build that no longer exists)
+        # are skipped rather than pruned from QSettings here - cheap
+        # per-open check, no extra write path.
+
+        for build_name in self._load_favorite_builds():
+            if not self.leveling_manager.get_class_for_build(build_name):
+                continue
+            items.append(
+                {
+                    "label": build_name,
+                    "category": "Favorite",
+                    "action": lambda b=build_name: self._select_build_from_search(b),
+                }
+            )
+
+        for build_name in self._load_recent_builds():
+            if not self.leveling_manager.get_class_for_build(build_name):
+                continue
+            items.append(
+                {
+                    "label": build_name,
+                    "category": "Recent",
+                    "action": lambda b=build_name: self._select_build_from_search(b),
+                }
             )
 
         # ---- All builds, across all classes ----
