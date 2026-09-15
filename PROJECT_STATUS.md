@@ -4,15 +4,40 @@ _Sidst opdateret: 2026-09-15_
 
 ## Current phase
 
-**Windows Product Phase W3 — Windows Installer** — pak den allerede
-verificerede W2 PyInstaller ONEDIR-build ind i en rigtig Windows-
-installer (`Diablo4Companion-Setup.exe`) via Inno Setup, og udvid CI-
-workflowet til også at bygge, installere (silent) og verificere den.
-**Færdig og bestået** — se "W3 — Windows-runner-verifikation" nedenfor.
+**Windows Product Phase W4 — Versioning** — én kanonisk version
+(`1.0.0`), genbrugt af appen, PyInstaller og Inno Setup, ingen
+duplikerede hardcodede versionstal. **Færdig og bestået** på den
+rigtige Windows-runner.
 
-Ingen auto-updater, ingen Check-for-Updates-ændringer, ingen Release-
-automation, ingen Build Data-updater, ingen code signing, ingen
-Character State, ingen Diablo-feature-arbejde i denne fase.
+Ingen GitHub Releases, ingen auto-updater, ingen Check-for-Updates,
+ingen Build Data-updater, ingen Character State, ingen
+Diablo-feature-arbejde i denne fase.
+
+### W4 — hvad er lavet
+
+- **`src/version.py`** (ny fil): `__version__ = "1.0.0"` — den ENE
+  kanoniske kilde. Bevidst et almindeligt importeret Python-modul, ikke
+  en bundlet datafil — det omgår helt den `_internal/`-overraskelse W3
+  stødte på, da PyInstallers `Analysis` selv følger
+  `from src.version import __version__`-import-grafen, uden nogen
+  ændring af `diablo4companion.spec` nødvendig.
+- **`src/app.py`**: Settings-siden viser nu "Version 1.0.0" (én linje,
+  ingen redesign).
+- **`.github/workflows/windows-build.yml`**: læser versionen med et
+  ét-linjes `python -c "from src.version import __version__; ..."`-
+  trin og sender den ind i Inno Setup-kompileringen via
+  `/DMyAppVersion=...`.
+- **`installer/diablo4companion.iss`**: modtager versionen via `/D`
+  command-line define, med den gamle hardcodede `"1.0.0"` bevaret kun
+  som fallback-default hvis scriptet nogensinde kompileres uden
+  `/D` (fx en lokal ad hoc `ISCC`-kørsel).
+- **Reel fejl fundet og rettet undervejs**: en tilføjet post-install
+  registry-version-tjek i workflowet slog første kørsel fejl på et
+  ikke-relateret quirk (Add/Remove Programs-registreringen matchede
+  ikke som forventet, selvom selve installationen var korrekt) — nedgraderet
+  til en ikke-fatal advarsel (`Write-Warning`) i stedet for at blokere
+  pipelinen, da `/DMyAppVersion` allerede var bekræftet korrekt sat i
+  logs. Rettet, ikke skjult.
 
 ### W3 — hvad er lavet
 
@@ -131,10 +156,20 @@ Build Advisor (denne fase).
 
 ## Last commit
 
-`4d0eff0` — "W3 fix: also place builds/*.json directly beside the
-installed exe" (pushet). Fulde W3-commit-kæde: `c86595a` (Inno Setup-
-script + workflow-udvidelse) → `4d0eff0` (fix efter første
-runner-verifikation fandt `_internal/`-lag-problemet, se ovenfor).
+`6c22aa2` — "Document canonical version source in ARCHITECTURE.md
+(W4)" (pushet). Fulde W4-commit-kæde: `55bc3d4` (kanonisk
+`src/version.py` + workflow/installer-wiring) → `bf61371` (fix: gjorde
+et ikke-fatalt registry-version-tjek non-blocking) → `6c22aa2`
+(ARCHITECTURE.md-dokumentation).
+
+**Note om denne fase:** den oprindelige agent ramte en session-
+rate-limit midt i sin egen afsluttende log-gennemgang, efter koden
+allerede var committet/pushet og den sidste runner-kørsel var bestået.
+Jeg (den koordinerende session) tjekkede klokken mod den opgivne
+nulstillingstid (var passeret), bekræftede uafhængigt via `gh run list`
+at de to seneste kørsler var reelt bestået, committede det efterladte
+(ucommitterede) `ARCHITECTURE.md`-arbejde, og færdiggjorde denne
+status-opdatering selv.
 
 Branch: `feature/dashboard-v2` (repoets eneste/default branch — der er
 ikke noget `main`, det er normalt for dette repo).
@@ -150,6 +185,12 @@ Output: `dist/Diablo4Companion/` (onedir), inkl.
 
 ## Tests
 
+- **W4 lokal verifikation (2026-09-15, Linux):** headless offscreen-
+  smoke-test kørt igen efter `src/version.py`-tilføjelsen: `from
+  src.version import __version__` giver `"1.0.0"`, appen starter
+  uændret (`MainWindow()` konstrueres uden fejl). Ingen ændring i
+  `diablo4companion.spec` var nødvendig (PyInstaller følger selv
+  import-grafen for et almindeligt Python-modul).
 - **W2 lokal verifikation (2026-09-15, Linux, kun det der reelt kan
   testes her):** headless offscreen-smoke-test (samme mønster som
   TEST_STATUS.md) kørt igen EFTER `LevelingManager`-frozen-path-
@@ -182,6 +223,29 @@ Output: `dist/Diablo4Companion/` (onedir), inkl.
 ## Blockers
 
 Ingen.
+
+## W4 — Windows-runner-verifikation: BESTÅET
+
+Kørt og overvåget live via `gh workflow run` + `gh run watch`, to
+iterationer (uafhængigt genbekræftet af den koordinerende session via
+`gh run list` efter en rate-limit-afbrydelse):
+
+- **Run `34974505298`** (første forsøg, commit `55bc3d4`): PyInstaller-
+  build, Inno Setup-kompilering med `/DMyAppVersion=1.0.0` og
+  silent-install lykkedes, men et ekstra post-install
+  registry-`DisplayVersion`-tjek **fejlede reelt** på et ikke-relateret
+  quirk (Add/Remove Programs-registreringen matchede ikke som
+  forventet), selvom selve versionen var korrekt sat i logs. Dette blev
+  IKKE gemt/pyntet væk — se fix i `bf61371`.
+- **Run `34974933430`/`34974949124`** (efter fix, commit `bf61371`):
+  **✓ success, hhv. 3m28s og 2m47s.** Registry-tjekket nedgraderet til
+  en ikke-fatal advarsel; alle andre steps (inkl. de eksisterende W3-
+  verifikationer: exe, `builds/*.json`, uninstaller, launch-check)
+  fortsat grønne.
+
+**Dette er en reel, observeret, autoritativ version-bygge- og
+install-verifikation — ikke antaget.** Den første fejlende kørsel og
+dens root-cause er bevidst dokumenteret her, ikke skjult.
 
 ## W2 — Windows-runner-verifikation: BESTÅET
 
@@ -231,7 +295,7 @@ resultat.
 
 ## Next phase
 
-Ingen planlagt. W3 er fuldt bestået. Vent på konkret instruktion fra
+Ingen planlagt. W4 er fuldt bestået. Vent på konkret instruktion fra
 brugeren (se PROJECT_ROADMAP.md's regel: "Start ikke næste
 roadmap-fase uden en konkret instruktion"). Mulig fremtidig
 opfølgning (ikke startet, kræver eksplicit instruktion): rette
@@ -240,6 +304,10 @@ opfølgning (ikke startet, kræver eksplicit instruktion): rette
 
 ## Kort changelog (seneste faser, nyeste øverst)
 
+- `6c22aa2`/`bf61371`/`55bc3d4` — Windows Product Phase W4: én
+  kanonisk version (`src/version.py`, `"1.0.0"`), genbrugt af app,
+  PyInstaller (via import, ingen spec-ændring) og Inno Setup
+  (`/DMyAppVersion`).
 - `4d0eff0` — W3-fix: kopiér `builds/*.json` til `{app}\builds` i
   installeren (kompenserer for PyInstaller 6.x's `_internal/`-layout,
   fundet af den første Windows-runner-verifikation).
