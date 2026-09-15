@@ -2393,6 +2393,13 @@
             "name": "Que (Fortress)",
             "effect_text": "Invoke the Druid's Earthen Bulwark Skill for {s1} seconds, granting yourself a Barrier."
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2413,6 +2420,13 @@
             "name": "Lac (Defiance)",
             "effect_text": "Invoke the Barbarian's Challenging Shout Skill, taunting enemies and reducing your damage taken for {s1} seconds."
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2427,6 +2441,13 @@
             "name": "Grand Amethyst",
             "effect_text": "x24% Shadow Damage Multiplier / +181% Barrier Generation / +2625 Shadow Resistance"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Destruction",
+            "group": "Weapons",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2440,12 +2461,26 @@
             "name": "Grand Amethyst",
             "effect_text": "x24% Shadow Damage Multiplier"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Destruction",
+            "group": "Weapons",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Gloves",
         "item_name": "Fists of Fate",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "tempering": [
+          {
+            "recipe_name": "Demonologist",
+            "group": "Offensive",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Pants",
@@ -2465,12 +2500,26 @@
             "name": "Grand Sapphire",
             "effect_text": "~90 Willpower"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Boots",
         "item_name": "Footfalls of the Waning World",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "tempering": [
+          {
+            "recipe_name": "Natural Motion",
+            "group": "Mobility",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Ring 1",
@@ -2482,6 +2531,13 @@
             "kind": "gem",
             "name": "Grand Diamond",
             "effect_text": "+375 Resistance to All Elements"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "3"
           }
         ]
       },
@@ -2497,6 +2553,13 @@
             "name": "Grand Diamond",
             "effect_text": "+375 Resistance to All Elements"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2510,6 +2573,13 @@
             "kind": "gem",
             "name": "Grand Ruby",
             "effect_text": "+2625 Fire Resistance"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
           }
         ]
       },

@@ -2415,6 +2415,13 @@
             "name": "Kry (Unleashing)",
             "effect_text": "Invoke the Spiritborn's Vortex Skill, dealing damage and Pulling In enemies."
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2435,6 +2442,13 @@
             "name": "Tzic (Stampede)",
             "effect_text": "Invoke the Spiritborn's Concussive Stomp Skill, dealing damage and Knocking Down enemies."
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2454,13 +2468,27 @@
             "name": "Grand Skull",
             "effect_text": "x24% Physical Damage Multiplier"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Elemental Finesse - Day",
+            "group": "Offensive",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Gloves",
         "item_name": "Runic Gloves",
         "rarity": "Legendary",
-        "aspect": "Aspect of Plains Power"
+        "aspect": "Aspect of Plains Power",
+        "tempering": [
+          {
+            "recipe_name": "Elemental Finesse - Day",
+            "group": "Offensive",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Pants",
@@ -2479,12 +2507,26 @@
             "name": "Grand Emerald",
             "effect_text": "~90 Dexterity"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Boots",
         "item_name": "Path of the Emissary",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "tempering": [
+          {
+            "recipe_name": "Natural Motion",
+            "group": "Mobility",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Ring 1",
@@ -2496,6 +2538,13 @@
             "kind": "gem",
             "name": "Grand Diamond",
             "effect_text": "+375 Resistance to All Elements"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "3"
           }
         ]
       },
@@ -2510,6 +2559,13 @@
             "name": "Grand Diamond",
             "effect_text": "+375 Resistance to All Elements"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2523,6 +2579,13 @@
             "kind": "gem",
             "name": "Grand Amethyst",
             "effect_text": "+2625 Shadow Resistance"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "3"
           }
         ]
       },

@@ -2362,6 +2362,13 @@
             "name": "Que (Fortress)",
             "effect_text": "Invoke the Druid's Earthen Bulwark Skill for {s1} seconds, granting yourself a Barrier."
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2381,6 +2388,13 @@
             "kind": "rune",
             "name": "Vex (Heart of the Oak)",
             "effect_text": "Gain +1 to all Skills for 10 seconds."
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
           }
         ]
       },
@@ -2402,6 +2416,13 @@
             "name": "Grand Emerald",
             "effect_text": "x24% Poison Damage Multiplier"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Finesse",
+            "group": "Offensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2414,6 +2435,13 @@
             "kind": "gem",
             "name": "Grand Emerald",
             "effect_text": "x24% Poison Damage Multiplier"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Finesse",
+            "group": "Offensive",
+            "tier": "3"
           }
         ]
       },
@@ -2428,13 +2456,27 @@
             "name": "Grand Emerald",
             "effect_text": "x24% Poison Damage Multiplier"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Finesse",
+            "group": "Offensive",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Gloves",
         "item_name": "Runic Gloves",
         "rarity": "Legendary",
-        "aspect": "Aspect of Imitated Imbuement"
+        "aspect": "Aspect of Imitated Imbuement",
+        "tempering": [
+          {
+            "recipe_name": "Worldly Finesse",
+            "group": "Offensive",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Pants",
@@ -2453,13 +2495,27 @@
             "name": "Grand Emerald",
             "effect_text": "~90 Dexterity"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Boots",
         "item_name": "Runic Cleats",
         "rarity": "Legendary",
-        "aspect": "Earthstriker's Aspect"
+        "aspect": "Earthstriker's Aspect",
+        "tempering": [
+          {
+            "recipe_name": "Natural Motion",
+            "group": "Mobility",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Ring",
@@ -2472,6 +2528,13 @@
             "kind": "unknown",
             "name": null,
             "effect_text": null
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Finesse",
+            "group": "Offensive",
+            "tier": "3"
           }
         ]
       },
@@ -2486,6 +2549,13 @@
             "kind": "unknown",
             "name": null,
             "effect_text": null
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Finesse",
+            "group": "Offensive",
+            "tier": "3"
           }
         ]
       },

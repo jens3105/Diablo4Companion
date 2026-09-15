@@ -2341,6 +2341,13 @@
             "name": "Grand Ruby",
             "effect_text": "~90 Strength"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2361,6 +2368,13 @@
             "name": "Gar (Precision)",
             "effect_text": "Gain {s1}% Critical Strike Chance for 5 seconds, up to 10%."
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2374,6 +2388,13 @@
             "kind": "gem",
             "name": "Grand Ruby",
             "effect_text": "x24% Fire and Holy Damage Multiplier / ~90 Strength / +2625 Fire Resistance"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
           }
         ]
       },
@@ -2389,13 +2410,27 @@
             "name": "Grand Ruby",
             "effect_text": "x24% Fire and Holy Damage Multiplier"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Destruction",
+            "group": "Weapons",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Gloves",
         "item_name": "Runic Gloves",
         "rarity": "Legendary",
-        "aspect": "Aspect of the Judicator"
+        "aspect": "Aspect of the Judicator",
+        "tempering": [
+          {
+            "recipe_name": "Guardian Finesse",
+            "group": "Offensive",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Pants",
@@ -2414,6 +2449,13 @@
             "kind": "rune",
             "name": "Ceh (Alpha Canid)",
             "effect_text": "Summon a Spirit Wolf Companion to attack enemies for 8 seconds."
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
           }
         ]
       },
@@ -2435,6 +2477,13 @@
             "name": "Grand Topaz",
             "effect_text": "+2625 Lightning Resistance"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2447,6 +2496,13 @@
             "kind": "gem",
             "name": "Grand Emerald",
             "effect_text": "+2625 Poison Resistance"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "3"
           }
         ]
       },
@@ -2461,6 +2517,13 @@
             "kind": "gem",
             "name": "Grand Ruby",
             "effect_text": "+2625 Fire Resistance"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
           }
         ]
       },

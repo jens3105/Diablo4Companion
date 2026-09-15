@@ -2386,6 +2386,13 @@
             "name": "Mot (Shadow)",
             "effect_text": "Gain {s1} |4 shadow:shadows;, from the Rogue's Dark Shroud Skill, reducing damage taken per shadow."
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2405,6 +2412,13 @@
             "kind": "rune",
             "name": "Gar (Precision)",
             "effect_text": "Gain {s1}% Critical Strike Chance for 5 seconds, up to 10%."
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
           }
         ]
       },
@@ -2426,6 +2440,13 @@
             "name": "Grand Sapphire",
             "effect_text": "x24% Cold Damage Multiplier"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Destruction",
+            "group": "Weapons",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2438,6 +2459,13 @@
             "kind": "gem",
             "name": "Grand Sapphire",
             "effect_text": "x24% Cold Damage Multiplier"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Destruction",
+            "group": "Weapons",
+            "tier": "3"
           }
         ]
       },
@@ -2452,12 +2480,26 @@
             "name": "Grand Sapphire",
             "effect_text": "x24% Cold Damage Multiplier"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Destruction",
+            "group": "Weapons",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Gloves",
         "item_name": "Fist of the Iron Rose",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "tempering": [
+          {
+            "recipe_name": "Worldly Finesse",
+            "group": "Offensive",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Pants",
@@ -2476,13 +2518,27 @@
             "name": "Grand Emerald",
             "effect_text": "~90 Dexterity"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Boots",
         "item_name": "Runic Cleats",
         "rarity": "Legendary",
-        "aspect": "Aspect of Siphoning Strikes"
+        "aspect": "Aspect of Siphoning Strikes",
+        "tempering": [
+          {
+            "recipe_name": "Natural Motion",
+            "group": "Mobility",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Ring 1",
@@ -2495,6 +2551,13 @@
             "kind": "gem",
             "name": "Grand Diamond",
             "effect_text": "+375 Resistance to All Elements"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "3"
           }
         ]
       },
@@ -2510,6 +2573,13 @@
             "name": "Grand Ruby",
             "effect_text": "+2625 Fire Resistance"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2523,6 +2593,13 @@
             "kind": "gem",
             "name": "Grand Topaz",
             "effect_text": "+2625 Lightning Resistance"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
           }
         ]
       },

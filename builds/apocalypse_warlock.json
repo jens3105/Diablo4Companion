@@ -2394,6 +2394,13 @@
             "name": "Lac (Defiance)",
             "effect_text": "Invoke the Barbarian's Challenging Shout Skill, taunting enemies and reducing your damage taken for {s1} seconds."
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2412,6 +2419,13 @@
             "kind": "rune",
             "name": "Que (Fortress)",
             "effect_text": "Invoke the Druid's Earthen Bulwark Skill for {s1} seconds, granting yourself a Barrier."
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
           }
         ]
       },
@@ -2437,7 +2451,14 @@
       {
         "slot": "Gloves",
         "item_name": "Hands of the Worldbreaker",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "tempering": [
+          {
+            "recipe_name": "Sharpened Finesse",
+            "group": "Offensive",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Pants",
@@ -2457,13 +2478,27 @@
             "name": "Grand Sapphire",
             "effect_text": "~90 Willpower"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Boots",
         "item_name": "Runic Cleats",
         "rarity": "Legendary",
-        "aspect": "Aspect of Accursed Touch"
+        "aspect": "Aspect of Accursed Touch",
+        "tempering": [
+          {
+            "recipe_name": "Natural Motion",
+            "group": "Mobility",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Ring 1",
@@ -2490,6 +2525,13 @@
             "name": "Grand Diamond",
             "effect_text": "+375 Resistance to All Elements"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Sharpened Finesse",
+            "group": "Offensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2503,6 +2545,13 @@
             "kind": "gem",
             "name": "Grand Ruby",
             "effect_text": "+2625 Fire Resistance"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Natural Motion",
+            "group": "Mobility",
+            "tier": "3"
           }
         ]
       },

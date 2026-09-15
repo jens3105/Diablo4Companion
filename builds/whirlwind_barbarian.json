@@ -2351,6 +2351,13 @@
             "name": "Jah (Enigma)",
             "effect_text": "Replace your next Evade with the Sorcerer's Teleport Skill, blinking further, dealing damage, and becoming Unstoppable."
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2370,6 +2377,13 @@
             "kind": "rune",
             "name": "Kel (Inspiration )",
             "effect_text": "Invoke the Paladins's Rally Skill, gaining Resource and Movement Speed for {s1} seconds."
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
           }
         ]
       },
@@ -2391,6 +2405,13 @@
             "name": "Grand Skull",
             "effect_text": "x24% Physical Damage Multiplier"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Destruction",
+            "group": "Weapons",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2410,6 +2431,13 @@
             "name": "Grand Skull",
             "effect_text": "x24% Physical Damage Multiplier"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Destruction",
+            "group": "Weapons",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2422,6 +2450,13 @@
             "kind": "gem",
             "name": "Grand Skull",
             "effect_text": "x24% Physical Damage Multiplier"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Destruction",
+            "group": "Weapons",
+            "tier": "3"
           }
         ]
       },
@@ -2437,12 +2472,26 @@
             "name": "Grand Skull",
             "effect_text": "x24% Physical Damage Multiplier"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Destruction",
+            "group": "Weapons",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Gloves",
         "item_name": "Gohr's Devastating Grips",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "tempering": [
+          {
+            "recipe_name": "Worldly Finesse",
+            "group": "Offensive",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Pants",
@@ -2461,13 +2510,27 @@
             "name": "Grand Ruby",
             "effect_text": "~90 Strength"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Boots",
         "item_name": "Runic Cleats",
         "rarity": "Legendary",
-        "aspect": "Battle-Mad Aspect"
+        "aspect": "Battle-Mad Aspect",
+        "tempering": [
+          {
+            "recipe_name": "Natural Motion",
+            "group": "Mobility",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Ring 1",
@@ -2479,6 +2542,13 @@
             "kind": "gem",
             "name": "Grand Topaz",
             "effect_text": "+2625 Lightning Resistance"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "3"
           }
         ]
       },
@@ -2494,6 +2564,13 @@
             "name": "Grand Ruby",
             "effect_text": "+2625 Fire Resistance"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2507,6 +2584,13 @@
             "kind": "gem",
             "name": "Grand Diamond",
             "effect_text": "+375 Resistance to All Elements"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "3"
           }
         ]
       },

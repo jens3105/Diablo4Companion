@@ -2390,6 +2390,13 @@
             "name": "Que (Fortress)",
             "effect_text": "Invoke the Druid's Earthen Bulwark Skill for {s1} seconds, granting yourself a Barrier."
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Necromancer Wall",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2410,6 +2417,13 @@
             "name": "Ceh (Alpha Canid)",
             "effect_text": "Summon a Spirit Wolf Companion to attack enemies for 8 seconds."
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2429,12 +2443,26 @@
             "name": "Flawless Horadric Amethyst",
             "effect_text": "x32% Shadow Damage Multiplier"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Destruction",
+            "group": "Weapons",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Gloves",
         "item_name": "The Hand of Naz",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "tempering": [
+          {
+            "recipe_name": "Worldly Finesse",
+            "group": "Offensive",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Pants",
@@ -2453,13 +2481,27 @@
             "name": "Flawless Horadric Topaz",
             "effect_text": "~150 Intelligence"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Boots",
         "item_name": "Runic Cleats",
         "rarity": "Legendary",
-        "aspect": "Exploiter's Aspect"
+        "aspect": "Exploiter's Aspect",
+        "tempering": [
+          {
+            "recipe_name": "Natural Motion",
+            "group": "Mobility",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Ring 1",
@@ -2471,6 +2513,13 @@
             "kind": "gem",
             "name": "Flawless Horadric Diamond",
             "effect_text": "+625 Resistance to All Elements"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Finesse",
+            "group": "Offensive",
+            "tier": "3"
           }
         ]
       },
@@ -2486,6 +2535,13 @@
             "name": "Flawless Horadric Diamond",
             "effect_text": "+625 Resistance to All Elements"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Finesse",
+            "group": "Offensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2499,6 +2555,13 @@
             "kind": "gem",
             "name": "Flawless Horadric Topaz",
             "effect_text": "+4375 Lightning Resistance"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
           }
         ]
       },

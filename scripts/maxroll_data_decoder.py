@@ -490,6 +490,123 @@ def _strip_rune_markup(text: str) -> str:
     return _RUNE_MARKUP_RE.sub("", text).strip()
 
 
+# ---------------------------------------------------------
+# Tempering (Tempering phase)
+#
+# Each equipped item *instance* also carries a ``tempered`` list (real,
+# per-build guide data - exactly which Tempering Manual affix + roll
+# value the guide author actually applied), one entry per tempered
+# affix slot (D4 allows up to 2 per item on some slots - confirmed by
+# scanning every cached profile, the real max seen is 2, never assumed
+# to be exactly 1). Each entry's ``nid`` resolves against
+# ``data_dict["affixes"]`` (the same ``id`` -> definition lookup
+# ``decode_gear`` already builds for aspects) to that affix's slug (the
+# affixes dict's own KEY, not its ``id`` value).
+#
+# That slug carries no player-facing display text anywhere in
+# data.min.json (confirmed - a tempered affix's own definition is just
+# numeric ``attributes``/``formula`` data, same dead end as regular
+# explicit affixes), so a "+X stat" line is never attempted. What IS
+# real, unambiguous, in-game text is ``data_dict["temperingRecipes"]``
+# (~187 entries, each a real Tempering Manual name e.g. "Barbarian
+# Strategy" + category ``group`` + a ``tiers`` list of
+# ``[slug, ...]`` buckets, 0-based index = Tier 1/2/3): a tempered
+# affix's slug appears in exactly one recipe's tiers for the *vast*
+# majority of slugs, so resolving through it gives a genuine "Manual
+# name (group) - Tier N" result.
+#
+# This was verified programmatically, not assumed, by scanning the
+# whole ``temperingRecipes`` list once (see ``_build_tempering_index``):
+# 59 of the 1618 real tempering slugs DO appear under more than one
+# distinct recipe name (e.g. "Tempered_Damage_Generic_All_Tier1" is
+# shared by both "Natural Finesse" and the legacy "Arsenal Finesse
+# (Legacy)" recipes - two different Manuals list literally the same
+# affix). Those slugs are excluded from the index entirely rather than
+# picking one recipe arbitrarily - an item tempered with one of them
+# falls back to "DATA UNAVAILABLE" for that entry, same as an
+# unresolvable one.
+#
+# Separately (not a collision - same recipe, not "must fall back"): 34
+# slugs appear at *two* tier positions within the SAME recipe (their
+# own name usually says why, e.g.
+# "..._Concussion_Tier1Tier2" - a real D4 mechanic where a handful of
+# passive-rank-bonus tempers roll identically at Tier 1 and Tier 2, only
+# diverging at Tier 3). For these, ``tier`` is rendered as "1-2" (the
+# real positions found) rather than guessing which single one applies -
+# still exact, sourced data, never fabricated.
+# ---------------------------------------------------------
+
+
+def _build_tempering_index(data_dict: dict) -> dict[str, dict]:
+    """Build ``{affix_slug: {"recipe_name", "group", "tier"}}`` from
+    ``data_dict["temperingRecipes"]`` - see the module comment above for
+    the collision check and same-recipe multi-tier handling. Cheap
+    enough (~187 recipes) to rebuild per ``decode_gear`` call, same as
+    the existing ``affixes_by_id`` lookup."""
+
+    recipes = data_dict.get("temperingRecipes") or []
+
+    # Pass 1: which recipe name(s) each slug appears under, across ALL
+    # recipes - to find real cross-recipe collisions (see above).
+    slug_recipe_names: dict[str, set[str]] = {}
+    for recipe in recipes:
+        name = recipe.get("name")
+        for tier_list in recipe.get("tiers") or []:
+            for slug in tier_list:
+                slug_recipe_names.setdefault(slug, set()).add(name)
+
+    colliding_slugs = {slug for slug, names in slug_recipe_names.items() if len(names) > 1}
+
+    # Pass 2: build the actual index, skipping colliding slugs entirely
+    # and collapsing same-recipe multi-tier slugs into a "N-M" tier
+    # label instead of guessing a single tier.
+    index: dict[str, dict] = {}
+    for recipe in recipes:
+        name = recipe.get("name")
+        group = recipe.get("group")
+        tiers = recipe.get("tiers") or []
+
+        slug_positions: dict[str, list[int]] = {}
+        for tier_idx, tier_list in enumerate(tiers):
+            for slug in tier_list:
+                slug_positions.setdefault(slug, []).append(tier_idx)
+
+        for slug, positions in slug_positions.items():
+            if slug in colliding_slugs:
+                continue
+            tier_numbers = sorted(p + 1 for p in positions)
+            index[slug] = {
+                "recipe_name": name,
+                "group": group,
+                "tier": "-".join(str(n) for n in tier_numbers),
+            }
+
+    return index
+
+
+def _resolve_tempering(
+    tempered_entries: list[dict] | None,
+    affix_slug_by_id: dict[int, str],
+    tempering_index: dict[str, dict],
+) -> list[dict]:
+    """Resolve one item instance's ``tempered`` list (real per-build
+    Tempering Manual choices) into
+    ``[{"recipe_name", "group", "tier"}, ...]`` via ``tempering_index``.
+    An entry whose ``nid`` doesn't resolve to a known affix slug, or
+    whose slug isn't in the index (unrecognized, or excluded as a
+    cross-recipe collision - see above), is simply omitted rather than
+    guessed; the caller shows "DATA UNAVAILABLE" when the resulting list
+    ends up empty."""
+
+    results = []
+    for entry in tempered_entries or []:
+        slug = affix_slug_by_id.get(entry.get("nid"))
+        recipe = tempering_index.get(slug) if slug else None
+        if recipe:
+            results.append(dict(recipe))
+    return results
+
+
 # A gem's ``socketedEffects[i]["label"]`` is Maxroll's own display
 # template, e.g. "x[{value}*100|%|] Lightning Damage Multiplier" -
 # ``{value}`` is a literal placeholder for that SAME effect entry's own
@@ -635,6 +752,14 @@ def decode_gear(data: dict, profile: dict, data_dict: dict) -> list[dict]:
     convention as ``aspect``) - real, per-build "expected gem/rune in
     each socket" data, not guessed.
 
+    Each item instance also carries a ``tempered`` list (up to 2 real
+    per-build Tempering Manual choices). Each entry is resolved (see
+    ``_resolve_tempering``/``_build_tempering_index``) into
+    ``{recipe_name, group, tier}`` - a real Manual name + category +
+    tier number, e.g. "Barbarian Strategy" / "Defensive" / "2" - and
+    attached as this gear entry's own ``tempering`` list, only when
+    non-empty (same additive convention as ``aspect``/``sockets``).
+
     Items with no resolvable base definition/name are skipped rather
     than guessed. Duplicate slot labels (both Rings, dual-wielded
     weapons) get a trailing " 1"/" 2" so each row has a distinct key.
@@ -645,9 +770,13 @@ def decode_gear(data: dict, profile: dict, data_dict: dict) -> list[dict]:
     item_defs = data_dict["items"]
 
     affixes_by_id: dict[int, dict] = {}
-    for affix_def in data_dict["affixes"].values():
+    affix_slug_by_id: dict[int, str] = {}
+    for affix_slug, affix_def in data_dict["affixes"].items():
         if isinstance(affix_def, dict) and "id" in affix_def:
             affixes_by_id[affix_def["id"]] = affix_def
+            affix_slug_by_id[affix_def["id"]] = affix_slug
+
+    tempering_index = _build_tempering_index(data_dict)
 
     resolved = []
 
@@ -675,6 +804,10 @@ def decode_gear(data: dict, profile: dict, data_dict: dict) -> list[dict]:
             if content_slug
         ]
 
+        tempering = _resolve_tempering(
+            instance.get("tempered"), affix_slug_by_id, tempering_index
+        )
+
         resolved.append(
             {
                 "slot_label": _humanize_item_type(item_type),
@@ -682,6 +815,7 @@ def decode_gear(data: dict, profile: dict, data_dict: dict) -> list[dict]:
                 "rarity": _resolve_item_rarity(instance, item_def),
                 "aspect": ", ".join(aspect_names) if aspect_names else None,
                 "sockets": sockets,
+                "tempering": tempering,
             }
         )
 
@@ -702,6 +836,8 @@ def decode_gear(data: dict, profile: dict, data_dict: dict) -> list[dict]:
             gear_entry["aspect"] = entry["aspect"]
         if entry["sockets"]:
             gear_entry["sockets"] = entry["sockets"]
+        if entry["tempering"]:
+            gear_entry["tempering"] = entry["tempering"]
 
         result.append(gear_entry)
 

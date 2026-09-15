@@ -1336,6 +1336,13 @@
             "name": "Ceh (Alpha Canid)",
             "effect_text": "Summon a Spirit Wolf Companion to attack enemies for 8 seconds."
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -1354,6 +1361,13 @@
             "kind": "rune",
             "name": "Gar (Precision)",
             "effect_text": "Gain {s1}% Critical Strike Chance for 5 seconds, up to 10%."
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
           }
         ]
       },
@@ -1375,6 +1389,13 @@
             "name": "Grand Ruby",
             "effect_text": "x24% Fire and Holy Damage Multiplier"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Sharpened Finesse",
+            "group": "Offensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -1395,6 +1416,13 @@
             "name": "Grand Ruby",
             "effect_text": "x24% Fire and Holy Damage Multiplier"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Sharpened Finesse",
+            "group": "Offensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -1408,6 +1436,13 @@
             "kind": "gem",
             "name": "Grand Ruby",
             "effect_text": "x24% Fire and Holy Damage Multiplier"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Sharpened Finesse",
+            "group": "Offensive",
+            "tier": "3"
           }
         ]
       },
@@ -1423,13 +1458,27 @@
             "name": "Grand Ruby",
             "effect_text": "x24% Fire and Holy Damage Multiplier"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Sharpened Finesse",
+            "group": "Offensive",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Gloves",
         "item_name": "Runic Gloves",
         "rarity": "Legendary",
-        "aspect": "Crushing Aspect"
+        "aspect": "Crushing Aspect",
+        "tempering": [
+          {
+            "recipe_name": "Sharpened Finesse",
+            "group": "Offensive",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Pants",
@@ -1449,13 +1498,27 @@
             "name": "Grand Ruby",
             "effect_text": "~90 Strength"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Boots",
         "item_name": "Runic Cleats",
         "rarity": "Legendary",
-        "aspect": "Aspect of Dominance"
+        "aspect": "Aspect of Dominance",
+        "tempering": [
+          {
+            "recipe_name": "Natural Motion",
+            "group": "Mobility",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Ring 1",
@@ -1467,6 +1530,13 @@
             "kind": "gem",
             "name": "Grand Topaz",
             "effect_text": "+2625 Lightning Resistance"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "3"
           }
         ]
       },
@@ -1482,6 +1552,13 @@
             "name": "Grand Skull",
             "effect_text": "+2625 Physical Resistance"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -1495,6 +1572,13 @@
             "kind": "gem",
             "name": "Grand Ruby",
             "effect_text": "+2625 Fire Resistance"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Sharpened Finesse",
+            "group": "Offensive",
+            "tier": "3"
           }
         ]
       },

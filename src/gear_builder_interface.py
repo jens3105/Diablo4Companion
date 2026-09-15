@@ -9,12 +9,13 @@ real field for one slot at a time, in comfortably large text" view.
 Data boundary (see ``src/gear_planner.py``'s module docstring and the
 build JSON itself): ``verified_build.gear`` is Maxroll planner data,
 already fully decoded, and each entry is
-``{slot, item_name, rarity, aspect, sockets}`` - there is still no
-stats/affix/tempering/masterworking data anywhere in the source. Every
+``{slot, item_name, rarity, aspect, sockets, tempering}`` - there is
+still no stats/affix/masterworking data anywhere in the source. Every
 card here shows the real fields when present, and a literal "DATA
 UNAVAILABLE" row for each of Affixes/Stats, Sockets/Gems (only when the
-item genuinely has none), Tempering and Masterworking. This is expected,
-not a bug.
+item genuinely has none), Tempering (only when the item genuinely has
+no tempered affix, or one that didn't resolve to a known recipe) and
+Masterworking. This is expected, not a bug.
 
 Sockets/Gems (Gems System phase): when an item's ``sockets`` list is
 non-empty (see ``scripts/maxroll_data_decoder.py``'s ``decode_gear``),
@@ -27,6 +28,15 @@ socket actually gets marked done; a socket whose content couldn't be
 resolved at all (``kind == "unknown"`` - e.g. Season 15 Soul Splinter
 boss materials) shows literally "DATA UNAVAILABLE" for that one socket,
 never a fabricated name.
+
+Tempering (Tempering phase): when an item's ``tempering`` list is
+non-empty (see ``decode_gear``/``_resolve_tempering``), the "Tempering"
+row shows the real Tempering Manual name(s) instead of the placeholder -
+e.g. "Worldly Endurance (Defensive) — Tier 3", joined with "; " when an
+item has two tempered affixes. An item with no ``tempering`` data (no
+tempered affix at all, or one that didn't resolve to a known recipe -
+e.g. a slug shared by more than one Manual, never guessed) still shows
+"DATA UNAVAILABLE" for this row, same as before.
 
 Builds with no ``verified_build`` at all (today, only Heartseeker Rogue -
 its guide predates the Maxroll planner decode and only has prose-derived
@@ -89,9 +99,11 @@ _CARD_BUCKET_ORDER = [
     "WEAPON",
 ]
 
-# The four fields this app's data source (see module docstring) simply
-# never contains for any item, on any build - always rendered literally
-# as "DATA UNAVAILABLE", never invented.
+# Fields this app's data source (see module docstring) never contains
+# for any item, on any build - always rendered literally as "DATA
+# UNAVAILABLE", never invented. Sockets/Gems and Tempering are the two
+# exceptions once an item genuinely has real decoded data for them (see
+# ``_sockets_summary_row``/``_tempering_summary_row``).
 _UNAVAILABLE_FIELDS = ["Affixes / Stats", "Sockets / Gems", "Tempering", "Masterworking"]
 
 
@@ -110,12 +122,14 @@ class GearSlotCard(QFrame):
         entry: SlotEntry,
         sockets: list[dict] | None = None,
         socketed_gems: set[str] | None = None,
+        tempering: list[dict] | None = None,
         parent=None,
     ):
         super().__init__(parent)
 
         self._sockets = sockets or []
         self._socketed_gems = socketed_gems or set()
+        self._tempering = tempering or []
 
         self.entry = entry
         self.setObjectName("gearBuilderCard")
@@ -177,6 +191,8 @@ class GearSlotCard(QFrame):
         for field_name in _UNAVAILABLE_FIELDS:
             if field_name == "Sockets / Gems" and self._sockets:
                 outer.addWidget(self._sockets_summary_row(entry.slot_label))
+            elif field_name == "Tempering" and self._tempering:
+                outer.addWidget(self._tempering_summary_row())
             else:
                 outer.addWidget(self._field_row(field_name, "DATA UNAVAILABLE", muted=True))
 
@@ -204,6 +220,18 @@ class GearSlotCard(QFrame):
         count = len(self._sockets)
         label = f"{count} socket{'s' if count != 1 else ''}"
         return self._field_row("Sockets / Gems", f"{label} — " + ", ".join(parts))
+
+    def _tempering_summary_row(self) -> QWidget:
+        """Real Tempering Manual read-out, e.g. "Worldly Endurance
+        (Defensive) — Tier 3" - joined with "; " when the item has two
+        tempered affixes (see ``scripts/maxroll_data_decoder.py``'s
+        ``_resolve_tempering``). Read-only, same as Sockets/Gems - there
+        is no separate "mark tempered" toggle anywhere in the app."""
+
+        parts = [
+            f"{t['recipe_name']} ({t['group']}) — Tier {t['tier']}" for t in self._tempering
+        ]
+        return self._field_row("Tempering", "; ".join(parts))
 
     def _field_row(self, label: str, value: str, muted: bool = False) -> QWidget:
 
@@ -369,22 +397,31 @@ class GearBuilderCard(BaseCard):
         sockets_by_slot = {
             item["slot"]: item["sockets"] for item in verified_gear if item.get("sockets")
         }
+        tempering_by_slot = {
+            item["slot"]: item["tempering"] for item in verified_gear if item.get("tempering")
+        }
 
         owned_count = sum(1 for entry in verified_gear if entry["item_name"] in owned_names)
         self.rollup_label.setText(f"{owned_count} / {len(verified_gear)} items equipped")
 
         for bucket in _CARD_BUCKET_ORDER:
             for entry in by_bucket.get(bucket, []):
-                self._add_card(entry, sockets_by_slot.get(entry.slot_label), socketed_gems)
+                self._add_card(
+                    entry,
+                    sockets_by_slot.get(entry.slot_label),
+                    socketed_gems,
+                    tempering_by_slot.get(entry.slot_label),
+                )
 
     def _add_card(
         self,
         entry: SlotEntry,
         sockets: list[dict] | None = None,
         socketed_gems: set[str] | None = None,
+        tempering: list[dict] | None = None,
     ):
 
-        card = GearSlotCard(entry, sockets, socketed_gems, self._cards_container)
+        card = GearSlotCard(entry, sockets, socketed_gems, tempering, self._cards_container)
         card.owned_toggled.connect(self.item_owned_changed)
         self._cards_layout.insertWidget(self._cards_layout.count() - 1, card)
         self._cards.append(card)

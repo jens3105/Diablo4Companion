@@ -2384,6 +2384,13 @@
             "name": "Mot (Shadow)",
             "effect_text": "Gain {s1} |4 shadow:shadows;, from the Rogue's Dark Shroud Skill, reducing damage taken per shadow."
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2403,6 +2410,13 @@
             "name": "Thul (Absolute Zero)",
             "effect_text": "Invoke the Sorcerer's Frost Nova Skill, Freezing enemies."
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2417,6 +2431,13 @@
             "name": "Flawless Horadric Topaz",
             "effect_text": "x32% Lightning Damage Multiplier / ~150 Intelligence / +4375 Lightning Resistance"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Destruction",
+            "group": "Weapons",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2430,13 +2451,27 @@
             "name": "Flawless Horadric Topaz",
             "effect_text": "x32% Lightning Damage Multiplier"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Destruction",
+            "group": "Weapons",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Gloves",
         "item_name": "Runic Gloves",
         "rarity": "Legendary",
-        "aspect": "Aspect of Elemental Constellation"
+        "aspect": "Aspect of Elemental Constellation",
+        "tempering": [
+          {
+            "recipe_name": "Worldly Finesse",
+            "group": "Offensive",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Pants",
@@ -2456,13 +2491,27 @@
             "name": "Flawless Horadric Topaz",
             "effect_text": "~150 Intelligence"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Boots",
         "item_name": "Runic Cleats",
         "rarity": "Legendary",
-        "aspect": "Aspect of Mind's Awakening"
+        "aspect": "Aspect of Mind's Awakening",
+        "tempering": [
+          {
+            "recipe_name": "Natural Motion",
+            "group": "Mobility",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Ring 1",
@@ -2474,6 +2523,13 @@
             "kind": "gem",
             "name": "Flawless Horadric Diamond",
             "effect_text": "+625 Resistance to All Elements"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "3"
           }
         ]
       },
@@ -2488,6 +2544,13 @@
             "name": "Flawless Horadric Diamond",
             "effect_text": "+625 Resistance to All Elements"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2501,6 +2564,13 @@
             "kind": "gem",
             "name": "Flawless Horadric Diamond",
             "effect_text": "+625 Resistance to All Elements"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "3"
           }
         ]
       },

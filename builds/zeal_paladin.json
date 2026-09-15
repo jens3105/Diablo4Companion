@@ -2360,6 +2360,13 @@
             "name": "Gar (Precision)",
             "effect_text": "Gain {s1}% Critical Strike Chance for 5 seconds, up to 10%."
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2380,6 +2387,13 @@
             "name": "Jah (Enigma)",
             "effect_text": "Replace your next Evade with the Sorcerer's Teleport Skill, blinking further, dealing damage, and becoming Unstoppable."
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2399,12 +2413,26 @@
             "name": "Flawless Horadric Skull",
             "effect_text": "x32% Physical Damage Multiplier"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Destruction",
+            "group": "Weapons",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Gloves",
         "item_name": "Fists of Fate",
-        "rarity": "Mythic"
+        "rarity": "Mythic",
+        "tempering": [
+          {
+            "recipe_name": "Aura Innovation",
+            "group": "Utility",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Pants",
@@ -2424,13 +2452,27 @@
             "name": "Flawless Horadric Ruby",
             "effect_text": "~150 Strength"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Boots",
         "item_name": "Runic Cleats",
         "rarity": "Legendary",
-        "aspect": "Embattled Aspect"
+        "aspect": "Embattled Aspect",
+        "tempering": [
+          {
+            "recipe_name": "Natural Motion",
+            "group": "Mobility",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Ring 1",
@@ -2443,6 +2485,13 @@
             "kind": "gem",
             "name": "Flawless Horadric Skull",
             "effect_text": "+4375 Physical Resistance"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "3"
           }
         ]
       },
@@ -2458,6 +2507,13 @@
             "name": "Flawless Horadric Topaz",
             "effect_text": "+4375 Lightning Resistance"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2471,6 +2527,13 @@
             "kind": "gem",
             "name": "Flawless Horadric Ruby",
             "effect_text": "+4375 Fire Resistance"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "3"
           }
         ]
       },

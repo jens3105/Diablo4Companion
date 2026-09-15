@@ -2362,6 +2362,13 @@
             "name": "Gar (Precision)",
             "effect_text": "Gain {s1}% Critical Strike Chance for 5 seconds, up to 10%."
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Necromancer Wall",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2382,6 +2389,13 @@
             "name": "Wat (Disdain)",
             "effect_text": "Invoke the Necromancer's Decrepify Skill, Weakening and Slowing enemies."
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2394,6 +2408,13 @@
             "kind": "gem",
             "name": "Flawless Horadric Topaz",
             "effect_text": "x32% Lightning Damage Multiplier / ~150 Intelligence / +4375 Lightning Resistance"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Destruction",
+            "group": "Weapons",
+            "tier": "3"
           }
         ]
       },
@@ -2409,13 +2430,27 @@
             "name": "Flawless Horadric Skull",
             "effect_text": "x32% Physical Damage Multiplier"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Destruction",
+            "group": "Weapons",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Gloves",
         "item_name": "Runic Gloves",
         "rarity": "Legendary",
-        "aspect": "Aspect of Serration"
+        "aspect": "Aspect of Serration",
+        "tempering": [
+          {
+            "recipe_name": "Sharpened Finesse",
+            "group": "Offensive",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Pants",
@@ -2434,13 +2469,27 @@
             "name": "Flawless Horadric Topaz",
             "effect_text": "~150 Intelligence"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "3"
+          }
         ]
       },
       {
         "slot": "Boots",
         "item_name": "Runic Cleats",
         "rarity": "Legendary",
-        "aspect": "Aspect of Shielding Bones"
+        "aspect": "Aspect of Shielding Bones",
+        "tempering": [
+          {
+            "recipe_name": "Natural Motion",
+            "group": "Mobility",
+            "tier": "3"
+          }
+        ]
       },
       {
         "slot": "Ring 1",
@@ -2453,6 +2502,13 @@
             "kind": "gem",
             "name": "Flawless Horadric Diamond",
             "effect_text": "+625 Resistance to All Elements"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Finesse",
+            "group": "Offensive",
+            "tier": "3"
           }
         ]
       },
@@ -2468,6 +2524,13 @@
             "name": "Flawless Horadric Emerald",
             "effect_text": "+4375 Poison Resistance"
           }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Finesse",
+            "group": "Offensive",
+            "tier": "3"
+          }
         ]
       },
       {
@@ -2481,6 +2544,13 @@
             "kind": "gem",
             "name": "Flawless Horadric Ruby",
             "effect_text": "+4375 Fire Resistance"
+          }
+        ],
+        "tempering": [
+          {
+            "recipe_name": "Worldly Finesse",
+            "group": "Offensive",
+            "tier": "3"
           }
         ]
       },
