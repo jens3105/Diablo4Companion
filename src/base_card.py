@@ -8,11 +8,11 @@ from qfluentwidgets.common.icon import FluentIconBase
 from src import theme
 
 
-class ClickableBodyLabel(BodyLabel):
-    """A ``BodyLabel`` that can be toggled (``set_active``) into a
-    clickable, hand-cursor state - used for the Dashboard/Build Advisor
-    "next action" line jumping straight to the relevant page/tab (see
-    ``CurrentBuildCard``/``BuildAdvisorCard``).
+class _ClickableLabelMixin:
+    """Shared behavior for a label that can be toggled (``set_active``)
+    into a clickable, hand-cursor state - used for the Dashboard/Build
+    Advisor "next action" line jumping straight to the relevant
+    page/tab (see ``CurrentBuildCard``/``BuildAdvisorCard``).
 
     When inactive, an unhandled mouse release just falls through to
     ``QLabel``'s default (Qt propagates an *ignored* mouse event up to
@@ -21,9 +21,12 @@ class ClickableBodyLabel(BodyLabel):
     already fell through to the whole card's own ``clicked`` navigation).
     When active, the event is accepted here instead, so it stops at this
     label and fires ``clicked`` rather than also triggering the parent
-    card's navigation."""
+    card's navigation.
 
-    clicked = Signal()
+    Mixed into the concrete ``Clickable*Label`` classes below, each of
+    which supplies its own ``clicked`` signal (a ``Signal()`` can't be
+    defined once here and shared, since PySide6 binds signals to the
+    class that declares them) and its own QLabel base for styling."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -41,26 +44,18 @@ class ClickableBodyLabel(BodyLabel):
             super().mouseReleaseEvent(e)
 
 
-class ClickableStrongBodyLabel(StrongBodyLabel):
+class ClickableBodyLabel(_ClickableLabelMixin, BodyLabel):
+    """A ``BodyLabel`` with clickable-when-active behavior - see
+    ``_ClickableLabelMixin``."""
+
+    clicked = Signal()
+
+
+class ClickableStrongBodyLabel(_ClickableLabelMixin, StrongBodyLabel):
     """Same as ``ClickableBodyLabel``, styled like ``StrongBodyLabel`` -
     used by ``BuildAdvisorCard``'s bigger next-action line."""
 
     clicked = Signal()
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._active = False
-
-    def set_active(self, active: bool):
-        self._active = active
-        self.setCursor(Qt.PointingHandCursor if active else Qt.ArrowCursor)
-
-    def mouseReleaseEvent(self, e):
-        if self._active:
-            e.accept()
-            self.clicked.emit()
-        else:
-            super().mouseReleaseEvent(e)
 
 
 class BaseCard(CardWidget):

@@ -10,7 +10,7 @@ for a short "what's missing" list per category.
 No new validation logic lives here - this module is presentation only,
 same as ``CurrentBuildCard``/``LevelingCard``'s Build Status widget."""
 
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QColor, QFontMetrics
 from PySide6.QtWidgets import QHBoxLayout, QSizePolicy, QWidget
 
@@ -109,7 +109,12 @@ class BuildAdvisorCard(BaseCard):
             cat_header = CaptionLabel(category.upper(), self.content)
             cat_header.setFixedWidth(70)
             cat_header.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
-            row.addWidget(cat_header)
+            # Top-align with the first line of the (possibly multi-line)
+            # list next to it, instead of the QHBoxLayout's default of
+            # stretching this label to the row's full height and then
+            # vertically centering its text within that - which looks off
+            # once the list grows past one line.
+            row.addWidget(cat_header, 0, Qt.AlignTop)
 
             cat_label = BodyLabel("—", self.content)
             cat_label.setWordWrap(True)
