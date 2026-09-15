@@ -4,14 +4,46 @@ _Sidst opdateret: 2026-09-15_
 
 ## Current phase
 
-**Windows Product Phase W4 — Versioning** — én kanonisk version
-(`1.0.0`), genbrugt af appen, PyInstaller og Inno Setup, ingen
-duplikerede hardcodede versionstal. **Færdig og bestået** på den
-rigtige Windows-runner.
+**Windows Product Phase W5 — GitHub Releases** — GitHub Releases er nu
+den centrale kilde til app-versions-/opdateringsinformation for
+Windows-produktet; git-checkout-afhængigheden i Settings' update-check
+er fjernet helt. **DONE.**
 
-Ingen GitHub Releases, ingen auto-updater, ingen Check-for-Updates,
-ingen Build Data-updater, ingen Character State, ingen
-Diablo-feature-arbejde i denne fase.
+Ingen Check-for-Updates-UI-redesign (W6), ingen Update Now (W7), ingen
+download/verify/install/restart (W8), ingen rollback (W9), ingen Build
+Data-updater (W10), ingen Character State, ingen Diablo-feature-arbejde
+i denne fase.
+
+### W5 — hvad er lavet
+
+- **`src/app.py`**: `GITHUB_COMMIT_API_URL`/`GITHUB_BRANCH`/
+  `get_local_commit_sha()` (git `rev-parse HEAD` mod branch-tip-commit-
+  API'et) fjernet helt — ikke bevaret som dev-fallback, da W5's
+  eksplicitte mål er at stoppe med at afhænge af git for
+  produktions-version/update-status. Erstattet af
+  `GITHUB_RELEASES_API_URL` (`.../releases/latest`) + en ny
+  `_parse_semver()`-hjælper der sammenligner release-tags
+  (`"v1.2.3"`/`"1.2.3"`) mod `src/version.py`'s `__version__` som
+  `(major, minor, patch)`-tupler.
+- Settings-sektionen "Build Data Updates" omdøbt til **"App Updates"**
+  (indholdet er reelt ændret — det handler nu om app-versionen, ikke
+  build-data-friskhed, som forbliver W10). "Current version"-linjen
+  viser nu altid `src/version.py`'s `__version__` (samme kilde som
+  W4) — **aldrig** "unknown"/"not a git checkout" mere, hverken fra
+  kilde eller i den installerede .exe.
+- Klik-handleren henter nu `releases/latest`, håndterer eksplicit det
+  reelle, nuværende tilfælde (ingen GitHub Release er udgivet endnu —
+  det er en senere fase) som en ærlig "No published releases found
+  yet." i stedet for en generisk netværksfejl-besked (skelnet via et
+  eksplicit 404-tjek, ikke en fanget exception), og viser ellers
+  "Up to date" / "A newer version is available: ..." / en
+  "kunne ikke sammenligne"-besked for et ikke-parsbart tag — aldrig
+  gættet.
+- `import subprocess` fjernet fra `src/app.py` (kun brugt af den nu
+  fjernede funktion).
+- **Ingen ændring af Windows-workflowet** — ren app-logik uden nye
+  dependencies eller pakke-relevans, allerede dækket af W4's seneste
+  beståede build/launch på den rigtige runner.
 
 ### W4 — hvad er lavet
 
@@ -156,20 +188,8 @@ Build Advisor (denne fase).
 
 ## Last commit
 
-`6c22aa2` — "Document canonical version source in ARCHITECTURE.md
-(W4)" (pushet). Fulde W4-commit-kæde: `55bc3d4` (kanonisk
-`src/version.py` + workflow/installer-wiring) → `bf61371` (fix: gjorde
-et ikke-fatalt registry-version-tjek non-blocking) → `6c22aa2`
-(ARCHITECTURE.md-dokumentation).
-
-**Note om denne fase:** den oprindelige agent ramte en session-
-rate-limit midt i sin egen afsluttende log-gennemgang, efter koden
-allerede var committet/pushet og den sidste runner-kørsel var bestået.
-Jeg (den koordinerende session) tjekkede klokken mod den opgivne
-nulstillingstid (var passeret), bekræftede uafhængigt via `gh run list`
-at de to seneste kørsler var reelt bestået, committede det efterladte
-(ucommitterede) `ARCHITECTURE.md`-arbejde, og færdiggjorde denne
-status-opdatering selv.
+`a2ef4d7` — "Windows Product Phase W5: GitHub Releases as the app
+update source" (pushet).
 
 Branch: `feature/dashboard-v2` (repoets eneste/default branch — der er
 ikke noget `main`, det er normalt for dette repo).
@@ -185,6 +205,21 @@ Output: `dist/Diablo4Companion/` (onedir), inkl.
 
 ## Tests
 
+- **W5 lokal verifikation (2026-09-15, Linux):** headless offscreen-
+  smoke-test — app starter uændret, `current_version_label` viser
+  "Current version: 1.0.0". `_parse_semver` testet med `"v1.2.3"`,
+  `"1.0.0"` og en ikke-parsbar streng. Klik-handleren testet mod: (a)
+  det RIGTIGE, levende GitHub-repo (ingen Release udgivet endnu →
+  korrekt "No published releases found yet."), (b) 3 mockede
+  release-svar der dækker alle tre sammenligningsudfald ("A newer
+  version is available...", "Up to date...", og en ikke-parsbar
+  tag-besked), (c) en simuleret netværksfejl (degraderer korrekt til
+  den eksisterende fejlbesked, ingen crash, knappen genaktiveres).
+  Fuld regressions-sweep af alle 26 builds efter ændringen: 0 fejl.
+  **Ingen Windows-runner-kørsel udløst for denne fase** — ren
+  app-logik uden nye dependencies eller pakke-relevans, ingen
+  `.github/workflows`- eller `.spec`-ændring, allerede dækket af W4's
+  seneste beståede build/launch.
 - **W4 lokal verifikation (2026-09-15, Linux):** headless offscreen-
   smoke-test kørt igen efter `src/version.py`-tilføjelsen: `from
   src.version import __version__` giver `"1.0.0"`, appen starter
@@ -295,7 +330,7 @@ resultat.
 
 ## Next phase
 
-Ingen planlagt. W4 er fuldt bestået. Vent på konkret instruktion fra
+Ingen planlagt. W5 er DONE. Vent på konkret instruktion fra
 brugeren (se PROJECT_ROADMAP.md's regel: "Start ikke næste
 roadmap-fase uden en konkret instruktion"). Mulig fremtidig
 opfølgning (ikke startet, kræver eksplicit instruktion): rette
@@ -304,6 +339,9 @@ opfølgning (ikke startet, kræver eksplicit instruktion): rette
 
 ## Kort changelog (seneste faser, nyeste øverst)
 
+- `a2ef4d7` — Windows Product Phase W5: GitHub Releases erstatter
+  git-checkout-baseret version/update-check; "Not a git checkout"
+  kan ikke længere vises.
 - `6c22aa2`/`bf61371`/`55bc3d4` — Windows Product Phase W4: én
   kanonisk version (`src/version.py`, `"1.0.0"`), genbrugt af app,
   PyInstaller (via import, ingen spec-ændring) og Inno Setup
