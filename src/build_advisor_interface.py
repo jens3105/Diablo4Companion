@@ -3,10 +3,11 @@ clearer size than the compact widgets it's built from, exactly what the
 Build Guide's status widget and the Dashboard's Current Build card
 already compute - ``MainWindow._compute_build_status`` for the Skills/
 Leveling/Paragon/Gear percentage rollup, ``MainWindow._advisor_next_
-action`` for the single unified next step, and ``MainWindow._pending_
-skill_actions``/``_pending_paragon_actions``/``_pending_gear_actions``/
-``_pending_gem_actions``/``_pending_tempering_actions`` for a short
-"what's missing" list per category.
+action`` for the single unified next step, and ``MainWindow._advisor_
+missing_summary`` for a short "what's missing" list per category. Both
+of those, since the Build Advisor phase, read from ``MainWindow.
+_build_validation`` - the one place that decides completion/differences
+- rather than computing anything of their own.
 
 No new validation logic lives here - this module is presentation only,
 same as ``CurrentBuildCard``/``LevelingCard``'s Build Status widget."""
@@ -88,6 +89,17 @@ class BuildAdvisorCard(BaseCard):
         self.next_action_label.clicked.connect(self._on_next_action_clicked)
         self.add_widget(self.next_action_label)
 
+        # "Why is this next" - one line of the same priority reasoning
+        # already documented in MainWindow's priority-order comment/
+        # _ADVISOR_REASONS (Build Advisor phase) - not a redesign, just
+        # surfacing existing reasoning that had nowhere to show before.
+        self.next_action_reason_label = CaptionLabel("", self.content)
+        self.next_action_reason_label.setWordWrap(True)
+        self.next_action_reason_label.setTextColor(
+            QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED)
+        )
+        self.add_widget(self.next_action_reason_label)
+
         self._next_action_kind = None
 
         self.add_spacing(14)
@@ -143,6 +155,7 @@ class BuildAdvisorCard(BaseCard):
         next_action_text: str,
         next_action_kind: str | None,
         pending_by_category: dict[str, tuple[list[str], int]],
+        next_action_reason: str = "",
     ):
         """``status_rows``/``footer_text``/``footer_is_ready`` are exactly
         what ``MainWindow._compute_build_status`` returns.
@@ -155,7 +168,9 @@ class BuildAdvisorCard(BaseCard):
         each of ``Skills``/``Paragon``/``Gear``/``Gems`` to ``(capped_texts,
         total_count)`` - already capped by the caller (see
         ``MainWindow._advisor_missing_summary``) so this widget never has
-        to decide the cap itself."""
+        to decide the cap itself. ``next_action_reason`` is the Build
+        Advisor phase's one-line "why is this next" text (``MainWindow.
+        _ADVISOR_REASONS``), empty when there's nothing to act on."""
 
         if not build_name:
             self.header_label.setText("No build selected")
@@ -165,6 +180,7 @@ class BuildAdvisorCard(BaseCard):
             self.next_action_label.setText("—")
             self._next_action_kind = None
             self.next_action_label.set_active(False)
+            self.next_action_reason_label.setText("")
             for label in self._category_labels.values():
                 label.setText("—")
             return
@@ -192,6 +208,7 @@ class BuildAdvisorCard(BaseCard):
         self.next_action_label.setText(next_action_text or "—")
         self._next_action_kind = next_action_kind
         self.next_action_label.set_active(next_action_kind is not None)
+        self.next_action_reason_label.setText(next_action_reason or "")
 
         for category in _CATEGORIES:
             texts, total = pending_by_category.get(category, ([], 0))
@@ -225,6 +242,9 @@ class BuildAdvisorCard(BaseCard):
             f"font-family: monospace; font-size: 16px; color: {theme.TEXT_PRIMARY};"
         )
         self.next_header.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
+        self.next_action_reason_label.setTextColor(
+            QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED)
+        )
         self._missing_header.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
 
         for header in self._category_headers.values():

@@ -1801,6 +1801,24 @@ class MainWindow(FluentWindow):
     # validation engine.
     # -----------------------------------------------------------
 
+    # Build Advisor phase: one-line "why is this next" reasoning shown
+    # next to the NEXT ACTION line, keyed by the action's ``kind`` -
+    # reuses the exact reasoning documented in the priority-order comment
+    # above verbatim, not new phrasing. Gems/Tempering weren't part of
+    # that original 4-category comment (they were appended later, in the
+    # Build Validation phase, as the two lowest-priority layers) so their
+    # wording instead comes from ``_pending_gem_actions``'/``_pending_
+    # tempering_actions``'s own docstrings.
+    _ADVISOR_REASONS = {
+        "leveling": "Leveling — usually the earliest-blocking thing in a real playthrough",
+        "skill": "Skills — usually the actual blocker while leveling",
+        "paragon": "Paragon — the next endgame power spike once skills are sorted",
+        "paragon_node": "Paragon — the next endgame power spike once skills are sorted",
+        "gear": "Gear — drop-gated, so it's last in priority",
+        "gem": "Gems — matters even less than owning the item it lives in",
+        "tempering": "Tempering — matters even less than a socketed gem",
+    }
+
     def _pending_leveling_actions(self, build_name: str) -> list[tuple[str, str, object]]:
         """Every not-yet-completed Leveling milestone, in order, as
         ``(kind, text, key)`` - ``kind`` is always ``"leveling"`` here,
@@ -2032,6 +2050,11 @@ class MainWindow(FluentWindow):
 
         return actions
 
+    # Priority order Build Advisor's unified list walks the categories in -
+    # Leveling first (see the priority-order comment above), then the 5
+    # categories ``_build_validation`` names, in its documented order.
+    _ADVISOR_CATEGORY_ORDER = ("Leveling", "Skills", "Paragon", "Gear", "Gems", "Tempering")
+
     def _advisor_pending_actions(self, build_name: str) -> list[tuple[str, str, object]]:
         """The full unified Build Advisor list for ``build_name``: every
         pending Leveling action, then every pending Skills action, then
@@ -2041,16 +2064,22 @@ class MainWindow(FluentWindow):
         item ``(kind, text, key)``. The single source of truth for
         "what's next" shared by ``_advisor_next_action`` (Dashboard's
         Current Build card) and ``_compact_next_action`` (Compact Mode),
-        so both surfaces always agree."""
+        so both surfaces always agree.
 
-        return (
-            self._pending_leveling_actions(build_name)
-            + self._pending_skill_actions(build_name)
-            + self._pending_paragon_actions(build_name)
-            + self._pending_gear_actions(build_name)
-            + self._pending_gem_actions(build_name)
-            + self._pending_tempering_actions(build_name)
-        )
+        Build Validation phase: sourced entirely from ``_build_validation``
+        (which includes a "Leveling" category alongside its 5 named ones
+        purely for this consumer - see its docstring) instead of calling
+        each ``_pending_*_actions`` helper a second time here - there is
+        now exactly one place (``_build_validation``) that walks that raw
+        data."""
+
+        categories = self._build_validation(build_name)["categories"]
+
+        return [
+            (action["kind"], action["text"], action["key"])
+            for category in self._ADVISOR_CATEGORY_ORDER
+            for action in categories[category]["actions"]
+        ]
 
     def _advisor_next_action(self, build_name: str) -> tuple[str | None, str]:
         """Pick the single concrete "next thing to do" across Leveling,
@@ -2095,7 +2124,7 @@ class MainWindow(FluentWindow):
             self.gear_builder_card.set_header(char_name, "", 0)
             self.gems_card.set_header(char_name, "", 0)
             self.paragon_card.set_paragon("", "", 0, None, set(), set(), None)
-            self.advisor_card.set_advisor("", 0, [], "", False, "", None, {})
+            self.advisor_card.set_advisor("", 0, [], "", False, "", None, {}, "")
             self._refresh_compact_window()
             return
 
@@ -2131,6 +2160,7 @@ class MainWindow(FluentWindow):
             next_action,
             next_kind,
             self._advisor_missing_summary(build_name),
+            self._ADVISOR_REASONS.get(next_kind, ""),
         )
 
         # Everything that can move the Dashboard card's needle (build/
@@ -2151,8 +2181,8 @@ class MainWindow(FluentWindow):
         Rogue). Purely a display-formatting pass over data already
         computed elsewhere - ``paragon_status_row`` is ``_compute_build_
         status``'s "Paragon" row (same one shown everywhere else) and the
-        next-action text reuses ``_pending_paragon_actions`` - no second
-        Paragon calculation."""
+        next-action text reuses ``_build_validation``'s Paragon actions -
+        no second Paragon calculation."""
 
         verified_build = self.leveling_manager.get_verified_build(build_name)
         verified_boards = (verified_build or {}).get("paragon_boards") or []
@@ -2170,8 +2200,9 @@ class MainWindow(FluentWindow):
                 break
 
         node_actions = [
-            text for kind, text, _key in self._pending_paragon_actions(build_name)
-            if kind == "paragon_node"
+            action["text"]
+            for action in self._build_validation(build_name)["categories"]["Paragon"]["actions"]
+            if action["kind"] == "paragon_node"
         ]
         next_text = node_actions[0] if node_actions else "All paragon nodes taken"
         pct_text = paragon_status_row[2] if paragon_status_row else "N/A"
@@ -2183,43 +2214,53 @@ class MainWindow(FluentWindow):
     ) -> dict[str, tuple[list[str], int]]:
         """The Build Advisor page's "what's missing" data: for each of
         Skills/Paragon/Gear/Gems/Tempering, the first ``cap`` pending-
-        action texts (see ``_pending_skill_actions``/``_pending_paragon_
-        actions``/``_pending_gear_actions``/``_pending_gem_actions``/
-        ``_pending_tempering_actions``) plus the true total pending
-        count, so the page can show "(+N more)" instead of an unbounded
-        wall of text - matching the roadmap's "low visual noise,
-        scannable" principle. Pure formatting over the exact same
-        helpers the unified next-action already uses - no new
+        action texts plus the true total pending count, so the page can
+        show "(+N more)" instead of an unbounded wall of text - matching
+        the roadmap's "low visual noise, scannable" principle.
+
+        Build Validation phase: reads ``_build_validation``'s per-category
+        ``differences`` (Leveling excluded, exactly as before this phase -
+        see ``_build_validation``'s docstring) instead of calling each
+        ``_pending_*_actions`` helper directly - pure formatting, no new
         validation logic."""
 
-        per_category = {
-            "Skills": self._pending_skill_actions(build_name),
-            "Paragon": self._pending_paragon_actions(build_name),
-            "Gear": self._pending_gear_actions(build_name),
-            "Gems": self._pending_gem_actions(build_name),
-            "Tempering": self._pending_tempering_actions(build_name),
-        }
+        categories = self._build_validation(build_name)["categories"]
 
         return {
-            category: ([text for _kind, text, _key in actions[:cap]], len(actions))
-            for category, actions in per_category.items()
+            category: (
+                categories[category]["differences"][:cap],
+                len(categories[category]["differences"]),
+            )
+            for category in ("Skills", "Paragon", "Gear", "Gems", "Tempering")
         }
 
     def _build_validation(self, build_name: str) -> dict:
-        """Build Validation phase: one clean aggregation structure over
-        Skills/Paragon/Gear/Gems/Tempering for Build Advisor (or any
-        future consumer) -
+        """Build Validation phase (extended in the Build Advisor phase):
+        one clean aggregation structure over Leveling/Skills/Paragon/
+        Gear/Gems/Tempering that is now the SINGLE source of truth both
+        for Build Status's percentages and for Build Advisor's "what's
+        next"/"what's missing" - every other method that used to compute
+        pending actions independently (``_advisor_pending_actions``,
+        ``_advisor_missing_summary``, ``_paragon_dashboard_summary``,
+        ``_navigate_to_next_action``) now reads from this instead -
 
         ``{"overall_percent": int | None, "categories": {name: {
-        "percent": int | None, "status": str, "differences": [str,...]
+        "percent": int | None, "status": str, "differences": [str,...],
+        "actions": [{"kind": str, "text": str, "key": object}, ...]
         }}}``.
 
-        Purely a reshape - reuses ``_category_percents`` (the exact same
-        numbers ``_compute_build_status`` renders as its 🟢/🟡/🔴 rows)
-        and each ``_pending_*_actions`` helper's already-computed
-        difference texts. Introduces no second way of deciding what's
-        done: every number here traces back to the one calculation in
-        ``_category_percents``.
+        ``differences`` is the flat display-text list this structure
+        originally shipped with (kept for any plain-text consumer);
+        ``actions`` is the Build Advisor phase's addition - the exact
+        same entries, but as full ``(kind, text, key)`` info, since
+        navigating to / marking-done a specific item (``_navigate_to_
+        next_action``, Compact Mode's Done button) needs more than
+        display text. Both are the same list in the same order, just
+        reshaped - still purely a reshape of ``_category_percents`` (the
+        exact same numbers ``_compute_build_status`` renders as its
+        🟢/🟡/🔴 rows) and each ``_pending_*_actions`` helper's already-
+        computed ``(kind, text, key)`` tuples. Introduces no second way
+        of deciding what's done.
 
         ``status`` per category is one of:
           - ``"unavailable"`` - no verified data to compare against at
@@ -2246,15 +2287,21 @@ class MainWindow(FluentWindow):
         produces ``"different"`` for that reason, on purpose, not by
         omission.
 
-        Leveling is deliberately excluded, matching ``_advisor_missing_
-        summary``'s existing category set: for a build with no verified
+        Leveling is now included in ``categories`` (Build Advisor phase),
+        purely so ``_advisor_pending_actions`` has exactly one place to
+        read every category - including Leveling - from. It is still
+        deliberately excluded from ``overall_percent``, exactly as
+        before this phase: for a build with no verified
         ``skill_allocation`` it is literally the same checklist as
-        Skills (see ``_category_percents``), so including both would
-        double-count one real checklist into the overall average."""
+        Skills (see ``_category_percents``), so averaging both in would
+        double-count one real checklist into the overall average.
+        ``_advisor_missing_summary`` (the "what's missing" list) also
+        keeps ignoring Leveling, matching its pre-existing category set."""
 
         percents = self._category_percents(build_name)
 
-        diffs_by_category = {
+        actions_by_category = {
+            "Leveling": self._pending_leveling_actions(build_name),
             "Skills": self._pending_skill_actions(build_name),
             "Paragon": self._pending_paragon_actions(build_name),
             "Gear": self._pending_gear_actions(build_name),
@@ -2264,7 +2311,7 @@ class MainWindow(FluentWindow):
 
         categories = {}
 
-        for category, actions in diffs_by_category.items():
+        for category, actions in actions_by_category.items():
             pct = percents[category]
 
             if pct is None:
@@ -2280,9 +2327,18 @@ class MainWindow(FluentWindow):
                 "percent": pct,
                 "status": status,
                 "differences": [text for _kind, text, _key in actions],
+                "actions": [
+                    {"kind": kind, "text": text, "key": key} for kind, text, key in actions
+                ],
             }
 
-        real_percents = [c["percent"] for c in categories.values() if c["percent"] is not None]
+        # overall_percent is averaged over the original 5 Build Validation
+        # categories only - Leveling is deliberately excluded here (see
+        # docstring above) even though it's now present in ``categories``.
+        overall_keys = ("Skills", "Paragon", "Gear", "Gems", "Tempering")
+        real_percents = [
+            categories[k]["percent"] for k in overall_keys if categories[k]["percent"] is not None
+        ]
         overall_percent = round(sum(real_percents) / len(real_percents)) if real_percents else None
 
         return {"overall_percent": overall_percent, "categories": categories}
@@ -2321,10 +2377,14 @@ class MainWindow(FluentWindow):
             self.switchTo(self.paragon_interface)
 
             build_name = self.leveling_manager.current_build_name
-            pending = self._pending_paragon_actions(build_name) if build_name else []
+            pending = (
+                self._build_validation(build_name)["categories"]["Paragon"]["actions"]
+                if build_name
+                else []
+            )
 
             if pending:
-                _kind, _text, node_key = pending[0]
+                node_key = pending[0]["key"]
                 board_id = str(node_key).rsplit(":", 1)[0]
                 self.paragon_card.select_board(board_id)
             return
