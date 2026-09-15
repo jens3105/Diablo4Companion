@@ -83,8 +83,13 @@ class LevelingCard(BaseCard):
     PARAGON_KEY = "paragon"
 
     # Diablo IV's actual level cap - hardcoded since it hasn't changed in
-    # a way that needs to be data-driven for this app's purposes.
-    LEVEL_CAP = 70
+    # a way that needs to be data-driven for this app's purposes. Must
+    # match the level input's own QIntValidator max below - a mismatch
+    # here previously showed a nonsensical "LEVEL 85 / 70" for any
+    # character above level 70 (common in real play; build milestone
+    # data itself only goes up to level 70, but the character level cap
+    # is 100).
+    LEVEL_CAP = 100
 
     def __init__(self, parent=None):
         super().__init__("BUILD GUIDE", icon=FIF.EDUCATION, parent=parent)
