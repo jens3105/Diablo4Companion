@@ -1,8 +1,17 @@
+import os
+import subprocess
 from datetime import datetime, timezone
 
+import requests
 from PySide6.QtCore import QSettings, Qt, QTimer
 from PySide6.QtGui import QGuiApplication, QKeySequence, QShortcut
-from PySide6.QtWidgets import QHBoxLayout, QInputDialog, QVBoxLayout, QWidget
+from PySide6.QtWidgets import (
+    QApplication,
+    QHBoxLayout,
+    QInputDialog,
+    QVBoxLayout,
+    QWidget,
+)
 
 from qfluentwidgets import (
     BodyLabel,
@@ -11,6 +20,7 @@ from qfluentwidgets import (
     FluentIcon as FIF,
     FluentWindow,
     NavigationItemPosition,
+    PrimaryPushButton,
     StrongBodyLabel,
     SubtitleLabel,
     SwitchButton,
@@ -25,6 +35,41 @@ from src.dashboard import DashboardWidget
 from src.leveling_card import LevelingCard
 from src.managers.leveling_manager import LevelingManager
 from src.quick_search import QuickSearchDialog
+
+
+# Build-data update check (Update Center, scoped-down): the running app
+# and its ``builds/*.json`` data are both just a git checkout of this
+# same public repo, so "is my build data current" is answerable by
+# comparing local HEAD against the branch tip on GitHub - no auth, no
+# self-update, just a read-only informational check (see SettingsInterface).
+GITHUB_REPO = "jens3105/Diablo4Companion"
+GITHUB_BRANCH = "feature/dashboard-v2"
+GITHUB_COMMIT_API_URL = (
+    f"https://api.github.com/repos/{GITHUB_REPO}/commits/{GITHUB_BRANCH}"
+)
+
+
+def get_local_commit_sha() -> str | None:
+    """Return the full SHA of the local checkout's current HEAD commit,
+    or ``None`` if this isn't a git checkout (e.g. a packaged build) or
+    ``git`` isn't available. Uses the same repo-root pattern as
+    ``LevelingManager`` for locating ``builds/`` - ``src/app.py`` sits one
+    level shallower, so one fewer ``dirname`` call."""
+
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=repo_root,
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=True,
+        )
+        return result.stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        return None
 
 
 class BuildsInterface(QWidget):
@@ -140,6 +185,45 @@ class SettingsInterface(QWidget):
 
         layout.addLayout(preset_row)
 
+        layout.addSpacing(16)
+
+        # -------------------------
+        # Build data updates
+        # -------------------------
+        # Read-only check: compares the local checkout's HEAD against the
+        # branch tip on GitHub. Deliberately does NOT pull/apply anything -
+        # a running app rewriting its own git checkout is out of scope and
+        # risky. See ``get_local_commit_sha`` / ``GITHUB_COMMIT_API_URL``.
+
+        updates_title = StrongBodyLabel("Build Data Updates", self)
+        layout.addWidget(updates_title)
+
+        self._local_sha = get_local_commit_sha()
+        local_short = self._local_sha[:7] if self._local_sha else "unknown"
+
+        self.current_version_label = CaptionLabel(
+            f"Current build data: {local_short}"
+            if self._local_sha
+            else "Current build data: unknown (not a git checkout)",
+            self,
+        )
+        layout.addWidget(self.current_version_label)
+
+        self.update_status_label = BodyLabel("", self)
+        self.update_status_label.setWordWrap(True)
+        self.update_status_label.hide()
+        layout.addWidget(self.update_status_label)
+
+        check_row = QHBoxLayout()
+        check_row.setSpacing(10)
+
+        self.check_updates_button = PrimaryPushButton("Check for Updates", self)
+        self.check_updates_button.clicked.connect(self._on_check_updates_clicked)
+        check_row.addWidget(self.check_updates_button)
+        check_row.addStretch(1)
+
+        layout.addLayout(check_row)
+
         layout.addStretch(1)
 
     def _on_theme_toggled(self, checked: bool):
@@ -151,6 +235,52 @@ class SettingsInterface(QWidget):
         preset = self._preset_keys[index]
         self.settings.setValue("appearance/accent_preset", preset)
         theme.set_appearance(theme.current_mode(), preset)
+
+    def _on_check_updates_clicked(self):
+
+        self.check_updates_button.setEnabled(False)
+        self.check_updates_button.setText("Checking...")
+        self.update_status_label.setText("Checking GitHub for the latest build data...")
+        self.update_status_label.show()
+        # Force the "Checking..." state to actually paint before the
+        # (blocking) network call below - same synchronous-call style
+        # DiabloAPI.get_schedule uses, just with the UI given a chance to
+        # repaint first since this runs off a click instead of a timer.
+        QApplication.processEvents()
+
+        try:
+            response = requests.get(GITHUB_COMMIT_API_URL, timeout=8)
+            response.raise_for_status()
+            data = response.json()
+
+            remote_sha = data.get("sha", "")
+            commit_info = data.get("commit", {}) or {}
+            author_info = commit_info.get("author", {}) or {}
+            remote_date = author_info.get("date", "")
+            remote_message = (commit_info.get("message") or "").strip().splitlines()[0] if commit_info.get("message") else ""
+
+            if not remote_sha:
+                raise ValueError("GitHub svarede uden en commit-sha")
+
+            if self._local_sha and remote_sha == self._local_sha:
+                self.update_status_label.setText("Build data up to date")
+            else:
+                date_str = remote_date.split("T")[0] if remote_date else "ukendt dato"
+                detail = f" - {remote_message}" if remote_message else ""
+                self.update_status_label.setText(
+                    f"Newer build data available (updated {date_str}{detail}). "
+                    f"Run 'git pull' in the app folder to update."
+                )
+
+        except (requests.RequestException, ValueError) as exc:
+            print(f"Kunne ikke tjekke for build-data opdateringer: {exc}")
+            self.update_status_label.setText(
+                "Could not check for updates (network error) - try again later."
+            )
+
+        finally:
+            self.check_updates_button.setEnabled(True)
+            self.check_updates_button.setText("Check for Updates")
 
 
 class MainWindow(FluentWindow):
