@@ -4,18 +4,39 @@ _Sidst opdateret: 2026-09-15_
 
 ## Current phase
 
-**Windows Product Phase W6 — Check for Updates** — **DONE.** Ved
-inspektion viste det sig at W5's implementering allerede opfyldte
-samtlige W6-krav 1:1 (Check for Updates-knap, GitHub Releases-opslag,
-versionssammenligning, tydelig status for alle udfald, ingen
-git-tekst, ingen unødvendig gemt state, intet download/install). Denne
-fase tilføjede derfor **ingen ny kode** — kun en udtømmende eksplicit
-testkørsel af de scenarier W6 selv efterspurgte, for at bekræfte det
-ærligt i stedet for at antage det.
+**Windows Product Phase W7 — Update Now** — **DONE.** Settings har nu
+en "Update Now"-knap der kun vises/aktiveres når `_on_check_updates_
+clicked` (W5/W6) har bekræftet en reelt nyere GitHub Release. Klik
+giver tydelig bekræftelses-feedback (hvilken version, at target er
+fundet) og henviser til manuel download fra GitHub Releases-siden —
+intet download/verify/install/restart/rollback endnu, det er W8/W9.
 
-Ingen Update Now (W7), ingen download/verify/install/restart (W8),
-ingen rollback (W9), ingen Build Data-updater (W10), ingen Character
-State, ingen Diablo-feature-arbejde i denne fase.
+Ingen download/verify/install/restart (W8), ingen rollback (W9), ingen
+Build Data-updater (W10), ingen Character State, ingen
+Diablo-feature-arbejde i denne fase.
+
+### W7 — hvad er lavet
+
+- **`src/app.py`**: Ny `self.update_now_button` (`PrimaryPushButton`,
+  genbruger eksisterende komponent, ingen ny import) — skjult som
+  standard, vist/aktiveret KUN i den ene gren af
+  `_on_check_updates_clicked` hvor en reelt nyere release er bekræftet
+  (`remote_version > local_version`). Nulstillet (skjult +
+  `_pending_update_release = None`) i starten af HVERT nyt tjek, så et
+  gammelt target aldrig kan hænge ved fra et tidligere klik.
+- Ny `self._pending_update_release: dict | None` — det fulde,
+  bekræftede GitHub Release-objekt (ikke kun tag'et), som W8's
+  faktiske download/verify/install/restart-pipeline skal bruge som
+  target. `None` i alle andre udfald (up to date, ingen releases
+  endnu, ikke-parsbar version, netværks-/API-fejl).
+- Ny `_on_update_now_clicked()` — selve handlings-søm'en W8 udvider.
+  Nægter at gøre noget hvis `_pending_update_release` er tom
+  (defensivt fallback, selvom knappen kun vises når et target er
+  bekræftet). Med et gyldigt target: viser en tydelig
+  bekræftelsestekst med versionsnavnet og henviser til manuel download
+  fra GitHub Releases-siden i mellemtiden — intet download, ingen
+  filverifikation, ingen installation, ingen app-luk/genstart, ingen
+  rollback.
 
 ### W6 — hvad er lavet
 
@@ -200,8 +221,7 @@ Build Advisor (denne fase).
 
 ## Last commit
 
-`a2ef4d7` — "Windows Product Phase W5: GitHub Releases as the app
-update source" (pushet).
+`fb7ae9e` — "Windows Product Phase W7: Update Now action" (pushet).
 
 Branch: `feature/dashboard-v2` (repoets eneste/default branch — der er
 ikke noget `main`, det er normalt for dette repo).
@@ -217,6 +237,17 @@ Output: `dist/Diablo4Companion/` (onedir), inkl.
 
 ## Tests
 
+- **W7 lokal verifikation (2026-09-15, Linux):** headless offscreen.
+  Intet-tilgængeligt-tilfælde: "Update Now" forbliver skjult
+  (`isHidden()`), og et fremtvunget kald til `_on_update_now_clicked`
+  er en no-op (statustekst uændret). Nyere-version-fundet: korrekt
+  target fanges i `_pending_update_release`, knappen bliver synlig
+  (`isHidden() == False`), klik viser korrekt bekræftelsestekst med
+  versionsnavnet. Netværks-/API-fejl: knappen forbliver skjult, target
+  forbliver `None`, fremtvunget klik er en no-op. Bekræftet et Update
+  Now-klik hverken skriver nye QSettings-nøgler eller nye filer til
+  disk (ingen download/install/genstart sker utilsigtet). Fuld
+  regressions-sweep af alle 26 builds: 0 fejl.
 - **W6 lokal verifikation (2026-09-15, Linux):** headless offscreen,
   mod den eksisterende `_on_check_updates_clicked` (uændret siden W5):
   current==latest ("Up to date (version 1.0.0)."), current<latest
@@ -351,7 +382,7 @@ resultat.
 
 ## Next phase
 
-Ingen planlagt. W6 er DONE. Vent på konkret instruktion fra
+Ingen planlagt. W7 er DONE. Vent på konkret instruktion fra
 brugeren (se PROJECT_ROADMAP.md's regel: "Start ikke næste
 roadmap-fase uden en konkret instruktion"). Mulig fremtidig
 opfølgning (ikke startet, kræver eksplicit instruktion): rette
@@ -360,6 +391,9 @@ opfølgning (ikke startet, kræver eksplicit instruktion): rette
 
 ## Kort changelog (seneste faser, nyeste øverst)
 
+- `fb7ae9e` — Windows Product Phase W7: "Update Now"-knap + intern
+  `_pending_update_release`-target, som W8 kobler download/install/
+  restart på. Intet download/install/restart/rollback endnu.
 - Windows Product Phase W6 — Check for Updates: ingen ny kode (W5
   opfyldte allerede alle krav), udtømmende test af 6 scenarier
   bekræftede det.
