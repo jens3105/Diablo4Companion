@@ -29,14 +29,23 @@ resolved at all (``kind == "unknown"`` - e.g. Season 15 Soul Splinter
 boss materials) shows literally "DATA UNAVAILABLE" for that one socket,
 never a fabricated name.
 
-Tempering (Tempering phase): when an item's ``tempering`` list is
-non-empty (see ``decode_gear``/``_resolve_tempering``), the "Tempering"
-row shows the real Tempering Manual name(s) instead of the placeholder -
-e.g. "Worldly Endurance (Defensive) — Tier 3", joined with "; " when an
-item has two tempered affixes. An item with no ``tempering`` data (no
-tempered affix at all, or one that didn't resolve to a known recipe -
-e.g. a slug shared by more than one Manual, never guessed) still shows
-"DATA UNAVAILABLE" for this row, same as before.
+Tempering (Tempering phase; toggle tracking added in the Build
+Validation phase): when an item's ``tempering`` list is non-empty (see
+``decode_gear``/``_resolve_tempering``), the "Tempering" row shows the
+real Tempering Manual name(s) instead of the placeholder - e.g. "Worldly
+Endurance (Defensive) — Tier 3" - each with its own "Have it"
+``SwitchButton`` (usually just one, but an item can have two tempered
+affixes, each tracked separately). Unlike Sockets/Gems, this row is NOT
+read-only - there is no separate Tempering page, so this is the only
+place a tempered affix ever gets confirmed. Toggling reuses the exact
+"dumb pipe" pattern as everything else here: ``tempering_toggled`` ->
+``MainWindow.on_tempering_toggled`` -> the shared ``gear/<build>/
+tempered_items`` QSettings toggle set (mirrors ``socketed_gems``
+exactly, keyed ``"<slot_label>:<temper_index>"``). An item with no
+``tempering`` data (no tempered affix at all, or one that didn't
+resolve to a known recipe - e.g. a slug shared by more than one Manual,
+never guessed) still shows "DATA UNAVAILABLE" for this row, with no
+toggle - there is nothing honest to confirm.
 
 Builds with no ``verified_build`` at all (today, only Heartseeker Rogue -
 its guide predates the Maxroll planner decode and only has prose-derived
@@ -116,6 +125,7 @@ class GearSlotCard(QFrame):
     request)."""
 
     owned_toggled = Signal(str, bool)  # (key, checked)
+    tempering_toggled = Signal(str, bool)  # (key, checked)
 
     def __init__(
         self,
@@ -123,6 +133,7 @@ class GearSlotCard(QFrame):
         sockets: list[dict] | None = None,
         socketed_gems: set[str] | None = None,
         tempering: list[dict] | None = None,
+        tempered_items: set[str] | None = None,
         parent=None,
     ):
         super().__init__(parent)
@@ -130,6 +141,7 @@ class GearSlotCard(QFrame):
         self._sockets = sockets or []
         self._socketed_gems = socketed_gems or set()
         self._tempering = tempering or []
+        self._tempered_items = tempered_items or set()
 
         self.entry = entry
         self.setObjectName("gearBuilderCard")
@@ -192,7 +204,7 @@ class GearSlotCard(QFrame):
             if field_name == "Sockets / Gems" and self._sockets:
                 outer.addWidget(self._sockets_summary_row(entry.slot_label))
             elif field_name == "Tempering" and self._tempering:
-                outer.addWidget(self._tempering_summary_row())
+                outer.addWidget(self._tempering_summary_row(entry.slot_label))
             else:
                 outer.addWidget(self._field_row(field_name, "DATA UNAVAILABLE", muted=True))
 
@@ -221,17 +233,50 @@ class GearSlotCard(QFrame):
         label = f"{count} socket{'s' if count != 1 else ''}"
         return self._field_row("Sockets / Gems", f"{label} — " + ", ".join(parts))
 
-    def _tempering_summary_row(self) -> QWidget:
+    def _tempering_summary_row(self, slot_label: str) -> QWidget:
         """Real Tempering Manual read-out, e.g. "Worldly Endurance
-        (Defensive) — Tier 3" - joined with "; " when the item has two
-        tempered affixes (see ``scripts/maxroll_data_decoder.py``'s
-        ``_resolve_tempering``). Read-only, same as Sockets/Gems - there
-        is no separate "mark tempered" toggle anywhere in the app."""
+        (Defensive) — Tier 3", each with its own "Have it"
+        ``SwitchButton`` (Build Validation phase) - unlike Sockets/Gems,
+        this row owns the actual toggle (see module docstring): there is
+        no separate Tempering page, so this is the only place a tempered
+        affix ever gets confirmed. One sub-row per ``self._tempering``
+        entry (usually just one, but the schema is a list) so an item
+        with two tempered affixes tracks each independently."""
 
-        parts = [
-            f"{t['recipe_name']} ({t['group']}) — Tier {t['tier']}" for t in self._tempering
-        ]
-        return self._field_row("Tempering", "; ".join(parts))
+        row = QWidget(self)
+        outer = QVBoxLayout(row)
+        outer.setContentsMargins(0, 0, 0, 0)
+        outer.setSpacing(6)
+
+        label_widget = BodyLabel("Tempering:", row)
+        label_widget.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
+        outer.addWidget(label_widget)
+
+        for idx, t in enumerate(self._tempering):
+            entry_row = QWidget(row)
+            h = QHBoxLayout(entry_row)
+            h.setContentsMargins(0, 0, 0, 0)
+            h.setSpacing(8)
+
+            text = f"{t['recipe_name']} ({t['group']}) — Tier {t['tier']}"
+            value_widget = BodyLabel(text, entry_row)
+            value_widget.setWordWrap(True)
+            value_widget.setTextColor(QColor(theme.TEXT_PRIMARY), QColor(theme.TEXT_PRIMARY))
+            h.addWidget(value_widget, 1)
+
+            key = f"{slot_label}:{idx}"
+            toggle = SwitchButton(entry_row)
+            toggle.setOnText("Have it")
+            toggle.setOffText("Missing")
+            toggle.setChecked(key in self._tempered_items)
+            toggle.checkedChanged.connect(
+                lambda checked, k=key: self.tempering_toggled.emit(k, checked)
+            )
+            h.addWidget(toggle)
+
+            outer.addWidget(entry_row)
+
+        return row
 
     def _field_row(self, label: str, value: str, muted: bool = False) -> QWidget:
 
@@ -290,6 +335,7 @@ class GearBuilderCard(BaseCard):
     entry, in a scrollable column."""
 
     item_owned_changed = Signal(str, bool)
+    tempering_toggled = Signal(str, bool)
 
     def __init__(self, parent=None):
         super().__init__("GEAR BUILDER", icon=FIF.SHOPPING_CART, parent=parent)
@@ -363,6 +409,7 @@ class GearBuilderCard(BaseCard):
         owned_names: set[str],
         verified_build: dict | None,
         socketed_gems: set[str] | None = None,
+        tempered_items: set[str] | None = None,
     ):
         """``verified_build`` is ``LeveleingManager.get_verified_build``'s
         return value. Only its ``gear`` list drives this page (see module
@@ -372,7 +419,11 @@ class GearBuilderCard(BaseCard):
         _load_socketed_gems``'s set for this build - only used to render
         each item's real Sockets/Gems summary row (see
         ``GearSlotCard._sockets_summary_row``); omit it and every item
-        just shows its sockets as all-missing."""
+        just shows its sockets as all-missing. ``tempered_items`` is
+        ``MainWindow._load_tempered_items``'s set for this build - drives
+        each item's real Tempering row toggle state (see
+        ``GearSlotCard._tempering_summary_row``); omit it and every
+        tempering toggle starts unchecked."""
 
         self._clear_cards()
 
@@ -411,6 +462,7 @@ class GearBuilderCard(BaseCard):
                     sockets_by_slot.get(entry.slot_label),
                     socketed_gems,
                     tempering_by_slot.get(entry.slot_label),
+                    tempered_items,
                 )
 
     def _add_card(
@@ -419,10 +471,14 @@ class GearBuilderCard(BaseCard):
         sockets: list[dict] | None = None,
         socketed_gems: set[str] | None = None,
         tempering: list[dict] | None = None,
+        tempered_items: set[str] | None = None,
     ):
 
-        card = GearSlotCard(entry, sockets, socketed_gems, tempering, self._cards_container)
+        card = GearSlotCard(
+            entry, sockets, socketed_gems, tempering, tempered_items, self._cards_container
+        )
         card.owned_toggled.connect(self.item_owned_changed)
+        card.tempering_toggled.connect(self.tempering_toggled)
         self._cards_layout.insertWidget(self._cards_layout.count() - 1, card)
         self._cards.append(card)
 

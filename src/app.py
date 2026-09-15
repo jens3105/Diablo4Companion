@@ -474,6 +474,7 @@ class MainWindow(FluentWindow):
         self.leveling_card.mark_board_done.connect(self.on_mark_board_done)
         self.character_card.gear_owned_changed.connect(self.on_gear_owned_changed)
         self.gear_builder_card.item_owned_changed.connect(self.on_gear_owned_changed)
+        self.gear_builder_card.tempering_toggled.connect(self.on_tempering_toggled)
         self.gems_card.socket_owned_changed.connect(self.on_gem_socket_toggled)
         self.leveling_card.character_changed.connect(self.on_character_changed)
         self.leveling_card.add_character_requested.connect(self.on_add_character)
@@ -1351,9 +1352,10 @@ class MainWindow(FluentWindow):
         owned = self._load_owned_items(build_name)
         verified_build = self.leveling_manager.get_verified_build(build_name)
         socketed = self._load_socketed_gems(build_name)
+        tempered = self._load_tempered_items(build_name)
 
         self.character_card.set_gear(gear, owned, verified_build)
-        self.gear_builder_card.set_gear(owned, verified_build, socketed)
+        self.gear_builder_card.set_gear(owned, verified_build, socketed, tempered)
         self._refresh_gems(verified_build, socketed)
 
     def on_gear_owned_changed(self, name: str, owned: bool):
@@ -1456,6 +1458,62 @@ class MainWindow(FluentWindow):
         self._refresh_build_status()
 
     # ---------------------------------------------------------
+    # BUILD-GUIDE / TEMPERING (Build Validation phase)
+    #
+    # Mirrors ``socketed_gems`` immediately above, exactly: a toggle set
+    # of EXPECTED tempered-affix entries (one entry per equipped item's
+    # real ``verified_build.gear[].tempering[]`` entry - usually length
+    # 1, but the schema is a list, so this is keyed per-entry, not
+    # per-item) the player has confirmed they've actually applied on
+    # their real character. Its own QSettings key for the same reason
+    # ``socketed_gems`` has its own: a toggle (can go backwards - a
+    # temper re-rolled), not a monotonic "completed" set.
+    #
+    # Tempering previously had zero player-facing tracking at all (see
+    # ``gear_builder_interface.py``'s module docstring) - it was
+    # display-only text. This is the one genuinely new tracking
+    # dimension the Build Validation phase adds.
+    # ---------------------------------------------------------
+
+    def _tempered_items_key(self, build_name: str) -> str:
+        return f"{self._char_prefix()}/gear/{build_name}/tempered_items"
+
+    def _load_tempered_items(self, build_name: str) -> set[str]:
+
+        raw = self.settings.value(self._tempered_items_key(build_name), [], type=list)
+        return {str(v) for v in raw}
+
+    def _save_tempered_items(self, build_name: str, tempered: set[str]):
+
+        self.settings.setValue(self._tempered_items_key(build_name), sorted(tempered))
+
+    @staticmethod
+    def _tempering_key(slot_label: str, temper_index: int) -> str:
+        return f"{slot_label}:{temper_index}"
+
+    def on_tempering_toggled(self, key: str, confirmed: bool):
+        """A tempered-affix's "Have it" switch was flipped on the Gear
+        Builder page's Tempering row - mirrors ``on_gem_socket_toggled``
+        exactly."""
+
+        build_name = self.leveling_manager.current_build_name
+
+        if not build_name:
+            return
+
+        tempered = self._load_tempered_items(build_name)
+
+        if confirmed:
+            tempered.add(key)
+        else:
+            tempered.discard(key)
+
+        self._save_tempered_items(build_name, tempered)
+
+        self._refresh_gear()
+        self._refresh_build_status()
+
+    # ---------------------------------------------------------
     # BUILD-GUIDE / BUILD STATUS SUMMARY (Phase 6)
     #
     # Pure aggregation over the completion state the Build Guide's three
@@ -1488,15 +1546,15 @@ class MainWindow(FluentWindow):
     def _pct_text(pct: int | None) -> str:
         return "N/A" if pct is None else f"{pct}%"
 
-    def _compute_build_status(self, build_name: str):
-        """Pure aggregation over the persisted completion state each tab
-        already reads: ``skills/<build>/completed_levels`` (Skills +
-        Leveling - they share one set, see ``_load_completed_levels``),
-        ``paragon/<build>/completed_boards`` and ``gear/<build>/
-        owned_items``. Factored out of ``_refresh_build_status``
-        (Phase 7) so the Build Guide's status widget and the Dashboard's
-        Current Build card compute the exact same 🟢/🟡/🔴 rows instead
-        of two copies of this math.
+    def _category_percents(self, build_name: str) -> dict[str, int | None]:
+        """The raw percent-or-``None`` (``None`` = no trackable data for
+        this build/category, an N/A state, not a 0%/red one - see
+        ``_pct``) for every Build Status category: Skills, Leveling,
+        Paragon, Gear, Gems, Tempering. Computed exactly once here and
+        shared by both ``_compute_build_status`` (renders the 🟢/🟡/🔴
+        rows) and ``_build_validation`` (the Build Advisor-facing
+        aggregation structure) - one calculation, two read-outs, so
+        they can never disagree.
 
         Skills and Leveling used to always show the identical percentage,
         since both tracked the same ``milestones`` list. Now that the
@@ -1509,8 +1567,13 @@ class MainWindow(FluentWindow):
         Leveling. Paragon works the same way against verified board ids
         vs. legacy board positions.
 
-        Returns ``(rows, footer_text, ready)`` - see
-        ``LevelingCard.set_build_status`` for the shape of ``rows``."""
+        Gems/Tempering (Build Validation phase) follow the same
+        expected-vs-toggled-count pattern already used for Gear: the
+        denominator is every real socket/tempering entry across
+        ``verified_build.gear[]`` (0 when the build has no verified gear
+        at all, e.g. Heartseeker Rogue - correctly ``None``/N-A, never
+        0%/red), the numerator every one of those the player has
+        toggled "Have it" on via ``socketed_gems``/``tempered_items``."""
 
         milestones = self.leveling_manager.get_skills_data(build_name)["milestones"]
         completed_levels = self._load_completed_levels(build_name)
@@ -1571,6 +1634,84 @@ class MainWindow(FluentWindow):
 
         owned = self._load_owned_items(build_name) & gear_names
         gear_pct = self._pct(len(owned), len(gear_names))
+
+        # Gems: only sockets that resolved to a real gem/rune name count
+        # as trackable (matches ``_pending_gem_actions`` exactly) - an
+        # "unknown" socket (see that method's docstring) is neither
+        # done nor pending, it's just not counted at all.
+        total_gem_sockets = sum(
+            1
+            for item in verified_gear
+            for socket in (item.get("sockets") or [])
+            if socket.get("kind") in ("gem", "rune") and socket.get("name")
+        )
+        socketed = self._load_socketed_gems(build_name)
+        done_gem_sockets = sum(
+            1
+            for item in verified_gear
+            for idx, socket in enumerate(item.get("sockets") or [])
+            if socket.get("kind") in ("gem", "rune")
+            and socket.get("name")
+            and self._gem_socket_key(item.get("slot", "?"), idx) in socketed
+        )
+        gems_pct = self._pct(done_gem_sockets, total_gem_sockets)
+
+        total_temper_slots = sum(len(item.get("tempering") or []) for item in verified_gear)
+        tempered = self._load_tempered_items(build_name)
+        done_temper_slots = sum(
+            1
+            for item in verified_gear
+            for idx, _t in enumerate(item.get("tempering") or [])
+            if self._tempering_key(item.get("slot", "?"), idx) in tempered
+        )
+        tempering_pct = self._pct(done_temper_slots, total_temper_slots)
+
+        return {
+            "Skills": skills_pct,
+            "Leveling": leveling_pct,
+            "Paragon": paragon_pct,
+            "Gear": gear_pct,
+            "Gems": gems_pct,
+            "Tempering": tempering_pct,
+        }
+
+    def _compute_build_status(self, build_name: str):
+        """Pure aggregation over the persisted completion state each tab
+        already reads: ``skills/<build>/completed_levels`` (Skills +
+        Leveling - they share one set, see ``_load_completed_levels``),
+        ``paragon/<build>/completed_boards``/``completed_nodes``,
+        ``gear/<build>/owned_items``, ``gear/<build>/socketed_gems`` and
+        ``gear/<build>/tempered_items``. Factored out of
+        ``_refresh_build_status`` (Phase 7) so the Build Guide's status
+        widget and the Dashboard's Current Build card compute the exact
+        same 🟢/🟡/🔴 rows instead of two copies of this math. The
+        actual per-category percent math lives in ``_category_percents``
+        (shared with ``_build_validation``) - this method only turns
+        those numbers into display rows + the ready/footer verdict.
+
+        Returns ``(rows, footer_text, ready)`` - see
+        ``LevelingCard.set_build_status`` for the shape of ``rows``."""
+
+        pcts = self._category_percents(build_name)
+        skills_pct = pcts["Skills"]
+        leveling_pct = pcts["Leveling"]
+        paragon_pct = pcts["Paragon"]
+        gear_pct = pcts["Gear"]
+        gems_pct = pcts["Gems"]
+        tempering_pct = pcts["Tempering"]
+
+        # Only needed for the footer's "N items missing" count below -
+        # not a second completion decision, ``gear_pct`` above already
+        # is one.
+        verified_build = self.leveling_manager.get_verified_build(build_name)
+        verified_gear = (verified_build or {}).get("gear") or []
+        if verified_gear:
+            gear_names = {entry["item_name"] for entry in verified_gear}
+        else:
+            gear = self.leveling_manager.get_gear_data(build_name) or {}
+            checkable_gear = (gear.get("key_items") or []) + (gear.get("key_aspects") or [])
+            gear_names = {entry["name"] for entry in checkable_gear}
+        owned = self._load_owned_items(build_name) & gear_names
         missing_gear = len(gear_names) - len(owned)
 
         rows = [
@@ -1578,6 +1719,8 @@ class MainWindow(FluentWindow):
             (self._status_emoji(leveling_pct), "Leveling", self._pct_text(leveling_pct)),
             (self._status_emoji(paragon_pct), "Paragon", self._pct_text(paragon_pct)),
             (self._status_emoji(gear_pct), "Gear", self._pct_text(gear_pct)),
+            (self._status_emoji(gems_pct), "Gems", self._pct_text(gems_pct)),
+            (self._status_emoji(tempering_pct), "Tempering", self._pct_text(tempering_pct)),
         ]
 
         # Ready when every category with actual data is fully complete -
@@ -1587,6 +1730,8 @@ class MainWindow(FluentWindow):
             and (leveling_pct is None or leveling_pct == 100)
             and (paragon_pct is None or paragon_pct == 100)
             and (gear_pct is None or gear_pct == 100)
+            and (gems_pct is None or gems_pct == 100)
+            and (tempering_pct is None or tempering_pct == 100)
         )
 
         if ready:
@@ -1853,16 +1998,50 @@ class MainWindow(FluentWindow):
 
         return actions
 
+    def _pending_tempering_actions(self, build_name: str) -> list[tuple[str, str, object]]:
+        """Every not-yet-confirmed expected tempered affix, in order
+        (item by item, then tempering-entry by entry - usually just one
+        per item, but the schema is a list), as ``(kind, text, key)`` -
+        ``kind`` is ``"tempering"``, ``key`` is
+        ``"<slot_label>:<temper_index>"`` (exactly what
+        ``on_tempering_toggled`` expects). Mirrors ``_pending_gem_
+        actions``'s style exactly - this is the finest-grained, lowest-
+        priority layer of all (see ``_advisor_pending_actions``'s
+        ordering comment - appended after Gems, since a confirmed
+        tempered affix matters even less than a socketed gem)."""
+
+        verified_build = self.leveling_manager.get_verified_build(build_name)
+        verified_gear = (verified_build or {}).get("gear") or []
+
+        if not verified_gear:
+            return []
+
+        tempered = self._load_tempered_items(build_name)
+        actions = []
+
+        for item in verified_gear:
+            slot = item.get("slot", "?")
+            for idx, temper in enumerate(item.get("tempering") or []):
+                key = self._tempering_key(slot, idx)
+                if key in tempered:
+                    continue
+                recipe = temper.get("recipe_name") or "?"
+                group = temper.get("group")
+                label = f"{recipe} ({group})" if group else recipe
+                actions.append(("tempering", f"Apply {label} tempering to {slot}", key))
+
+        return actions
+
     def _advisor_pending_actions(self, build_name: str) -> list[tuple[str, str, object]]:
         """The full unified Build Advisor list for ``build_name``: every
         pending Leveling action, then every pending Skills action, then
         every pending Paragon action, then every pending Gear action,
-        then every pending Gem-socket action (see the priority-order
-        comment above) - each item ``(kind, text, key)``. The single
-        source of truth for "what's next" shared by ``_advisor_next_
-        action`` (Dashboard's Current Build card) and
-        ``_compact_next_action`` (Compact Mode), so both surfaces always
-        agree."""
+        then every pending Gem-socket action, then every pending
+        Tempering action (see the priority-order comment above) - each
+        item ``(kind, text, key)``. The single source of truth for
+        "what's next" shared by ``_advisor_next_action`` (Dashboard's
+        Current Build card) and ``_compact_next_action`` (Compact Mode),
+        so both surfaces always agree."""
 
         return (
             self._pending_leveling_actions(build_name)
@@ -1870,6 +2049,7 @@ class MainWindow(FluentWindow):
             + self._pending_paragon_actions(build_name)
             + self._pending_gear_actions(build_name)
             + self._pending_gem_actions(build_name)
+            + self._pending_tempering_actions(build_name)
         )
 
     def _advisor_next_action(self, build_name: str) -> tuple[str | None, str]:
@@ -2002,25 +2182,110 @@ class MainWindow(FluentWindow):
         self, build_name: str, cap: int = 5
     ) -> dict[str, tuple[list[str], int]]:
         """The Build Advisor page's "what's missing" data: for each of
-        Skills/Paragon/Gear, the first ``cap`` pending-action texts (see
-        ``_pending_skill_actions``/``_pending_paragon_actions``/
-        ``_pending_gear_actions``) plus the true total pending count, so
-        the page can show "(+N more)" instead of an unbounded wall of
-        text - matching the roadmap's "low visual noise, scannable"
-        principle. Pure formatting over the exact same helpers the
-        unified next-action already uses - no new validation logic."""
+        Skills/Paragon/Gear/Gems/Tempering, the first ``cap`` pending-
+        action texts (see ``_pending_skill_actions``/``_pending_paragon_
+        actions``/``_pending_gear_actions``/``_pending_gem_actions``/
+        ``_pending_tempering_actions``) plus the true total pending
+        count, so the page can show "(+N more)" instead of an unbounded
+        wall of text - matching the roadmap's "low visual noise,
+        scannable" principle. Pure formatting over the exact same
+        helpers the unified next-action already uses - no new
+        validation logic."""
 
         per_category = {
             "Skills": self._pending_skill_actions(build_name),
             "Paragon": self._pending_paragon_actions(build_name),
             "Gear": self._pending_gear_actions(build_name),
             "Gems": self._pending_gem_actions(build_name),
+            "Tempering": self._pending_tempering_actions(build_name),
         }
 
         return {
             category: ([text for _kind, text, _key in actions[:cap]], len(actions))
             for category, actions in per_category.items()
         }
+
+    def _build_validation(self, build_name: str) -> dict:
+        """Build Validation phase: one clean aggregation structure over
+        Skills/Paragon/Gear/Gems/Tempering for Build Advisor (or any
+        future consumer) -
+
+        ``{"overall_percent": int | None, "categories": {name: {
+        "percent": int | None, "status": str, "differences": [str,...]
+        }}}``.
+
+        Purely a reshape - reuses ``_category_percents`` (the exact same
+        numbers ``_compute_build_status`` renders as its 🟢/🟡/🔴 rows)
+        and each ``_pending_*_actions`` helper's already-computed
+        difference texts. Introduces no second way of deciding what's
+        done: every number here traces back to the one calculation in
+        ``_category_percents``.
+
+        ``status`` per category is one of:
+          - ``"unavailable"`` - no verified data to compare against at
+            all (``percent is None`` - e.g. every category for
+            Heartseeker Rogue, which has no ``verified_build``, or Gems/
+            Tempering for a build/item with zero sockets/tempered
+            affixes to expect).
+          - ``"correct"`` - 100% of this category's expected entries are
+            toggled "Have it".
+          - ``"partial"`` - some, but not all.
+          - ``"missing"`` - 0% (real data exists, none of it confirmed).
+
+        ``"different"`` is a deliberately UNREACHABLE status value that
+        exists only so a future real data source could report it - see
+        ARCHITECTURE.md's documented limitation, mirrored from
+        ``gear_planner.SlotStatus.INCORRECT`` and the Gems page's
+        scaffolded-but-unreachable "Wrong gem" state: every category
+        tracked here is a player self-reported "Have it" toggle (Skills/
+        Paragon nodes/Gear items/Gems/Tempering all work this way), which
+        can only ever be confirmed or not-yet-confirmed. There is no
+        character-state import anywhere in this app, so nothing can ever
+        detect the player has the *wrong* thing equipped/socketed/
+        tempered vs. simply not-yet-confirmed - this method never
+        produces ``"different"`` for that reason, on purpose, not by
+        omission.
+
+        Leveling is deliberately excluded, matching ``_advisor_missing_
+        summary``'s existing category set: for a build with no verified
+        ``skill_allocation`` it is literally the same checklist as
+        Skills (see ``_category_percents``), so including both would
+        double-count one real checklist into the overall average."""
+
+        percents = self._category_percents(build_name)
+
+        diffs_by_category = {
+            "Skills": self._pending_skill_actions(build_name),
+            "Paragon": self._pending_paragon_actions(build_name),
+            "Gear": self._pending_gear_actions(build_name),
+            "Gems": self._pending_gem_actions(build_name),
+            "Tempering": self._pending_tempering_actions(build_name),
+        }
+
+        categories = {}
+
+        for category, actions in diffs_by_category.items():
+            pct = percents[category]
+
+            if pct is None:
+                status = "unavailable"
+            elif pct == 100:
+                status = "correct"
+            elif pct == 0:
+                status = "missing"
+            else:
+                status = "partial"
+
+            categories[category] = {
+                "percent": pct,
+                "status": status,
+                "differences": [text for _kind, text, _key in actions],
+            }
+
+        real_percents = [c["percent"] for c in categories.values() if c["percent"] is not None]
+        overall_percent = round(sum(real_percents) / len(real_percents)) if real_percents else None
+
+        return {"overall_percent": overall_percent, "categories": categories}
 
     def _navigate_to_next_action(self, kind: str):
         """Dashboard card's / Build Advisor page's NEXT ACTION line was
@@ -2034,9 +2299,11 @@ class MainWindow(FluentWindow):
         Planner has no per-item anchor to jump further into - landing on
         the page is the achievable minimum there), ``"gem"`` -> the
         dedicated Gems page (same "landing on the page is enough" as
-        gear - no per-socket anchor exists there either). Uses the same
-        ``switchTo`` pattern already wired for the Dashboard card's
-        whole-card click."""
+        gear - no per-socket anchor exists there either), ``"tempering"``
+        -> the Gear Builder page (the only place a tempered affix's
+        toggle lives - same "landing on the page is enough" reasoning).
+        Uses the same ``switchTo`` pattern already wired for the
+        Dashboard card's whole-card click."""
 
         if kind == "gear":
             self.switchTo(self.character_interface)
@@ -2044,6 +2311,10 @@ class MainWindow(FluentWindow):
 
         if kind == "gem":
             self.switchTo(self.gems_interface)
+            return
+
+        if kind == "tempering":
+            self.switchTo(self.gear_builder_interface)
             return
 
         if kind == "paragon_node":
@@ -2159,13 +2430,14 @@ class MainWindow(FluentWindow):
     def on_compact_done(self):
         """Compact window's Done button - routes through whichever
         existing handler (``on_mark_done``/``on_mark_board_done``/
-        ``on_gear_owned_changed``/``on_gem_socket_toggled``) owns the
-        advisor's current action, so the main window's Leveling/Skills/
-        Paragon/Gear/Gems tabs and Build Status update immediately too,
-        not just Compact Mode's own view. Marking a Gear or Gem action
-        "done" here means "equip it"/"confirm it's socketed" - it flips
-        the same one-way-from-here toggle a "Have it" switch on that
-        page would.
+        ``on_gear_owned_changed``/``on_gem_socket_toggled``/
+        ``on_tempering_toggled``) owns the advisor's current action, so
+        the main window's Leveling/Skills/Paragon/Gear/Gems/Tempering
+        tracking and Build Status update immediately too, not just
+        Compact Mode's own view. Marking a Gear/Gem/Tempering action
+        "done" here means "equip it"/"confirm it's socketed"/"confirm
+        it's tempered" - it flips the same one-way-from-here toggle a
+        "Have it" switch on that page would.
 
         ``"leveling"`` routes through the exact same ``on_mark_done`` as
         ``"skill"`` - a Leveling action's key is a milestone position
@@ -2186,6 +2458,8 @@ class MainWindow(FluentWindow):
             self.on_gear_owned_changed(self._compact_action_key, True)
         elif self._compact_action_kind == "gem":
             self.on_gem_socket_toggled(self._compact_action_key, True)
+        elif self._compact_action_kind == "tempering":
+            self.on_tempering_toggled(self._compact_action_key, True)
 
     def on_class_changed(self, class_name: str):
         """Step-1 class selector changed: rebuild the step-2 build

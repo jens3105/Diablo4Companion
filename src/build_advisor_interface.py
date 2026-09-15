@@ -5,7 +5,8 @@ already compute - ``MainWindow._compute_build_status`` for the Skills/
 Leveling/Paragon/Gear percentage rollup, ``MainWindow._advisor_next_
 action`` for the single unified next step, and ``MainWindow._pending_
 skill_actions``/``_pending_paragon_actions``/``_pending_gear_actions``/
-``_pending_gem_actions`` for a short "what's missing" list per category.
+``_pending_gem_actions``/``_pending_tempering_actions`` for a short
+"what's missing" list per category.
 
 No new validation logic lives here - this module is presentation only,
 same as ``CurrentBuildCard``/``LevelingCard``'s Build Status widget."""
@@ -25,9 +26,9 @@ from src import theme
 from src.base_card import BaseCard, ClickableStrongBodyLabel
 
 # Display order + label for each pending-actions category - matches the
-# Skills -> Paragon -> Gear -> Gems priority order ``MainWindow._advisor_
-# pending_actions`` already unifies them in.
-_CATEGORIES = ["Skills", "Paragon", "Gear", "Gems"]
+# Skills -> Paragon -> Gear -> Gems -> Tempering priority order
+# ``MainWindow._advisor_pending_actions`` already unifies them in.
+_CATEGORIES = ["Skills", "Paragon", "Gear", "Gems", "Tempering"]
 
 
 class BuildAdvisorCard(BaseCard):
