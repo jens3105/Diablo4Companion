@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from PySide6.QtCore import QSettings, Qt, QTimer
-from PySide6.QtGui import QGuiApplication
+from PySide6.QtGui import QGuiApplication, QKeySequence, QShortcut
 from PySide6.QtWidgets import QHBoxLayout, QInputDialog, QVBoxLayout, QWidget
 
 from qfluentwidgets import (
@@ -24,6 +24,7 @@ from src.compact_window import CompactWindow
 from src.dashboard import DashboardWidget
 from src.leveling_card import LevelingCard
 from src.managers.leveling_manager import LevelingManager
+from src.quick_search import QuickSearchDialog
 
 
 class BuildsInterface(QWidget):
@@ -295,6 +296,14 @@ class MainWindow(FluentWindow):
         # this whenever it changes theme.py's colors, so every already-
         # built widget with a hard-coded color can re-apply it live.
         theme.theme_changed.changed.connect(self._on_theme_changed)
+
+        # Phase 25: Ctrl+K quick-search overlay - jump straight to any
+        # nav page or switch build without hunting through menus.
+        # ``QShortcut``'s default context (``Qt.WindowShortcut``) fires
+        # from any page/child widget as long as this window is active,
+        # so no per-page wiring is needed.
+        self.quick_search_shortcut = QShortcut(QKeySequence("Ctrl+K"), self)
+        self.quick_search_shortcut.activated.connect(self.open_quick_search)
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_countdown)
@@ -1507,6 +1516,128 @@ class MainWindow(FluentWindow):
 
         self.leveling_card.set_builds_for_class(builds, first_build_name)
         self.on_build_changed(first_build_name)
+
+    # ---------------------------------------------------------
+    # QUICK SEARCH (Phase 25 - Ctrl+K)
+    #
+    # A thin search-and-jump layer over data/navigation primitives that
+    # already exist - no new fetching, no new pages. Every searchable
+    # entry is built fresh each time the dialog opens (cheap: it's a
+    # handful of list() calls over data already loaded in memory) so it
+    # always reflects whichever build is currently active.
+    # ---------------------------------------------------------
+
+    def open_quick_search(self):
+
+        dialog = QuickSearchDialog(self)
+        dialog.set_items(self._build_quick_search_items())
+        dialog.exec()
+
+    def _select_build_from_search(self, build_name: str):
+        """Switch the active build to ``build_name`` and land on the
+        Build Guide page - the exact same class/build-selector state and
+        ``on_build_changed`` handler the Build Guide's own selectors
+        already use (``_apply_active_character`` populates the selectors
+        the same way), so nothing here duplicates that switching logic."""
+
+        class_name = self.leveling_manager.get_class_for_build(build_name)
+        builds = self.leveling_manager.list_builds_for_class(class_name)
+
+        self.leveling_card.set_classes(self.leveling_manager.list_classes(), class_name)
+        self.leveling_card.set_builds_for_class(builds, build_name)
+        self.on_build_changed(build_name)
+
+        self.switchTo(self.builds_interface)
+
+    def _jump_to_skill(self):
+
+        self.switchTo(self.builds_interface)
+        self.leveling_card.select_section(self.leveling_card.SKILLS_KEY)
+
+    def _build_quick_search_items(self) -> list[dict]:
+        """Flat, filterable list of ``{"label", "category", "action"}``
+        entries: the 5 nav pages, every build across every class (so any
+        build is one keystroke-search away from being switched to), and
+        the ACTIVE build's skill/gear names (cheap - just the one
+        already-loaded build, not all 25) so the player can jump
+        straight to a specific skill or gear item they're looking for."""
+
+        items = []
+
+        # ---- Nav pages ----
+
+        pages = [
+            ("Dashboard", self.dashboard),
+            ("Build Guide", self.builds_interface),
+            ("Character", self.character_interface),
+            ("Build Advisor", self.advisor_interface),
+            ("Settings", self.settings_interface),
+        ]
+        for label, interface in pages:
+            items.append(
+                {"label": label, "category": "Page", "action": lambda i=interface: self.switchTo(i)}
+            )
+
+        # ---- All builds, across all classes ----
+
+        for build in self.leveling_manager.list_builds():
+            build_name = build["build_name"]
+            category = build.get("class_name", "") or "Build"
+            items.append(
+                {
+                    "label": build_name,
+                    "category": category,
+                    "action": lambda b=build_name: self._select_build_from_search(b),
+                }
+            )
+
+        # ---- Active build's skills + gear only (see docstring) ----
+
+        active_build = self.leveling_manager.current_build_name
+
+        if active_build:
+            verified_build = self.leveling_manager.get_verified_build(active_build)
+            verified_skills = (verified_build or {}).get("skill_allocation") or []
+
+            if verified_skills:
+                skill_names = [entry["skill"] for entry in verified_skills]
+            else:
+                milestones = self.leveling_manager.get_skills_data(active_build)["milestones"]
+                seen = []
+                for m in milestones:
+                    skill = (m.get("skill") or "").strip()
+                    if skill and skill not in seen:
+                        seen.append(skill)
+                skill_names = seen
+
+            for name in skill_names:
+                items.append(
+                    {
+                        "label": name,
+                        "category": f"Skill - {active_build}",
+                        "action": self._jump_to_skill,
+                    }
+                )
+
+            verified_gear = (verified_build or {}).get("gear") or []
+
+            if verified_gear:
+                gear_names = [entry["item_name"] for entry in verified_gear]
+            else:
+                gear = self.leveling_manager.get_gear_data(active_build) or {}
+                gear_names = [item["name"] for item in gear.get("key_items") or []]
+                gear_names += [item["name"] for item in gear.get("key_aspects") or []]
+
+            for name in gear_names:
+                items.append(
+                    {
+                        "label": name,
+                        "category": f"Gear - {active_build}",
+                        "action": lambda: self.switchTo(self.character_interface),
+                    }
+                )
+
+        return items
 
     # ---------------------------------------------------------
     # UPCOMING EVENTS
