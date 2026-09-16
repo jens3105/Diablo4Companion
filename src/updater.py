@@ -202,9 +202,14 @@ def backup_install_dir(install_dir: str, backup_root: str, version: str) -> str:
     Called right before an installer is launched, so that if the newly
     installed version turns out to be broken there is a known-good copy
     of the CURRENT install to recover from. ``backup_root`` must be a
-    sibling of ``install_dir`` (the caller's responsibility, see
-    ``src/app.py``'s ``_on_update_now_clicked``) so Inno Setup's own
-    file operations during install never touch it.
+    location Inno Setup's own file operations during install never touch
+    AND one the current (possibly non-elevated) user can actually write
+    to regardless of where ``install_dir`` itself lives - see
+    ``src/app.py``'s ``_on_update_now_clicked``, which uses
+    ``%LOCALAPPDATA%`` rather than a sibling of ``install_dir`` for
+    exactly this reason (a real install can end up under Program Files,
+    which a normal user cannot write into, even though it can always
+    still be READ for the copy below).
 
     Raises whatever ``shutil.copytree`` raises (``OSError`` and
     subclasses - disk full, permission error, the destination already

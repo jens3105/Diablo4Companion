@@ -587,9 +587,28 @@ class SettingsInterface(QWidget):
         # frozen branch already uses).
         if getattr(sys, "frozen", False):
             install_dir = os.path.dirname(sys.executable)
-            backup_root = os.path.join(
-                os.path.dirname(install_dir), "Diablo4Companion_backup"
-            )
+            # backup_root must NOT be derived from install_dir's own
+            # location. installer/diablo4companion.iss's DefaultDirName
+            # is {localappdata}\Diablo4Companion specifically so a normal,
+            # non-elevated user can write there - but it does NOT disable
+            # Inno Setup's directory-picker page, so a real install can
+            # end up anywhere the user chose in the wizard, including
+            # Program Files. A previous version of this code computed
+            # backup_root as a SIBLING of install_dir, which silently
+            # inherited whatever write-permission restriction install_dir
+            # itself had - on a real Program-Files-style install, that
+            # made shutil.copytree's destination-directory creation fail
+            # with a permissions error, which this method correctly (by
+            # its own safety rule) treated as "cancel the update" rather
+            # than risk anything - the fix is giving the backup a
+            # location that is ALWAYS writable by the current user
+            # regardless of where the app itself is installed:
+            # %LOCALAPPDATA% (the exact same per-user, no-admin-required
+            # guarantee the installer's own DefaultDirName already relies
+            # on), falling back to the system temp dir on the rare chance
+            # that environment variable isn't set.
+            backup_base = os.environ.get("LOCALAPPDATA") or tempfile.gettempdir()
+            backup_root = os.path.join(backup_base, "Diablo4Companion_backup")
 
             target_version_tuple = _parse_semver(release.get("tag_name", ""))
             target_version = (
