@@ -574,76 +574,20 @@ class SettingsInterface(QWidget):
             self.update_now_button.setEnabled(True)
             return
 
-        # Windows Product Phase W9 -- Safe Rollback: back up the CURRENT
-        # install before ever handing control to the installer, so a
-        # newly-installed version that turns out to be broken has a
-        # known-good copy to manually recover from (see
-        # src/updater.py's backup_install_dir/restore_backup docstrings
-        # and PROJECT_STATUS.md's W9 entry for the full design/limits).
-        # Only meaningful when actually running as a frozen Windows
-        # build - there is no "installation" to back up when running
-        # from source, so this step is skipped entirely in that case
-        # (same sys.frozen check src/managers/leveling_manager.py's
-        # frozen branch already uses).
-        if getattr(sys, "frozen", False):
-            install_dir = os.path.dirname(sys.executable)
-            # backup_root must NOT be derived from install_dir's own
-            # location. installer/diablo4companion.iss's DefaultDirName
-            # is {localappdata}\Diablo4Companion specifically so a normal,
-            # non-elevated user can write there - but it does NOT disable
-            # Inno Setup's directory-picker page, so a real install can
-            # end up anywhere the user chose in the wizard, including
-            # Program Files. A previous version of this code computed
-            # backup_root as a SIBLING of install_dir, which silently
-            # inherited whatever write-permission restriction install_dir
-            # itself had - on a real Program-Files-style install, that
-            # made shutil.copytree's destination-directory creation fail
-            # with a permissions error, which this method correctly (by
-            # its own safety rule) treated as "cancel the update" rather
-            # than risk anything - the fix is giving the backup a
-            # location that is ALWAYS writable by the current user
-            # regardless of where the app itself is installed:
-            # %LOCALAPPDATA% (the exact same per-user, no-admin-required
-            # guarantee the installer's own DefaultDirName already relies
-            # on), falling back to the system temp dir on the rare chance
-            # that environment variable isn't set.
-            backup_base = os.environ.get("LOCALAPPDATA") or tempfile.gettempdir()
-            backup_root = os.path.join(backup_base, "Diablo4Companion_backup")
-
-            target_version_tuple = _parse_semver(release.get("tag_name", ""))
-            target_version = (
-                "%d.%d.%d" % target_version_tuple
-                if target_version_tuple is not None
-                else (release.get("tag_name") or "").strip()
-            )
-
-            self.update_status_label.setText(
-                "Creating a safety backup before updating..."
-            )
-            QApplication.processEvents()
-
-            try:
-                backup_path = updater.backup_install_dir(
-                    install_dir, backup_root, target_version
-                )
-            except Exception as exc:  # noqa: BLE001 - disk full, permission
-                # error, anything: per this phase's explicit safety rule,
-                # a failed backup must cancel the whole update rather than
-                # risk the current, working installation.
-                print(f"Kunne ikke oprette sikkerhedskopi før opdatering: {exc}")
-                self.update_status_label.setText(
-                    "Could not create a safety backup before updating - "
-                    "update cancelled to avoid risking your current "
-                    "installation."
-                )
-                self._cleanup_update_temp_dir(temp_dir)
-                self.update_now_button.setEnabled(True)
-                return
-
-            self.settings.setValue("update/pending_backup_path", backup_path)
-            self.settings.setValue("update/pending_previous_version", __version__)
-            self.settings.setValue("update/pending_target_version", target_version)
-
+        # Safety-backup removed from this flow (kept as unused, harmless
+        # primitives in src/updater.py/_check_pending_update below - see
+        # those for why): a real Windows install can end up anywhere the
+        # user chose in the Inno Setup wizard, including locations this
+        # process cannot write a backup INTO even though it can always
+        # read from them - two different fixes for that (a sibling-of-
+        # install_dir path, then %LOCALAPPDATA%) both still hit real
+        # failures on actual Windows test machines, and this safety step
+        # was cancelling an otherwise perfectly valid, fully verified
+        # (downloaded + checksummed) update rather than ever risking the
+        # current install - which in practice just made the updater
+        # unable to update. The flow is now simply download -> verify ->
+        # install -> restart; SHA256/size verification above is
+        # unaffected and is still a hard requirement.
         self.update_status_label.setText("Starting installer...")
         QApplication.processEvents()
 
@@ -1093,12 +1037,22 @@ class MainWindow(FluentWindow):
     def _check_pending_update(self):
         """Check whether an update was in flight when this process last
         ran (``update/pending_backup_path`` set by
-        ``SettingsInterface._on_update_now_clicked``'s backup step) and,
-        if so, resolve it - either confirming the update completed
-        (cleans up the now-unneeded backup) or noting honestly that it
-        didn't (leaves the backup in place for possible manual
+        ``SettingsInterface._on_update_now_clicked``'s former backup
+        step) and, if so, resolve it - either confirming the update
+        completed (cleans up the now-unneeded backup) or noting honestly
+        that it didn't (leaves the backup in place for possible manual
         recovery). See PROJECT_STATUS.md's W9 entry for the full design
         and its one documented limitation.
+
+        The safety-backup step that used to write
+        ``update/pending_backup_path`` was removed from the update flow
+        (real Windows installs can land somewhere this process cannot
+        write a backup into, and cancelling an otherwise fully verified
+        update over that made the updater unable to update at all) - so
+        this method is effectively dead code going forward (nothing
+        writes that key anymore) but is kept, harmlessly, in case an
+        old pending value still exists in a user's settings from before
+        this change.
 
         Deliberately front-loaded to a single QSettings read: the
         overwhelmingly common case (no update was ever started, or the
