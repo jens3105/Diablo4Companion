@@ -302,7 +302,7 @@ def restore_backup(backup_path: str, install_dir: str, backup_root: str) -> None
     shutil.copytree(backup_path_abs, install_dir_abs)
 
 
-def launch_installer(installer_path: str) -> None:
+def launch_installer(installer_path: str) -> subprocess.Popen:
     """Launch the verified installer as a separate process and return
     immediately - never blocks waiting for the (interactive) installer
     wizard to finish.
@@ -313,6 +313,19 @@ def launch_installer(installer_path: str) -> None:
     or not being executable) propagate naturally; the caller wraps this
     in its own try/except so it can show a clear status message instead
     of closing the app on a failed launch.
-    """
 
-    subprocess.Popen([installer_path], shell=False)
+    Returns the ``Popen`` handle so the caller can do a brief liveness
+    check (``proc.poll()``) before committing to closing this app -
+    ``Popen`` succeeding only means Windows accepted the request to
+    start a process, not that the process is still alive moments later.
+    A just-downloaded, unsigned .exe can be killed almost immediately by
+    antivirus/security software on a real machine (confirmed as a real
+    risk during Production Validation: the full click-to-launch_installer
+    flow was proven correct end-to-end against a real GitHub Release on
+    a real Windows runner, but that runner has no consumer-grade AV - a
+    real gaming PC's security software silently killing the freshly
+    spawned installer, with this app then blindly quitting a second
+    later regardless, would look exactly like "clicking Update Now does
+    nothing" from the user's side)."""
+
+    return subprocess.Popen([installer_path], shell=False)

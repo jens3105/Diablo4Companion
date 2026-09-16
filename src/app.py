@@ -2,6 +2,7 @@ import os
 import shutil
 import sys
 import tempfile
+import time
 from datetime import datetime, timezone
 
 import requests
@@ -558,12 +559,39 @@ class SettingsInterface(QWidget):
         QApplication.processEvents()
 
         try:
-            updater.launch_installer(installer_path)
+            installer_process = updater.launch_installer(installer_path)
         except OSError as exc:
             print(f"Kunne ikke starte installeren: {exc}")
             self.update_status_label.setText(
                 "Could not start the installer - please download it "
                 "manually from GitHub Releases."
+            )
+            self.update_now_button.setEnabled(True)
+            return
+
+        # Production Validation finding: Popen succeeding only means
+        # Windows accepted the request to start a process, not that it's
+        # still alive moments later - a just-downloaded, unsigned .exe
+        # can be killed almost immediately by antivirus/security
+        # software on a real machine. Blindly quitting this app right
+        # after Popen (the previous behavior) would then look exactly
+        # like "clicking Update Now does nothing": the old app closes,
+        # no installer window ever appears, nothing to restart from. A
+        # brief liveness check here turns that silent failure into a
+        # clear, actionable message instead.
+        time.sleep(1.5)
+        QApplication.processEvents()
+
+        if installer_process.poll() is not None:
+            print(
+                f"Installeren afsluttede uventet med det samme "
+                f"(exit code {installer_process.returncode})"
+            )
+            self.update_status_label.setText(
+                "The installer closed immediately after starting - it may "
+                "have been blocked by antivirus/security software. Please "
+                "download and run Diablo4Companion-Setup.exe manually from "
+                "GitHub Releases."
             )
             self.update_now_button.setEnabled(True)
             return
