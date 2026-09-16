@@ -4,7 +4,62 @@ _Sidst opdateret: 2026-09-15_
 
 ## Current phase
 
-**Windows Product Phase W9 — Safe Rollback** — **DONE**, bekræftet på
+**Dashboard Data/UI Bugfix (før W10)** — **DONE.** Prioriteret
+bugfix-fase, indsat mellem W9 og W10 på brugerens direkte anmodning.
+Ikke en del af Windows Product-nummereringen.
+
+- **Problem 1 (forkert live data):** Sporede hele World Boss/Legion/
+  Helltide-datastrømmen (helltides.com → `src/api.py` →
+  `src/app.py`s `load_world_boss`/`load_legion`/`load_helltide` →
+  `EventCard`) mod den ÆGTE, live helltides.com-API — hentet via en
+  rigtig browser-session, da både `requests` og `WebFetch` får 403 fra
+  Cloudflares bot-challenge (bekræftet ikke maskine-specifikt). Hvert
+  felt-navn/struktur koden allerede antog (top-niveau
+  `world_boss`/`legion`/`helltide`-nøgler; `startTime`/`timestamp`/
+  `type` pr. post; kun `world_boss` har `boss`/`zone`) matchede den
+  rigtige API præcist — **ingen felt-ombytning fundet i den kørende
+  kort-wiring-kode selv.**
+  **Den reelle rodårsag der blev fundet og rettet:** `get_next_world_
+  boss`/`get_next_legion`/`get_next_helltide`/`get_upcoming_events`
+  kaldte hver især `self.api.get_schedule()` uafhængigt — op til 4
+  separate HTTP-kald inden for millisekunder af hinanden pr. dashboard-
+  opdatering. Da helltides.com's Cloudflare-udfordring vides at blokere
+  almindelige HTTP-klienter intermitterende, kunne ét korts kald ramme
+  den live API mens et andets (kaldt lige efter) blev blokeret og faldt
+  tilbage til det lokalt beregnede estimat — reelt inkonsistente,
+  forskellig-kilde data på tværs af kort i samme opdatering. Rettet ved
+  at hente schedulen ÉN gang pr. opdateringscyklus og genbruge den
+  samme snapshot i alle forbrugere.
+  Tilføjede desuden defensiv validering: hver rigtig schedule-post
+  bærer sit eget `"type"`-felt (bekræftet live) — de fire metoder
+  springer nu enhver post over hvis dens eget `type` ikke matcher den
+  liste den står under, i stedet for blindt at stole på den ydre nøgle
+  — den egentlige rodårsags-niveau-fix for denne fejlklasse.
+- **Problem 2 (Upcoming Events):** Udvidet fra 5 til 8 rigtige events,
+  ny "Location"-kolonne (rigtig zone for World Boss, bogstaveligt
+  "DATA UNAVAILABLE" for Legion/Helltide — den live API leverer
+  bekræftet intet location-felt for de to typer). Mindre lodret plads
+  trods flere rækker: `CaptionLabel` i stedet for `BodyLabel`
+  (mindre linjehøjde) + strammere grid-spacing.
+- **Filer ændret:** `src/api.py`, `src/app.py`, `src/upcoming_card.py`.
+  `src/updater.py` (W5-W9) er ikke rørt.
+- **Tests:** Testet mod den ægte, live-bekræftede API-struktur —
+  World Boss/Legion/Helltide-kort bekræftet at modtage KUN egne felter
+  (ingen boss/zone-lækage til Legion/Helltide); `get_schedule()`-kald
+  under opstart bekræftet faldet fra 4 til 1; en bevidst forkert-typet
+  post bekræftet korrekt sprunget over; Upcoming Events bekræftet at
+  vise rigtigt navn/location for World Boss og ærlig DATA UNAVAILABLE
+  for Legion/Helltide. Fuld 26-build-regression: 0 fejl.
+  `src/updater.py` bekræftet stadig importerbar uændret.
+- **Commit:** `cc10305`.
+
+Windows Product Phase W9 (Safe Rollback) forbliver **DONE**. W10
+(Build Data Updates) forbliver **IKKE STARTET**. Character State
+forbliver **ON HOLD**.
+
+### Tidligere: Windows Product Phase W9 — Safe Rollback
+
+**DONE**, bekræftet på
 den rigtige Windows-runner. Kerne-indsigt: Inno Setup beskytter allerede
 selv mod at en afbrudt installation efterlader halvkopierede filer
 (indbygget transaktionslogik) — appens egen kode dækker i stedet det
@@ -358,8 +413,8 @@ Build Advisor (denne fase).
 
 ## Last commit
 
-`2695c3d` — "Windows Product Phase W9: safe rollback via
-backup-before-install" (pushet).
+`cc10305` — "Dashboard data bugfix: shared schedule fetch, type
+validation, real Upcoming Events" (pushet).
 
 Branch: `feature/dashboard-v2` (repoets eneste/default branch — der er
 ikke noget `main`, det er normalt for dette repo).
@@ -665,9 +720,9 @@ scope.
 
 ## Next phase
 
-Ingen planlagt. W9 er DONE. **W10 (Build Data updater) er stadig IKKE
-STARTET, og Character State er stadig ON HOLD.** Vent på konkret
-instruktion fra
+Ingen planlagt. Dashboard Data/UI-bugfixen er DONE. **W9 forbliver
+DONE. W10 (Build Data updater) er stadig IKKE STARTET, og Character
+State er stadig ON HOLD.** Vent på konkret instruktion fra
 brugeren (se PROJECT_ROADMAP.md's regel: "Start ikke næste
 roadmap-fase uden en konkret instruktion"). Mulig fremtidig
 opfølgning (ikke startet, kræver eksplicit instruktion): rette
@@ -676,6 +731,10 @@ opfølgning (ikke startet, kræver eksplicit instruktion): rette
 
 ## Kort changelog (seneste faser, nyeste øverst)
 
+- `cc10305` — Dashboard Data/UI-bugfix: delt schedule-fetch pr.
+  opdatering (rettede en reel 4x-redundant-fetch-inkonsistens-bug),
+  type-validering, Upcoming Events udvidet til 8 rigtige events +
+  Location-kolonne.
 - `2695c3d` — Windows Product Phase W9: Safe Rollback. Backup-før-
   install + selv-tjek-ved-næste-opstart, ingen overvågnings-proces.
   Bekræftet på rigtig Windows-runner (run `35068798145`, success).
