@@ -2,7 +2,61 @@
 
 _Sidst opdateret: 2026-09-16_
 
-## Current phase
+## Current phase — Dashboard Live Data: legitim kilde-undersøgelse afsluttet
+
+Efter at `local_schedule.py`-fabrikationen blev fjernet (`b08db7d`),
+blev det undersøgt om der findes en LEGITIM måde for selve den
+pakkede Windows-desktop-app (ikke en browser) at nå de rigtige,
+live helltides.com-data — uden at omgå Cloudflare/CAPTCHA/auth, som
+eksplicit forbudt.
+
+**Testet, med bevis:**
+- Almindelig `requests`-kald: `403`.
+- Med fuldt browser-lignende User-Agent: stadig `403`.
+- Med komplet sæt normale browser-headers (Accept, Accept-Language,
+  Referer, Origin): stadig `403`.
+- Response-headers (hentet via en rigtig browser-session) viser
+  `server: cloudflare` + Railway-hosting bagved — dette er IKKE en doven
+  User-Agent-baseret blokering, men et ægte fingerprint-/
+  udfordringsbaseret Cloudflare-tjek. At forsøge yderligere
+  header-/TLS-spoofing for at komme forbi ville være en reel omgåelse
+  af beskyttelsen — gjort bevidst IKKE.
+- helltides.com's egen forside bekræfter eksplicit: **"Helltides.com er
+  en fan-made Diablo 4 event timer... Not affiliated with Activision or
+  Blizzard Entertainment."** Ingen offentlig developer-API/docs-side
+  findes — kun deres egen "Discord Bot" (til Discord-servere, ikke et
+  generelt REST-API til tredjepartsapps).
+- Ingen officiel Blizzard-API for World Boss/Legion/Helltide-tider
+  eksisterer.
+
+**Konklusion (ærlig, ikke en antagelse):** Der findes ingen legitim
+måde for denne pakkede Python/PySide6-desktop-app at hente
+Diablo 4-eventdata live på egen hånd. Den eneste måde at faktisk se
+disse data er en RIGTIG browser (som består Cloudflares
+fingerprint-tjek automatisk) — at indlejre en fuld browser-motor
+(fx QtWebEngine) i denne app for at opnå dette ville være en enorm,
+uforholdsmæssig arkitekturændring, ikke bedt om og langt uden for
+denne fases scope.
+
+**Det betyder: DATA UNAVAILABLE er ikke en midlertidig fallback mens vi
+venter på en bedre løsning — det ER den korrekte, ærlige, endelige
+tilstand** når det live API ikke kan nås, præcis som brugerens egen
+regel foreskriver ("REAL API DATA > DATA UNAVAILABLE > NEVER
+FABRICATED DATA"). Fixet fra `b08db7d` (ingen fabrikation, tydelig
+DATA UNAVAILABLE) er derfor det korrekte og komplette svar — ikke en
+uafsluttet mellemtilstand.
+
+**Sekundært fund (ikke handlet på, uden for scope):** Den rigtige
+helltides.com-forside viser nu et 3. eventtype — "Realmwalker"
+(introduceret Season 6, "Hatred Rising") — som IKKE findes i
+`/api/schedule`-endpointets svar (kun `world_boss`/`legion`/`helltide`).
+Appen har derfor aldrig vist Realmwalker-data, hverken fabrikeret eller
+ægte. Dette er en mulig fremtidig udvidelse, ikke en del af denne
+bugfix.
+
+---
+
+## Tidligere fase
 
 **CRITICAL Dashboard Live Data Bug — fundet og rettet (commit
 `b08db7d`)**
