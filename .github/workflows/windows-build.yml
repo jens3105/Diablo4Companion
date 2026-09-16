@@ -140,13 +140,22 @@ jobs:
           }
           Write-Host "OK: Diablo4Companion.exe present."
 
+          # Compared against the checked-out source tree's real builds/*.json
+          # count rather than a hardcoded literal (Windows Product Phase W10
+          # added builds/manifest.json as a real 27th such file - a hardcoded
+          # "26" broke the moment that legitimate file existed; deriving the
+          # expected count from the actual source avoids this happening again
+          # for any future addition/removal).
+          $sourceBuildsDir = Join-Path $env:GITHUB_WORKSPACE "builds"
+          $expectedJsonCount = (Get-ChildItem -Path $sourceBuildsDir -Filter "*.json" -File).Count
+
           $buildsDir = Join-Path $installDir "builds"
           $jsonFiles = Get-ChildItem -Path $buildsDir -Filter "*.json" -File -ErrorAction SilentlyContinue
           $jsonCount = if ($jsonFiles) { $jsonFiles.Count } else { 0 }
-          if ($jsonCount -ne 26) {
-            throw "Expected 26 builds/*.json files in $buildsDir, found $jsonCount"
+          if ($jsonCount -ne $expectedJsonCount) {
+            throw "Expected $expectedJsonCount builds/*.json files in $buildsDir (matching the source tree), found $jsonCount"
           }
-          Write-Host "OK: found all 26 builds/*.json files."
+          Write-Host "OK: found all $expectedJsonCount builds/*.json files."
 
           # Windows Product Phase W4: best-effort check that the
           # /DMyAppVersion value we passed into ISCC made it into the
