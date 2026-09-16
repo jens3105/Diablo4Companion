@@ -1,12 +1,118 @@
 # Diablo 4 Companion — Project Status
 
-_Sidst opdateret: 2026-09-15_
+_Sidst opdateret: 2026-09-16_
 
 ## Current phase
 
-**Dashboard Data/UI Bugfix (før W10)** — **DONE.** Prioriteret
-bugfix-fase, indsat mellem W9 og W10 på brugerens direkte anmodning.
-Ikke en del af Windows Product-nummereringen.
+**Windows Product Phase W10 — Build Data Updates** — **DONE.**
+
+Et helt separat opdateringssystem for Diablo 4 build-JSON-filerne
+(`builds/*.json`), fuldstændig uafhængigt af app-versions-opdateringen
+(`src/updater.py`, W5-W9 — **ikke rørt** i denne fase, bekræftet via
+`git diff --stat -- src/updater.py` = tom). App-version og
+Build-Data-version er nu to helt separate koncepter med to separate
+opdaterings-flows.
+
+- **Build-data-kilde:** ingen ny hosting nødvendig — GitHub server
+  allerede ethvert committet fil som en almindelig offentlig GET via
+  `https://raw.githubusercontent.com/jens3105/Diablo4Companion/feature/dashboard-v2/builds/<filnavn>`
+  (samme slags endpoint som Maxroll-data-pipelinen og W5-W9's GitHub
+  Releases API allerede bruger). Selve manifestet hentes samme vej:
+  `.../builds/manifest.json`.
+- **Versioneringsmetode:** almindelig menneskeligt-læsbar dato-streng
+  (`"YYYY-MM-DD"`, fx `"2026-09-16"`) som `version`-feltet i
+  `builds/manifest.json` — bevidst IKKE bundet til en git commit SHA
+  (W5 fjernede med vilje appens produktions-git-afhængighed) og IKKE et
+  semver-skema (unødvendig kompleksitet for build-data). Ren
+  streng-sammenligning (`remote_version <= local_version`) er sikker
+  for netop dette faste-bredde, zero-padded `YYYY-MM-DD`-format, da det
+  sorterer identisk leksikografisk og kronologisk — dokumenteret som
+  kommentar i `src/app.py`'s `_on_check_build_data_updates_clicked`.
+- **Filer ændret:**
+  - `builds/manifest.json` (ny, committet) — den autoritative fil-liste
+    (alle 26 rigtige build-filer, alfabetisk, genereret ved reelt at
+    liste `builds/*.json` — ikke gættet) + version-stemplet. Denne fil
+    fungerer BÅDE som den fjerntliggende sandhed (hostet på GitHub) OG
+    som den lokale version-record (læses direkte fra disk, intet nyt
+    QSettings/database-lag).
+  - `src/build_data_updater.py` (ny fil) — `fetch_remote_manifest`/
+    `read_local_manifest`/`download_build_data`, rene funktioner,
+    ingen import fra/til `src/updater.py`.
+  - `src/managers/leveling_manager.py` — den eksisterende minimale
+    schema-tjek (`"build_name" in data and "milestones" in data`) i
+    `_load_builds` udtrukket til en ny `LevelingManager.
+    is_valid_build_schema`-staticmethod, så `build_data_updater.py`
+    genbruger PRÆCIS samme tjek i stedet for at opfinde et andet. Ingen
+    anden adfærdsændring i denne fil.
+  - `src/app.py` — ny, separat "Build Data"-sektion i
+    `SettingsInterface` (egne widgets/state/handlers: `build_data_
+    version_label`, `build_data_status_label`, `check_build_data_
+    button`, `update_build_data_button`, `_pending_build_data_
+    manifest`) — rører aldrig `_pending_update_release`/`update_now_
+    button`/noget fra "App Updates"-sektionen. `SettingsInterface`
+    tager nu en `leveling_manager`-reference (minimal, nødvendig
+    wiring — `MainWindow` sender sin eksisterende `self.
+    leveling_manager` med).
+  - `diablo4companion.spec`/`installer/diablo4companion.iss`/
+    `.github/workflows/windows-build.yml`: **ingen ændring** —
+    bekræftet (ikke antaget) at spec-filens eksisterende glob
+    (`builds/*.json`) automatisk fanger den nye `manifest.json` (27
+    filer i stedet for 26 i `builds_datas`-listen, verificeret direkte
+    med Python-glob-kald).
+- **Download/verify/install-flow:** for hver fil i `remote_manifest
+  ["files"]` (den ENESTE kilde til hvilke filer der nogensinde
+  downloades — aldrig et gæt): GET fra raw.githubusercontent.com,
+  tjek HTTP-status, ikke-tomt indhold, gyldig JSON, og det genbrugte
+  minimale schema-tjek. ALT dette sker i en frisk `tempfile.mkdtemp()`-
+  mappe oprettet som SØSKENDE til `builds_dir` (ikke i system-temp) —
+  netop dette gør de efterfølgende `os.replace()`-kald garanteret
+  atomiske på både POSIX og Windows (samme filsystem), ikke kun
+  "sandsynligvis". Fejler ÉT tjek for ÉN fil, kastes der straks med en
+  præcis fil+årsag-besked, og INGEN reelle filer i `builds_dir` er
+  rørt — kun efter at ALLE filer er downloadet og verificeret erstattes
+  de rigtige filer én for én via `os.replace`. Selve `manifest.json`
+  skrives og erstattes SIDST, kun efter alle data-filer er lykkedes, så
+  en afbrydelse midtvejs blot betyder at et nyt tjek finder "opdatering
+  stadig tilgængelig" igen — aldrig en inkonsistent tilstand.
+  `progress_callback(files_done, total_files)` opdaterer UI'et live
+  ("Downloading build data... N/26"). Efter succes kaldes
+  `leveling_manager._load_builds()` direkte — build-data opdateres i
+  UI'et med det samme, ingen genstart nødvendig.
+- **Offline fallback:** bekræftet testet — `builds/manifest.json`
+  fraværende helt (simulerer en installation fra før denne fase)
+  påvirker IKKE `MainWindow`/`LevelingManager`-opstart overhovedet
+  (`read_local_manifest` returnerer `None` uden at kaste, Settings
+  viser "Build Data Version: unknown (no manifest found)"). Intet
+  netværkskald sker nogensinde automatisk ved opstart — kun ved
+  eksplicit knap-klik. Et "Check for Build Data Updates"-klik uden
+  netværk viser en klar "Could not check for Build Data updates
+  (network error)"-besked uden at crashe noget, og genaktiverer knappen
+  korrekt.
+- **W5-W9 (App Updates/rollback):** bekræftet **fortsat DONE, uændret**
+  — `src/updater.py` har `git diff --stat` = tom (0 linjer ændret), og
+  to af W7's App Updates-scenarier (netværksfejl, up-to-date) blev
+  gen-kørt eksplicit efter W10's ændringer for at bevise ingen
+  regression, begge stadig korrekte.
+- **Character State:** fortsat **ON HOLD**, uændret, ikke rørt i denne
+  fase.
+- **Windows CI:** **ikke kørt, bevidst vurderet unødvendigt.** Denne
+  fases logik er ren Python-fil-I/O + HTTP, ingen PyInstaller/Inno
+  Setup-relevans. Bekræftet direkte (ikke antaget) at
+  `diablo4companion.spec`'s eksisterende `glob.glob(".../builds/*.json")`
+  automatisk fanger `manifest.json` uden nogen `.spec`/`.iss`-ændring —
+  en ny Windows CI-kørsel ville derfor kun genbekræfte allerede-kendt
+  bundling-adfærd, intet nyt om selve W10-koden (som er 100% testbar
+  fra Linux, da den ikke rører packaging/frozen-specifik sti-logik ud
+  over den allerede-eksisterende `LevelingManager.builds_dir`, som selv
+  er uændret i sin `sys.frozen`-opløsning).
+- **Sidste commit:** `f2ba7ad` — "Windows Product Phase W10: Build Data
+  Updates" (pushet til `feature/dashboard-v2`).
+
+---
+
+**Tidligere fase:** Dashboard Data/UI Bugfix (før W10) — **DONE.**
+Prioriteret bugfix-fase, indsat mellem W9 og W10 på brugerens direkte
+anmodning. Ikke en del af Windows Product-nummereringen.
 
 - **Problem 1 (forkert live data):** Sporede hele World Boss/Legion/
   Helltide-datastrømmen (helltides.com → `src/api.py` →
@@ -409,12 +515,11 @@ Ingen kendte bugs i kø.
 
 ## Last completed phase
 
-Build Advisor (denne fase).
+Windows Product Phase W10 — Build Data Updates (denne fase).
 
 ## Last commit
 
-`cc10305` — "Dashboard data bugfix: shared schedule fetch, type
-validation, real Upcoming Events" (pushet).
+`f2ba7ad` — "Windows Product Phase W10: Build Data Updates" (pushet).
 
 Branch: `feature/dashboard-v2` (repoets eneste/default branch — der er
 ikke noget `main`, det er normalt for dette repo).
@@ -430,6 +535,48 @@ Output: `dist/Diablo4Companion/` (onedir), inkl.
 
 ## Tests
 
+- **W10 — Lokal unit-test (2026-09-16, Linux), `src/build_data_updater.py`:**
+  `fetch_remote_manifest` mod mockede svar — HTTP-fejl (rejser
+  `requests.RequestException`), ugyldig JSON (rejser `ValueError`),
+  manifest uden `"files"`-felt (rejser `ValueError`), succes (korrekt
+  dict). `read_local_manifest` mod 3 rigtige temp-mapper — gyldigt
+  manifest (dict), manglende fil (`None`), korrupt JSON (`None`, ingen
+  exception i noget tilfælde). `download_build_data` mod en rigtig
+  lokal target-mappe med kendt originalt indhold + en konstrueret fake
+  remote-manifest + mockede HTTP-svar, 6 scenarier: fuld succes
+  (bekræftet: begge datafiler + `manifest.json` korrekt erstattet,
+  `progress_callback` kaldt korrekt `[(1,2),(2,2)]`, ingen efterladt
+  temp-mappe), midt-i-listen HTTP-fejl (404), ugyldig JSON i én fil,
+  schema-fejl i én fil, en fil der 404'er, og tomt indhold — for ALLE 5
+  fejl-scenarier bekræftet byte-for-byte at target-mappen var
+  **fuldstændig urørt** (`dir_snapshot` før/efter identisk) og at
+  exception'en navngiver den specifikke fil. 24/24 assertions bestået.
+- **W10 — Headless app-niveau (2026-09-16, Linux,
+  `QT_QPA_PLATFORM=offscreen`, isoleret temp `HOME`):** app starter
+  rent med det rigtige `builds/manifest.json` til stede, Settings viser
+  korrekt "Build Data Version: 2026-09-16". Manglende
+  `manifest.json` (simuleret pre-W10-installation) bekræftet at IKKE
+  påvirke `LevelingManager`/`MainWindow`-opstart overhovedet — viser
+  korrekt "unknown (no manifest found)", intet automatisk netværkskald
+  sker ved konstruktion. Et "Check for Build Data Updates"-klik uden
+  netværk (mocket `ConnectionError`) viser korrekt fejlbesked uden
+  crash. Simuleret nyere remote-manifest (mocket) bekræftet at afsløre
+  "Update Build Data"-knappen; et efterfølgende mocket, vellykket
+  download ind i en rigtig temp `builds_dir` bekræftet at
+  `LevelingManager.list_builds()` afspejler den opdaterede build
+  ("Heartseeker Rogue (W10 TEST UPDATED)") UDEN genstart, stadig 26
+  builds totalt, og Heartseeker Rogues `verified_build`-fravær (dens
+  eksisterende no-verified-data-fallback, et indholds-property af selve
+  JSON'en) bekræftet uændret af download-mekanismen. Fuld 26-build-
+  regressions-sweep: 0 fejl. `src/updater.py` bekræftet `git diff
+  --stat` = 0 linjer ændret, og 2 af W7's App Updates-scenarier
+  (netværksfejl, up-to-date) gen-kørt eksplicit efter W10's ændringer —
+  begge stadig korrekte, ingen regression. 20/20 assertions bestået.
+- **W10 — Windows CI:** ikke kørt, vurderet unødvendigt — bekræftet
+  (ikke antaget, se ovenfor) at `diablo4companion.spec`'s eksisterende
+  `glob.glob("builds/*.json")` automatisk bundler den nye
+  `manifest.json` uden nogen `.spec`/`.iss`-ændring, og denne fases
+  logik (ren fil-I/O + HTTP) har ingen anden packaging-relevans.
 - **W9 — (a) Lokal unit/integration (2026-09-16, Linux):**
   `backup_install_dir`/`cleanup_backup`/`restore_backup` testet mod
   rigtige lokale temp-mappetræer — bekræftet: reel kopiering virker,
@@ -720,17 +867,25 @@ scope.
 
 ## Next phase
 
-Ingen planlagt. Dashboard Data/UI-bugfixen er DONE. **W9 forbliver
-DONE. W10 (Build Data updater) er stadig IKKE STARTET, og Character
-State er stadig ON HOLD.** Vent på konkret instruktion fra
-brugeren (se PROJECT_ROADMAP.md's regel: "Start ikke næste
-roadmap-fase uden en konkret instruktion"). Mulig fremtidig
+Ingen planlagt. **W10 (Build Data Updates) er nu DONE. W5-W9 forbliver
+DONE, uændrede. Character State er stadig ON HOLD.** Vent på konkret
+instruktion fra brugeren (se PROJECT_ROADMAP.md's regel: "Start ikke
+næste roadmap-fase uden en konkret instruktion"). Mulig fremtidig
 opfølgning (ikke startet, kræver eksplicit instruktion): rette
 `leveling_manager.py`'s frozen-path-logik til selv at være
 `_internal`-bevidst i stedet for at kompensere på installer-niveau.
 
 ## Kort changelog (seneste faser, nyeste øverst)
 
+- `f2ba7ad` — Windows Product Phase W10: Build Data Updates. Ny
+  `builds/manifest.json` (26 filer + dato-version) + ny
+  `src/build_data_updater.py` (fetch/read/download-verify-atomisk-
+  installer, helt uafhængig af `src/updater.py`) + ny "Build Data"-
+  sektion i Settings. Genbruger `LevelingManager`s eksisterende
+  minimale schema-tjek (nu udtrukket til
+  `is_valid_build_schema`) i stedet for en ny definition. Ingen
+  `.spec`/`.iss`/CI-ændring nødvendig (bekræftet, ikke antaget) —
+  ingen Windows CI-kørsel udløst for denne fase.
 - `cc10305` — Dashboard Data/UI-bugfix: delt schedule-fetch pr.
   opdatering (rettede en reel 4x-redundant-fetch-inkonsistens-bug),
   type-validering, Upcoming Events udvidet til 8 rigtige events +
