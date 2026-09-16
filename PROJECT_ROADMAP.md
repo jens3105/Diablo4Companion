@@ -66,3 +66,35 @@ er på tværs af Leveling, Skills, Paragon, Gear og Gems.
 Claude Code må **ikke** selv ændre roadmapets rækkefølge eller opfinde
 nye projektfaser. Nye faser tilføjes kun til dette dokument, når
 brugeren giver dem.
+
+## BAN-SAFETY RULE — DIABLO IV
+
+Diablo4Companion must NEVER interact with the Diablo IV game client itself.
+
+The application must NEVER:
+
+- read Diablo IV game files
+- inspect Diablo IV game files
+- read Diablo IV process memory
+- hook into the Diablo IV process
+- inject code into Diablo IV
+- modify Diablo IV files
+- inspect or manipulate game packets
+- intercept or modify Diablo IV network traffic
+- automate gameplay
+- simulate player input for gameplay
+- use any technique intended to bypass Blizzard protections
+- use any technique that could reasonably create account-ban risk
+
+All Diablo 4 information used by Diablo4Companion must originate from external/public data sources, legitimate APIs, websites, or explicitly provided user/community reports.
+
+Game-event data such as World Boss, Legion and Helltide must therefore NEVER be obtained by inspecting or interacting with the Diablo IV client.
+
+When evaluating a possible technical solution, BAN-SAFETY takes priority over convenience.
+
+If a proposed solution requires interaction with the Diablo IV client, its files, memory, packets or process, REJECT THE APPROACH.
+
+This rule is permanent and applies to all future features, research, agents and implementation work.
+
+**IMPORTANT:**
+The project is a standalone companion application. It must remain completely separate from the Diablo IV game client.
