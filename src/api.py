@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 class DiabloAPI:
 
-    URL = "https://helltides.com/api/schedule"
+    URL = "http://192.168.10.11:8080/api/v1/schedule"
 
     # Officielt bekræftet af Blizzard på BlizzCon 2026-09-12:
     # "Season of Hell's Legacy" - 2026-09-15, 09:30 PT / 18:30 CEST.
@@ -15,8 +15,42 @@ class DiabloAPI:
 
     EMPTY_SCHEDULE = {"world_boss": [], "legion": [], "helltide": []}
 
+    @staticmethod
+    def _adapt_event_server_schedule(events):
+        """Translate the Event Server's external schema into Companion's
+        existing internal schedule shape, so every other consumer
+        (``get_next_world_boss``/etc., ``app.py``'s countdown logic) can
+        stay unchanged. Only ever maps fields the Event Server actually
+        provides - never invents a field it doesn't return.
+        """
+
+        adapted = {"world_boss": [], "legion": [], "helltide": []}
+
+        for boss in events.get("world_boss") or []:
+            adapted["world_boss"].append({
+                "timestamp": boss.get("timestamp"),
+                "boss": boss.get("boss"),
+                "startTime": boss.get("start_time"),
+                "zone": [{"name": z} for z in (boss.get("zones") or [])],
+            })
+
+        for legion in events.get("legion") or []:
+            adapted["legion"].append({
+                "timestamp": legion.get("timestamp"),
+                "startTime": legion.get("start_time"),
+            })
+
+        for helltide in events.get("helltide") or []:
+            adapted["helltide"].append({
+                "timestamp": helltide.get("timestamp"),
+                "startTime": helltide.get("start_time"),
+            })
+
+        return adapted
+
     def get_schedule(self):
-        """Fetch the live schedule from helltides.com.
+        """Fetch the live schedule from our own Event Server (which itself
+        fetches from helltides.com server-side - see PROJECT_ROADMAP.md).
 
         Dashboard Live Data bugfix: this used to fall back to a locally
         calculated, fixed-interval-based schedule (``src/local_schedule.py``,
@@ -27,11 +61,11 @@ class DiabloAPI:
         countdown with only a small "(estimated)" label most users would
         never notice on a fast-moving timer. NEVER inventing an event time
         is more important than always having something to show - if the
-        live API can't be reached or returns nothing, this returns an
-        empty schedule and every caller already handles that as "no data"
-        (see ``get_next_world_boss``/etc. returning ``None``, and the
-        Dashboard cards/Upcoming Events showing "DATA UNAVAILABLE" for
-        that), never a guessed time.
+        Event Server can't be reached, reports failure, or returns nothing,
+        this returns an empty schedule and every caller already handles
+        that as "no data" (see ``get_next_world_boss``/etc. returning
+        ``None``, and the Dashboard cards/Upcoming Events showing
+        "DATA UNAVAILABLE" for that), never a guessed time.
         """
 
         try:
@@ -39,13 +73,24 @@ class DiabloAPI:
             response.raise_for_status()
             data = response.json()
 
-            if data.get("world_boss") or data.get("legion") or data.get("helltide"):
-                return data
+            if data.get("status") != "ok":
+                print(f"Event Server rapporterede status={data.get('status')!r} - ingen data tilgaengelig.")
+                return {"world_boss": [], "legion": [], "helltide": []}
 
-            print("helltides.com svarede, men uden nogen events - ingen data tilgaengelig.")
+            events = data.get("events")
+            if events is None:
+                print("Event Server-response mangler 'events' - ingen data tilgaengelig.")
+                return {"world_boss": [], "legion": [], "helltide": []}
+
+            adapted = self._adapt_event_server_schedule(events)
+
+            if adapted["world_boss"] or adapted["legion"] or adapted["helltide"]:
+                return adapted
+
+            print("Event Server svarede, men uden nogen events - ingen data tilgaengelig.")
 
         except requests.RequestException as exc:
-            print(f"Kunne ikke hente schedule fra helltides.com: {exc} - ingen data tilgaengelig.")
+            print(f"Kunne ikke hente schedule fra Event Server: {exc} - ingen data tilgaengelig.")
 
         return {"world_boss": [], "legion": [], "helltide": []}
 
