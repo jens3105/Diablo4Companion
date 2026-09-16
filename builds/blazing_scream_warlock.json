@@ -35,7 +35,7 @@
       "Demonologist",
       "Hellforge"
     ],
-    "note": "Board/glyph selection and board order verified from Mobalytics (p4wnyhof, BLAZING Torment variant, updated Sep 16, 2026). Per-node rarity/name detail is DATA UNAVAILABLE: Mobalytics's build data only exposes board-relative position slugs for taken Paragon nodes (e.g. \"warlock-starter-board-x11-y14\"), never the node's actual name or rarity, so the previous build's detailed node list (which belonged to a different board selection entirely) was removed rather than kept and misattached to these boards."
+    "note": "Board/glyph selection and all 320 taken node positions verified live from Mobalytics (p4wnyhof, BLAZING Torment variant, updated Sep 16, 2026) via the site's own interactive Paragon Board widget (React/DOM props: id, type, isSelected - not present in the page's initial JSON payload). board_width (21), glyph_socket_index and start_node_index were derived from each node's real position (index = (y-1)*21 + (x-1), verified against the one board where an independent prior source also had a value at the exact same index). Node rarity comes from the widget's own node-type classification; normal/magic/rare node names are derived directly from their icon filenames (e.g. \"5-willpower-active.webp\" -> \"+5 Willpower\"). The 4 legendary nodes' exact names are DATA UNAVAILABLE: their icons only reuse the board's own generic icon, and this session's hover-based tooltip automation could not reach them (off-screen in the widget's pan/zoom state) - everything else about them (board, position, index, rarity=legendary, taken=true) is verified."
   },
   "gear": {
     "source_url": "https://mobalytics.gg/diablo-4/profile/p4wnyhof/builds/season-14-warlock-hub?ws-ngf5-1=activeVariantId%2C7",
@@ -43,50 +43,50 @@
       {
         "name": "Harlequin Crest",
         "slot": "Helm",
-        "note": "Mythic Unique. 2 rune sockets."
+        "note": "Gain +6 Rank to all Skills. Mythic Unique. 2 rune sockets."
       },
       {
         "name": "Elegy",
         "slot": "Weapon",
-        "note": "Unique. Ranks to Blazing Scream; 1 gem socket (Ruby)."
+        "note": "Blazing Scream is now an Archfiend Skill and deals [30-50]% increased damage. Blazing Scream gains the Skull Splitter Variant for free and the Lesser Demon skulls deal the same damage as the main skull. Unique. Ranks to Blazing Scream; 1 gem socket (Ruby)."
       },
       {
         "name": "Moloch's Beating Flame",
         "slot": "Amulet",
-        "note": "Unique. Kullean-transfigured with Undying Aspect — don't miss this or the build falls apart. 1 gem socket (Splinter of Sin)."
+        "note": "Hellfire Skills deal [20-30]% increased damage for every Skill you have Empowered by Volatility. Casting a Volatility Empowered Skill increases your Core Stats by 5% for 10 seconds, up to 50%. Unique. Kullean-transfigured with Undying Aspect — don't miss this or the build falls apart. 1 gem socket (Splinter of Sin)."
       },
       {
         "name": "Temerity",
         "slot": "Pants",
-        "note": "Unique. 2 rune sockets. Generates a Barrier from Healing (pairs with the amulet's Undying Aspect)."
+        "note": "Effects that Heal you beyond 100% Life grant you Barrier equal to [80-100]% of the overhealed amount that lasts for 8 seconds. You may now drink your Healing Potion while at full Life. Unique. 2 rune sockets. Generates a Barrier from Healing (pairs with the amulet's Undying Aspect)."
       },
       {
         "name": "The Eightfold Idol",
         "slot": "Ring 1",
-        "note": "Unique. Ranks to Sigil of Subversion; 1 gem socket (Splinter of the Black Soulstone)."
+        "note": "Blazing Scream leaves Sigil of Subversion Shadow or Lava trails behind. You deal [60-80]% increased Abyss or Hellfire Skill damage to enemies on Sigil of Subversion trails based on their type. Unique. Ranks to Sigil of Subversion; 1 gem socket (Splinter of the Black Soulstone)."
       },
       {
         "name": "Infernal Homunculus",
         "slot": "Offhand",
-        "note": "Unique. Ranks to Demonology skills; 1 gem socket (Ruby)."
+        "note": "Your Archfiend Skills deal [80-110]% increased damage and casting any Archfiend Skill activates all their Lesser Demon Upgrades for free with 200% longer durations. Unique. Ranks to Demonology skills; 1 gem socket (Ruby)."
       }
     ],
     "key_aspects": [
       {
         "name": "Aspect of Diabolical Armor",
-        "note": "Chest armor. 2 gem sockets (Sapphire)."
+        "note": "Demonform grants 20% Damage Reduction plus an additional [1.0-1.5]% for 5 seconds any time you take Fire damage, up to [10-15]%. Chest armor. 2 gem sockets (Sapphire)."
       },
       {
         "name": "Aspect of Ignition",
-        "note": "Gloves."
+        "note": "Skills empowered by Volatility deal an additional 60% increased damage and you have a [50.0-70.0]% chance for Volatility to persist on casting an empowered Skill. Gloves."
       },
       {
         "name": "Embattled Aspect",
-        "note": "Boots. Use Hellhound's Sabatons until swapping over to Metamorphosis (author swapped around Tier 6)."
+        "note": "Fortify's Drain Rate is increased by [150-200]%. Boots. Use Hellhound's Sabatons until swapping over to Metamorphosis (author swapped around Tier 6)."
       },
       {
         "name": "Aspect of Scorching Heat",
-        "note": "Ring 2. 1 gem socket (Splinter of Anguish)."
+        "note": "Your Hellfire Skills deal increased damage equal to [65-85]% of your Fire Resistance Damage Reduction. Ring 2. 1 gem socket (Splinter of Anguish)."
       }
     ],
     "stat_priority": [
@@ -111,7 +111,12 @@
     "source": "mobalytics_p4wnyhof_hub",
     "primary": {
       "name": "Raheir the Shieldbearer",
-      "skill_tree_choices": ["Ground Slam", "Raheir's Aegis", "Bastion", "Inspiration"]
+      "skill_tree_choices": [
+        "Ground Slam",
+        "Raheir's Aegis",
+        "Bastion",
+        "Inspiration"
+      ]
     },
     "reinforcement": {
       "name": "Varyana the Berserker Crone",
@@ -140,31 +145,48 @@
         "skill": "Blazing Scream",
         "rank": 15,
         "max_rank": 15,
-        "upgrades_chosen": ["Damage", "Impact Velocity"]
+        "upgrades_chosen": [
+          "Damage",
+          "Impact Velocity"
+        ]
       },
       {
         "skill": "Dark Prison",
         "rank": 15,
         "max_rank": 15,
-        "upgrades_chosen": ["Weaken", "Fortify", "Chain Aura"]
+        "upgrades_chosen": [
+          "Weaken",
+          "Fortify",
+          "Chain Aura"
+        ]
       },
       {
         "skill": "Rampage",
         "rank": 10,
         "max_rank": 15,
-        "upgrades_chosen": ["Demonic Smash"]
+        "upgrades_chosen": [
+          "Demonic Smash"
+        ]
       },
       {
         "skill": "Metamorphosis",
         "rank": 15,
         "max_rank": 15,
-        "upgrades_chosen": ["Damage Scaling", "Destruction Demon", "Stagger Bar"]
+        "upgrades_chosen": [
+          "Damage Scaling",
+          "Destruction Demon",
+          "Stagger Bar"
+        ]
       },
       {
         "skill": "Bombardment",
         "rank": 15,
         "max_rank": 15,
-        "upgrades_chosen": ["Endless Barrage", "Additional Demon", "Focused Target"]
+        "upgrades_chosen": [
+          "Endless Barrage",
+          "Additional Demon",
+          "Focused Target"
+        ]
       },
       {
         "skill": "Profane Sentinel",
@@ -177,7 +199,9 @@
         "skill": "Blazing Scream (Soul Shard upgrade)",
         "rank": null,
         "max_rank": null,
-        "upgrades_chosen": ["Orbital Scream"],
+        "upgrades_chosen": [
+          "Orbital Scream"
+        ],
         "note": "Soul Shard-granted skill upgrade (blazing-scream-orbital-scream), not a normal skill-tree rank."
       }
     ],
@@ -190,41 +214,1996 @@
         "board": "warlock-starter-board",
         "glyph": "Eliminator",
         "glyph_level": 150,
-        "nodes": [],
+        "nodes": [
+          {
+            "index": 10,
+            "slug": "warlock-starter-board-x11-y1",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 31,
+            "slug": "warlock-starter-board-x11-y2",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 32,
+            "slug": "warlock-starter-board-x12-y2",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 53,
+            "slug": "warlock-starter-board-x12-y3",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 74,
+            "slug": "warlock-starter-board-x12-y4",
+            "name": "+5 Damage",
+            "rarity": 2
+          },
+          {
+            "index": 93,
+            "slug": "warlock-starter-board-x10-y5",
+            "name": "+5 Damage",
+            "rarity": 3
+          },
+          {
+            "index": 95,
+            "slug": "warlock-starter-board-x12-y5",
+            "name": "+5 Damage",
+            "rarity": 3
+          },
+          {
+            "index": 112,
+            "slug": "warlock-starter-board-x8-y6",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 114,
+            "slug": "warlock-starter-board-x10-y6",
+            "name": "+5 Damage",
+            "rarity": 2
+          },
+          {
+            "index": 116,
+            "slug": "warlock-starter-board-x12-y6",
+            "name": "+5 Damage",
+            "rarity": 2
+          },
+          {
+            "index": 131,
+            "slug": "warlock-starter-board-x6-y7",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 132,
+            "slug": "warlock-starter-board-x7-y7",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 133,
+            "slug": "warlock-starter-board-x8-y7",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 135,
+            "slug": "warlock-starter-board-x10-y7",
+            "name": "+5 Dexterity",
+            "rarity": 0
+          },
+          {
+            "index": 136,
+            "slug": "warlock-starter-board-x11-y7",
+            "name": "Glyph Socket",
+            "rarity": 0
+          },
+          {
+            "index": 137,
+            "slug": "warlock-starter-board-x12-y7",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 138,
+            "slug": "warlock-starter-board-x13-y7",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 154,
+            "slug": "warlock-starter-board-x8-y8",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 155,
+            "slug": "warlock-starter-board-x9-y8",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 156,
+            "slug": "warlock-starter-board-x10-y8",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 157,
+            "slug": "warlock-starter-board-x11-y8",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 159,
+            "slug": "warlock-starter-board-x13-y8",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 175,
+            "slug": "warlock-starter-board-x8-y9",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 177,
+            "slug": "warlock-starter-board-x10-y9",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 180,
+            "slug": "warlock-starter-board-x13-y9",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 197,
+            "slug": "warlock-starter-board-x9-y10",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 198,
+            "slug": "warlock-starter-board-x10-y10",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 200,
+            "slug": "warlock-starter-board-x12-y10",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 201,
+            "slug": "warlock-starter-board-x13-y10",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 218,
+            "slug": "warlock-starter-board-x9-y11",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 219,
+            "slug": "warlock-starter-board-x10-y11",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 222,
+            "slug": "warlock-starter-board-x13-y11",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 238,
+            "slug": "warlock-starter-board-x8-y12",
+            "name": "+1.5% Resistance To All Elements",
+            "rarity": 2
+          },
+          {
+            "index": 239,
+            "slug": "warlock-starter-board-x9-y12",
+            "name": "+1.5% Resistance To All Elements",
+            "rarity": 3
+          },
+          {
+            "index": 240,
+            "slug": "warlock-starter-board-x10-y12",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 242,
+            "slug": "warlock-starter-board-x12-y12",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 243,
+            "slug": "warlock-starter-board-x13-y12",
+            "name": "+5 Damage",
+            "rarity": 3
+          },
+          {
+            "index": 260,
+            "slug": "warlock-starter-board-x9-y13",
+            "name": "+1.5% Resistance To All Elements",
+            "rarity": 2
+          },
+          {
+            "index": 281,
+            "slug": "warlock-starter-board-x9-y14",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 282,
+            "slug": "warlock-starter-board-x10-y14",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 283,
+            "slug": "warlock-starter-board-x11-y14",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 304,
+            "slug": "warlock-starter-board-x11-y15",
+            "name": "Paragon Starting Node",
+            "rarity": 0
+          }
+        ],
         "rotation": 0,
-        "position": {"x": 0, "y": 0}
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "glyph_socket_index": 136,
+        "start_node_index": 304,
+        "board_width": 21
       },
       {
         "board": "warlock-dynamism",
         "glyph": "Death Aura",
         "glyph_level": 150,
-        "nodes": [],
+        "nodes": [
+          {
+            "index": 10,
+            "slug": "warlock-dynamism-x11-y1",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 31,
+            "slug": "warlock-dynamism-x11-y2",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 52,
+            "slug": "warlock-dynamism-x11-y3",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 56,
+            "slug": "warlock-dynamism-x15-y3",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 73,
+            "slug": "warlock-dynamism-x11-y4",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 77,
+            "slug": "warlock-dynamism-x15-y4",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 78,
+            "slug": "warlock-dynamism-x16-y4",
+            "name": "+2.0% Maximum Life",
+            "rarity": 3
+          },
+          {
+            "index": 94,
+            "slug": "warlock-dynamism-x11-y5",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 95,
+            "slug": "warlock-dynamism-x12-y5",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 96,
+            "slug": "warlock-dynamism-x13-y5",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 97,
+            "slug": "warlock-dynamism-x14-y5",
+            "name": "+5 Dexterity",
+            "rarity": 0
+          },
+          {
+            "index": 98,
+            "slug": "warlock-dynamism-x15-y5",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 115,
+            "slug": "warlock-dynamism-x11-y6",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 130,
+            "slug": "warlock-dynamism-x5-y7",
+            "name": "+2.0% Maximum Life",
+            "rarity": 3
+          },
+          {
+            "index": 131,
+            "slug": "warlock-dynamism-x6-y7",
+            "name": "+1.5% Resistance To All Elements",
+            "rarity": 2
+          },
+          {
+            "index": 132,
+            "slug": "warlock-dynamism-x7-y7",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 133,
+            "slug": "warlock-dynamism-x8-y7",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 134,
+            "slug": "warlock-dynamism-x9-y7",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 135,
+            "slug": "warlock-dynamism-x10-y7",
+            "name": "+5 Dexterity",
+            "rarity": 0
+          },
+          {
+            "index": 136,
+            "slug": "warlock-dynamism-x11-y7",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 151,
+            "slug": "warlock-dynamism-x5-y8",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 154,
+            "slug": "warlock-dynamism-x8-y8",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 157,
+            "slug": "warlock-dynamism-x11-y8",
+            "name": "+5 Intelligence",
+            "rarity": 2
+          },
+          {
+            "index": 158,
+            "slug": "warlock-dynamism-x12-y8",
+            "name": "+5 Damage",
+            "rarity": 2
+          },
+          {
+            "index": 170,
+            "slug": "warlock-dynamism-x3-y9",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 171,
+            "slug": "warlock-dynamism-x4-y9",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 172,
+            "slug": "warlock-dynamism-x5-y9",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 175,
+            "slug": "warlock-dynamism-x8-y9",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 178,
+            "slug": "warlock-dynamism-x11-y9",
+            "name": "+5 Damage",
+            "rarity": 3
+          },
+          {
+            "index": 179,
+            "slug": "warlock-dynamism-x12-y9",
+            "name": "+5 Damage",
+            "rarity": 2
+          },
+          {
+            "index": 190,
+            "slug": "warlock-dynamism-x2-y10",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 191,
+            "slug": "warlock-dynamism-x3-y10",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 196,
+            "slug": "warlock-dynamism-x8-y10",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 199,
+            "slug": "warlock-dynamism-x11-y10",
+            "name": "+5 Damage",
+            "rarity": 2
+          },
+          {
+            "index": 200,
+            "slug": "warlock-dynamism-x12-y10",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 211,
+            "slug": "warlock-dynamism-x2-y11",
+            "name": "+5 Dexterity",
+            "rarity": 0
+          },
+          {
+            "index": 216,
+            "slug": "warlock-dynamism-x7-y11",
+            "name": "DATA UNAVAILABLE",
+            "rarity": 4
+          },
+          {
+            "index": 217,
+            "slug": "warlock-dynamism-x8-y11",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 221,
+            "slug": "warlock-dynamism-x12-y11",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 222,
+            "slug": "warlock-dynamism-x13-y11",
+            "name": "Glyph Socket",
+            "rarity": 0
+          },
+          {
+            "index": 230,
+            "slug": "warlock-dynamism-x21-y11",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 238,
+            "slug": "warlock-dynamism-x8-y12",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 241,
+            "slug": "warlock-dynamism-x11-y12",
+            "name": "+17.5% Demonology Damage",
+            "rarity": 2
+          },
+          {
+            "index": 242,
+            "slug": "warlock-dynamism-x12-y12",
+            "name": "+5 Dexterity",
+            "rarity": 0
+          },
+          {
+            "index": 243,
+            "slug": "warlock-dynamism-x13-y12",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 258,
+            "slug": "warlock-dynamism-x7-y13",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 259,
+            "slug": "warlock-dynamism-x8-y13",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 262,
+            "slug": "warlock-dynamism-x11-y13",
+            "name": "+2 Maximum Dominance",
+            "rarity": 3
+          },
+          {
+            "index": 263,
+            "slug": "warlock-dynamism-x12-y13",
+            "name": "+17.5% Demonology Damage",
+            "rarity": 2
+          },
+          {
+            "index": 264,
+            "slug": "warlock-dynamism-x13-y13",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 278,
+            "slug": "warlock-dynamism-x6-y14",
+            "name": "+1.5% Resistance To All Elements",
+            "rarity": 2
+          },
+          {
+            "index": 279,
+            "slug": "warlock-dynamism-x7-y14",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 284,
+            "slug": "warlock-dynamism-x12-y14",
+            "name": "+17.5% Demonology Damage",
+            "rarity": 2
+          },
+          {
+            "index": 285,
+            "slug": "warlock-dynamism-x13-y14",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 298,
+            "slug": "warlock-dynamism-x5-y15",
+            "name": "+1.5% Total Armor",
+            "rarity": 3
+          },
+          {
+            "index": 299,
+            "slug": "warlock-dynamism-x6-y15",
+            "name": "+1.5% Resistance To All Elements",
+            "rarity": 2
+          },
+          {
+            "index": 300,
+            "slug": "warlock-dynamism-x7-y15",
+            "name": "+1.5% Total Armor",
+            "rarity": 2
+          },
+          {
+            "index": 305,
+            "slug": "warlock-dynamism-x12-y15",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 306,
+            "slug": "warlock-dynamism-x13-y15",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 307,
+            "slug": "warlock-dynamism-x14-y15",
+            "name": "+5 Dexterity",
+            "rarity": 0
+          },
+          {
+            "index": 308,
+            "slug": "warlock-dynamism-x15-y15",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 329,
+            "slug": "warlock-dynamism-x15-y16",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 350,
+            "slug": "warlock-dynamism-x15-y17",
+            "name": "+2 Maximum Dominance",
+            "rarity": 2
+          },
+          {
+            "index": 371,
+            "slug": "warlock-dynamism-x15-y18",
+            "name": "+2 Maximum Dominance",
+            "rarity": 2
+          },
+          {
+            "index": 372,
+            "slug": "warlock-dynamism-x16-y18",
+            "name": "+2 Maximum Dominance",
+            "rarity": 3
+          },
+          {
+            "index": 392,
+            "slug": "warlock-dynamism-x15-y19",
+            "name": "+2 Maximum Dominance",
+            "rarity": 2
+          },
+          {
+            "index": 430,
+            "slug": "warlock-dynamism-x11-y21",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          }
+        ],
         "rotation": 180,
-        "position": {"x": -1, "y": 0}
+        "position": {
+          "x": -1,
+          "y": 0
+        },
+        "glyph_socket_index": 222,
+        "start_node_index": null,
+        "board_width": 21
       },
       {
         "board": "warlock-demonic-spicules",
         "glyph": "Ichor Carapace",
         "glyph_level": 150,
-        "nodes": [],
+        "nodes": [
+          {
+            "index": 10,
+            "slug": "warlock-demonic-spicules-x11-y1",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 76,
+            "slug": "warlock-demonic-spicules-x14-y4",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 77,
+            "slug": "warlock-demonic-spicules-x15-y4",
+            "name": "+2.0% Maximum Life",
+            "rarity": 3
+          },
+          {
+            "index": 78,
+            "slug": "warlock-demonic-spicules-x16-y4",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 90,
+            "slug": "warlock-demonic-spicules-x7-y5",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 97,
+            "slug": "warlock-demonic-spicules-x14-y5",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 109,
+            "slug": "warlock-demonic-spicules-x5-y6",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 110,
+            "slug": "warlock-demonic-spicules-x6-y6",
+            "name": "+8 Critical Strike Damage",
+            "rarity": 3
+          },
+          {
+            "index": 111,
+            "slug": "warlock-demonic-spicules-x7-y6",
+            "name": "+8 Critical Strike Damage",
+            "rarity": 2
+          },
+          {
+            "index": 112,
+            "slug": "warlock-demonic-spicules-x8-y6",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 118,
+            "slug": "warlock-demonic-spicules-x14-y6",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 130,
+            "slug": "warlock-demonic-spicules-x5-y7",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 131,
+            "slug": "warlock-demonic-spicules-x6-y7",
+            "name": "+8 Critical Strike Damage",
+            "rarity": 2
+          },
+          {
+            "index": 133,
+            "slug": "warlock-demonic-spicules-x8-y7",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 134,
+            "slug": "warlock-demonic-spicules-x9-y7",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 135,
+            "slug": "warlock-demonic-spicules-x10-y7",
+            "name": "+5 Dexterity",
+            "rarity": 0
+          },
+          {
+            "index": 136,
+            "slug": "warlock-demonic-spicules-x11-y7",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 137,
+            "slug": "warlock-demonic-spicules-x12-y7",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 138,
+            "slug": "warlock-demonic-spicules-x13-y7",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 139,
+            "slug": "warlock-demonic-spicules-x14-y7",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 155,
+            "slug": "warlock-demonic-spicules-x9-y8",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 159,
+            "slug": "warlock-demonic-spicules-x13-y8",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 176,
+            "slug": "warlock-demonic-spicules-x9-y9",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 180,
+            "slug": "warlock-demonic-spicules-x13-y9",
+            "name": "+17.5% Demonology Damage",
+            "rarity": 2
+          },
+          {
+            "index": 197,
+            "slug": "warlock-demonic-spicules-x9-y10",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 198,
+            "slug": "warlock-demonic-spicules-x10-y10",
+            "name": "DATA UNAVAILABLE",
+            "rarity": 4
+          },
+          {
+            "index": 200,
+            "slug": "warlock-demonic-spicules-x12-y10",
+            "name": "+17.5% Demonology Damage",
+            "rarity": 2
+          },
+          {
+            "index": 201,
+            "slug": "warlock-demonic-spicules-x13-y10",
+            "name": "+17.5% Demonology Damage",
+            "rarity": 3
+          },
+          {
+            "index": 210,
+            "slug": "warlock-demonic-spicules-x1-y11",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 222,
+            "slug": "warlock-demonic-spicules-x13-y11",
+            "name": "+17.5% Demonology Damage",
+            "rarity": 2
+          },
+          {
+            "index": 226,
+            "slug": "warlock-demonic-spicules-x17-y11",
+            "name": "+5 Dexterity",
+            "rarity": 0
+          },
+          {
+            "index": 227,
+            "slug": "warlock-demonic-spicules-x18-y11",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 228,
+            "slug": "warlock-demonic-spicules-x19-y11",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 229,
+            "slug": "warlock-demonic-spicules-x20-y11",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 240,
+            "slug": "warlock-demonic-spicules-x10-y12",
+            "name": "+5 Damage",
+            "rarity": 2
+          },
+          {
+            "index": 243,
+            "slug": "warlock-demonic-spicules-x13-y12",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 246,
+            "slug": "warlock-demonic-spicules-x16-y12",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 247,
+            "slug": "warlock-demonic-spicules-x17-y12",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 258,
+            "slug": "warlock-demonic-spicules-x7-y13",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 259,
+            "slug": "warlock-demonic-spicules-x8-y13",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 260,
+            "slug": "warlock-demonic-spicules-x9-y13",
+            "name": "+5 Damage",
+            "rarity": 2
+          },
+          {
+            "index": 261,
+            "slug": "warlock-demonic-spicules-x10-y13",
+            "name": "+5 Damage",
+            "rarity": 3
+          },
+          {
+            "index": 262,
+            "slug": "warlock-demonic-spicules-x11-y13",
+            "name": "+5 Damage",
+            "rarity": 2
+          },
+          {
+            "index": 264,
+            "slug": "warlock-demonic-spicules-x13-y13",
+            "name": "Glyph Socket",
+            "rarity": 0
+          },
+          {
+            "index": 265,
+            "slug": "warlock-demonic-spicules-x14-y13",
+            "name": "+5 Dexterity",
+            "rarity": 0
+          },
+          {
+            "index": 266,
+            "slug": "warlock-demonic-spicules-x15-y13",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 267,
+            "slug": "warlock-demonic-spicules-x16-y13",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 276,
+            "slug": "warlock-demonic-spicules-x4-y14",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 277,
+            "slug": "warlock-demonic-spicules-x5-y14",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 278,
+            "slug": "warlock-demonic-spicules-x6-y14",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 279,
+            "slug": "warlock-demonic-spicules-x7-y14",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 283,
+            "slug": "warlock-demonic-spicules-x11-y14",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 284,
+            "slug": "warlock-demonic-spicules-x12-y14",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 285,
+            "slug": "warlock-demonic-spicules-x13-y14",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 287,
+            "slug": "warlock-demonic-spicules-x15-y14",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 288,
+            "slug": "warlock-demonic-spicules-x16-y14",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 297,
+            "slug": "warlock-demonic-spicules-x4-y15",
+            "name": "+2.0% Maximum Life",
+            "rarity": 3
+          },
+          {
+            "index": 303,
+            "slug": "warlock-demonic-spicules-x10-y15",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 304,
+            "slug": "warlock-demonic-spicules-x11-y15",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 306,
+            "slug": "warlock-demonic-spicules-x13-y15",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 318,
+            "slug": "warlock-demonic-spicules-x4-y16",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 327,
+            "slug": "warlock-demonic-spicules-x13-y16",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 328,
+            "slug": "warlock-demonic-spicules-x14-y16",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 329,
+            "slug": "warlock-demonic-spicules-x15-y16",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 330,
+            "slug": "warlock-demonic-spicules-x16-y16",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 332,
+            "slug": "warlock-demonic-spicules-x18-y16",
+            "name": "+1.5% Companion Cooldown Reduction",
+            "rarity": 2
+          },
+          {
+            "index": 347,
+            "slug": "warlock-demonic-spicules-x12-y17",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 348,
+            "slug": "warlock-demonic-spicules-x13-y17",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 349,
+            "slug": "warlock-demonic-spicules-x14-y17",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 351,
+            "slug": "warlock-demonic-spicules-x16-y17",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 352,
+            "slug": "warlock-demonic-spicules-x17-y17",
+            "name": "+1.5% Companion Cooldown Reduction",
+            "rarity": 2
+          },
+          {
+            "index": 353,
+            "slug": "warlock-demonic-spicules-x18-y17",
+            "name": "+1.5% Total Armor",
+            "rarity": 2
+          },
+          {
+            "index": 367,
+            "slug": "warlock-demonic-spicules-x11-y18",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 368,
+            "slug": "warlock-demonic-spicules-x12-y18",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 372,
+            "slug": "warlock-demonic-spicules-x16-y18",
+            "name": "+1.5% Companion Cooldown Reduction",
+            "rarity": 2
+          },
+          {
+            "index": 373,
+            "slug": "warlock-demonic-spicules-x17-y18",
+            "name": "+1.5% Total Armor",
+            "rarity": 2
+          },
+          {
+            "index": 374,
+            "slug": "warlock-demonic-spicules-x18-y18",
+            "name": "+1.5% Companion Cooldown Reduction",
+            "rarity": 3
+          },
+          {
+            "index": 388,
+            "slug": "warlock-demonic-spicules-x11-y19",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 409,
+            "slug": "warlock-demonic-spicules-x11-y20",
+            "name": "+5 Strength",
+            "rarity": 0
+          }
+        ],
         "rotation": 540,
-        "position": {"x": -1, "y": 1}
+        "position": {
+          "x": -1,
+          "y": 1
+        },
+        "glyph_socket_index": 264,
+        "start_node_index": null,
+        "board_width": 21
       },
       {
         "board": "warlock-fathomless",
         "glyph": "Demonologist",
         "glyph_level": 150,
-        "nodes": [],
+        "nodes": [
+          {
+            "index": 31,
+            "slug": "warlock-fathomless-x11-y2",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 36,
+            "slug": "warlock-fathomless-x16-y2",
+            "name": "+5 Damage",
+            "rarity": 2
+          },
+          {
+            "index": 52,
+            "slug": "warlock-fathomless-x11-y3",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 56,
+            "slug": "warlock-fathomless-x15-y3",
+            "name": "+5 Damage",
+            "rarity": 2
+          },
+          {
+            "index": 57,
+            "slug": "warlock-fathomless-x16-y3",
+            "name": "+5 Damage",
+            "rarity": 3
+          },
+          {
+            "index": 58,
+            "slug": "warlock-fathomless-x17-y3",
+            "name": "+5 Strength",
+            "rarity": 2
+          },
+          {
+            "index": 73,
+            "slug": "warlock-fathomless-x11-y4",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 78,
+            "slug": "warlock-fathomless-x16-y4",
+            "name": "+5 Damage",
+            "rarity": 2
+          },
+          {
+            "index": 94,
+            "slug": "warlock-fathomless-x11-y5",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 95,
+            "slug": "warlock-fathomless-x12-y5",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 96,
+            "slug": "warlock-fathomless-x13-y5",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 97,
+            "slug": "warlock-fathomless-x14-y5",
+            "name": "+5 Dexterity",
+            "rarity": 0
+          },
+          {
+            "index": 98,
+            "slug": "warlock-fathomless-x15-y5",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 99,
+            "slug": "warlock-fathomless-x16-y5",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 119,
+            "slug": "warlock-fathomless-x15-y6",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 120,
+            "slug": "warlock-fathomless-x16-y6",
+            "name": "Glyph Socket",
+            "rarity": 0
+          },
+          {
+            "index": 121,
+            "slug": "warlock-fathomless-x17-y6",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 122,
+            "slug": "warlock-fathomless-x18-y6",
+            "name": "+17.5% Demonology Damage",
+            "rarity": 2
+          },
+          {
+            "index": 123,
+            "slug": "warlock-fathomless-x19-y6",
+            "name": "+17.5% Demonology Damage",
+            "rarity": 3
+          },
+          {
+            "index": 124,
+            "slug": "warlock-fathomless-x20-y6",
+            "name": "+17.5% Demonology Damage",
+            "rarity": 2
+          },
+          {
+            "index": 132,
+            "slug": "warlock-fathomless-x7-y7",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 141,
+            "slug": "warlock-fathomless-x16-y7",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 144,
+            "slug": "warlock-fathomless-x19-y7",
+            "name": "+17.5% Demonology Damage",
+            "rarity": 2
+          },
+          {
+            "index": 151,
+            "slug": "warlock-fathomless-x5-y8",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 152,
+            "slug": "warlock-fathomless-x6-y8",
+            "name": "+2.0% Maximum Life",
+            "rarity": 3
+          },
+          {
+            "index": 153,
+            "slug": "warlock-fathomless-x7-y8",
+            "name": "+3.0% Healing Received",
+            "rarity": 2
+          },
+          {
+            "index": 162,
+            "slug": "warlock-fathomless-x16-y8",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 174,
+            "slug": "warlock-fathomless-x7-y9",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 179,
+            "slug": "warlock-fathomless-x12-y9",
+            "name": "+1.5% Total Armor",
+            "rarity": 2
+          },
+          {
+            "index": 180,
+            "slug": "warlock-fathomless-x13-y9",
+            "name": "+1.5% Resistance To All Elements",
+            "rarity": 2
+          },
+          {
+            "index": 181,
+            "slug": "warlock-fathomless-x14-y9",
+            "name": "+5 Dexterity",
+            "rarity": 0
+          },
+          {
+            "index": 182,
+            "slug": "warlock-fathomless-x15-y9",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 183,
+            "slug": "warlock-fathomless-x16-y9",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 195,
+            "slug": "warlock-fathomless-x7-y10",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 196,
+            "slug": "warlock-fathomless-x8-y10",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 197,
+            "slug": "warlock-fathomless-x9-y10",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 198,
+            "slug": "warlock-fathomless-x10-y10",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 199,
+            "slug": "warlock-fathomless-x11-y10",
+            "name": "+1.5% Resistance To All Elements",
+            "rarity": 2
+          },
+          {
+            "index": 200,
+            "slug": "warlock-fathomless-x12-y10",
+            "name": "+1.5% Total Armor",
+            "rarity": 3
+          },
+          {
+            "index": 204,
+            "slug": "warlock-fathomless-x16-y10",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 210,
+            "slug": "warlock-fathomless-x1-y11",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 218,
+            "slug": "warlock-fathomless-x9-y11",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 221,
+            "slug": "warlock-fathomless-x12-y11",
+            "name": "+1.5% Total Armor",
+            "rarity": 2
+          },
+          {
+            "index": 225,
+            "slug": "warlock-fathomless-x16-y11",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 226,
+            "slug": "warlock-fathomless-x17-y11",
+            "name": "+5 Dexterity",
+            "rarity": 0
+          },
+          {
+            "index": 227,
+            "slug": "warlock-fathomless-x18-y11",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 228,
+            "slug": "warlock-fathomless-x19-y11",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 229,
+            "slug": "warlock-fathomless-x20-y11",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 237,
+            "slug": "warlock-fathomless-x7-y12",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 238,
+            "slug": "warlock-fathomless-x8-y12",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 239,
+            "slug": "warlock-fathomless-x9-y12",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 242,
+            "slug": "warlock-fathomless-x12-y12",
+            "name": "+5 Dexterity",
+            "rarity": 0
+          },
+          {
+            "index": 258,
+            "slug": "warlock-fathomless-x7-y13",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 263,
+            "slug": "warlock-fathomless-x12-y13",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 279,
+            "slug": "warlock-fathomless-x7-y14",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 284,
+            "slug": "warlock-fathomless-x12-y14",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 299,
+            "slug": "warlock-fathomless-x6-y15",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 300,
+            "slug": "warlock-fathomless-x7-y15",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 305,
+            "slug": "warlock-fathomless-x12-y15",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 306,
+            "slug": "warlock-fathomless-x13-y15",
+            "name": "+17.5% Demonology Damage",
+            "rarity": 2
+          },
+          {
+            "index": 307,
+            "slug": "warlock-fathomless-x14-y15",
+            "name": "+8 Critical Strike Damage",
+            "rarity": 2
+          },
+          {
+            "index": 308,
+            "slug": "warlock-fathomless-x15-y15",
+            "name": "+17.5% Demonology Damage",
+            "rarity": 2
+          },
+          {
+            "index": 320,
+            "slug": "warlock-fathomless-x6-y16",
+            "name": "DATA UNAVAILABLE",
+            "rarity": 4
+          },
+          {
+            "index": 327,
+            "slug": "warlock-fathomless-x13-y16",
+            "name": "+8 Critical Strike Damage",
+            "rarity": 2
+          },
+          {
+            "index": 328,
+            "slug": "warlock-fathomless-x14-y16",
+            "name": "+17.5% Demonology Damage",
+            "rarity": 3
+          },
+          {
+            "index": 339,
+            "slug": "warlock-fathomless-x4-y17",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 340,
+            "slug": "warlock-fathomless-x5-y17",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 341,
+            "slug": "warlock-fathomless-x6-y17",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 349,
+            "slug": "warlock-fathomless-x14-y17",
+            "name": "+17.5% Demonology Damage",
+            "rarity": 2
+          },
+          {
+            "index": 359,
+            "slug": "warlock-fathomless-x3-y18",
+            "name": "+5 Damage",
+            "rarity": 2
+          },
+          {
+            "index": 360,
+            "slug": "warlock-fathomless-x4-y18",
+            "name": "+1.5% Total Armor",
+            "rarity": 2
+          },
+          {
+            "index": 380,
+            "slug": "warlock-fathomless-x3-y19",
+            "name": "+5 Damage",
+            "rarity": 3
+          },
+          {
+            "index": 381,
+            "slug": "warlock-fathomless-x4-y19",
+            "name": "+5 Damage",
+            "rarity": 2
+          },
+          {
+            "index": 401,
+            "slug": "warlock-fathomless-x3-y20",
+            "name": "+5 Damage",
+            "rarity": 2
+          },
+          {
+            "index": 430,
+            "slug": "warlock-fathomless-x11-y21",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          }
+        ],
         "rotation": 180,
-        "position": {"x": -2, "y": 1}
+        "position": {
+          "x": -2,
+          "y": 1
+        },
+        "glyph_socket_index": 120,
+        "start_node_index": null,
+        "board_width": 21
       },
       {
         "board": "warlock-greater-hex",
         "glyph": "Hellforge",
         "glyph_level": 150,
-        "nodes": [],
+        "nodes": [
+          {
+            "index": 78,
+            "slug": "warlock-greater-hex-x16-y4",
+            "name": "+5 Damage",
+            "rarity": 3
+          },
+          {
+            "index": 97,
+            "slug": "warlock-greater-hex-x14-y5",
+            "name": "+5 Dexterity",
+            "rarity": 0
+          },
+          {
+            "index": 98,
+            "slug": "warlock-greater-hex-x15-y5",
+            "name": "+5 Damage",
+            "rarity": 2
+          },
+          {
+            "index": 99,
+            "slug": "warlock-greater-hex-x16-y5",
+            "name": "+6 Vulnerable Damage",
+            "rarity": 2
+          },
+          {
+            "index": 100,
+            "slug": "warlock-greater-hex-x17-y5",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 116,
+            "slug": "warlock-greater-hex-x12-y6",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 117,
+            "slug": "warlock-greater-hex-x13-y6",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 118,
+            "slug": "warlock-greater-hex-x14-y6",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 121,
+            "slug": "warlock-greater-hex-x17-y6",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 122,
+            "slug": "warlock-greater-hex-x18-y6",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 136,
+            "slug": "warlock-greater-hex-x11-y7",
+            "name": "DATA UNAVAILABLE",
+            "rarity": 4
+          },
+          {
+            "index": 137,
+            "slug": "warlock-greater-hex-x12-y7",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 143,
+            "slug": "warlock-greater-hex-x18-y7",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 151,
+            "slug": "warlock-greater-hex-x5-y8",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 152,
+            "slug": "warlock-greater-hex-x6-y8",
+            "name": "+2.0% Maximum Life",
+            "rarity": 3
+          },
+          {
+            "index": 162,
+            "slug": "warlock-greater-hex-x16-y8",
+            "name": "+2.0% Maximum Life",
+            "rarity": 3
+          },
+          {
+            "index": 163,
+            "slug": "warlock-greater-hex-x17-y8",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 164,
+            "slug": "warlock-greater-hex-x18-y8",
+            "name": "+3.0% Healing Received",
+            "rarity": 2
+          },
+          {
+            "index": 172,
+            "slug": "warlock-greater-hex-x5-y9",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 173,
+            "slug": "warlock-greater-hex-x6-y9",
+            "name": "+1.5% Total Armor",
+            "rarity": 2
+          },
+          {
+            "index": 174,
+            "slug": "warlock-greater-hex-x7-y9",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 175,
+            "slug": "warlock-greater-hex-x8-y9",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 182,
+            "slug": "warlock-greater-hex-x15-y9",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 183,
+            "slug": "warlock-greater-hex-x16-y9",
+            "name": "+3.0% Healing Received",
+            "rarity": 2
+          },
+          {
+            "index": 184,
+            "slug": "warlock-greater-hex-x17-y9",
+            "name": "+2.0% Maximum Life",
+            "rarity": 2
+          },
+          {
+            "index": 196,
+            "slug": "warlock-greater-hex-x8-y10",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 197,
+            "slug": "warlock-greater-hex-x9-y10",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 202,
+            "slug": "warlock-greater-hex-x14-y10",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 203,
+            "slug": "warlock-greater-hex-x15-y10",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 217,
+            "slug": "warlock-greater-hex-x8-y11",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 221,
+            "slug": "warlock-greater-hex-x12-y11",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 222,
+            "slug": "warlock-greater-hex-x13-y11",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 223,
+            "slug": "warlock-greater-hex-x14-y11",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 230,
+            "slug": "warlock-greater-hex-x21-y11",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          },
+          {
+            "index": 238,
+            "slug": "warlock-greater-hex-x8-y12",
+            "name": "+5 Strength",
+            "rarity": 2
+          },
+          {
+            "index": 242,
+            "slug": "warlock-greater-hex-x12-y12",
+            "name": "+5 Dexterity",
+            "rarity": 0
+          },
+          {
+            "index": 244,
+            "slug": "warlock-greater-hex-x14-y12",
+            "name": "+5 Intelligence",
+            "rarity": 2
+          },
+          {
+            "index": 258,
+            "slug": "warlock-greater-hex-x7-y13",
+            "name": "+5 Damage",
+            "rarity": 2
+          },
+          {
+            "index": 259,
+            "slug": "warlock-greater-hex-x8-y13",
+            "name": "+5 Damage",
+            "rarity": 3
+          },
+          {
+            "index": 261,
+            "slug": "warlock-greater-hex-x10-y13",
+            "name": "+5 Dexterity",
+            "rarity": 0
+          },
+          {
+            "index": 262,
+            "slug": "warlock-greater-hex-x11-y13",
+            "name": "Glyph Socket",
+            "rarity": 0
+          },
+          {
+            "index": 263,
+            "slug": "warlock-greater-hex-x12-y13",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 280,
+            "slug": "warlock-greater-hex-x8-y14",
+            "name": "+5 Damage",
+            "rarity": 2
+          },
+          {
+            "index": 281,
+            "slug": "warlock-greater-hex-x9-y14",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 282,
+            "slug": "warlock-greater-hex-x10-y14",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 284,
+            "slug": "warlock-greater-hex-x12-y14",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 285,
+            "slug": "warlock-greater-hex-x13-y14",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 301,
+            "slug": "warlock-greater-hex-x8-y15",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 306,
+            "slug": "warlock-greater-hex-x13-y15",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 326,
+            "slug": "warlock-greater-hex-x12-y16",
+            "name": "+5 Dexterity",
+            "rarity": 0
+          },
+          {
+            "index": 327,
+            "slug": "warlock-greater-hex-x13-y16",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 347,
+            "slug": "warlock-greater-hex-x12-y17",
+            "name": "+5 Intelligence",
+            "rarity": 0
+          },
+          {
+            "index": 368,
+            "slug": "warlock-greater-hex-x12-y18",
+            "name": "+5 Willpower",
+            "rarity": 0
+          },
+          {
+            "index": 389,
+            "slug": "warlock-greater-hex-x12-y19",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 409,
+            "slug": "warlock-greater-hex-x11-y20",
+            "name": "+5 Strength",
+            "rarity": 0
+          },
+          {
+            "index": 410,
+            "slug": "warlock-greater-hex-x12-y20",
+            "name": "+5 Dexterity",
+            "rarity": 0
+          },
+          {
+            "index": 430,
+            "slug": "warlock-greater-hex-x11-y21",
+            "name": "Board Attachment Gate",
+            "rarity": 0
+          }
+        ],
         "rotation": 270,
-        "position": {"x": -2, "y": 0}
+        "position": {
+          "x": -2,
+          "y": 0
+        },
+        "glyph_socket_index": 262,
+        "start_node_index": null,
+        "board_width": 21
       }
     ],
     "gear": [
@@ -233,11 +2212,25 @@
         "item_name": "Harlequin Crest",
         "rarity": "Mythic",
         "sockets": [
-          {"slug": "cir", "kind": "rune", "name": "Cir (Ritual)", "effect_text": "DATA UNAVAILABLE"},
-          {"slug": "kry", "kind": "rune", "name": "Kry (Invocation)", "effect_text": "DATA UNAVAILABLE"}
+          {
+            "slug": "cir",
+            "kind": "rune",
+            "name": "Cir (Ritual)",
+            "effect_text": "Cast 5 Skills then become exhausted for 3 seconds."
+          },
+          {
+            "slug": "kry",
+            "kind": "rune",
+            "name": "Kry (Invocation)",
+            "effect_text": "Invoke the Spiritborn's Vortex Skill, dealing damage and Pulling In enemies."
+          }
         ],
         "tempering": [
-          {"recipe_name": "Worldly Endurance", "group": "DATA UNAVAILABLE", "tier": "DATA UNAVAILABLE", "affix": "Maximum Life"}
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "DATA UNAVAILABLE"
+          }
         ]
       },
       {
@@ -246,11 +2239,25 @@
         "rarity": "Legendary",
         "aspect": "Aspect of Diabolical Armor",
         "sockets": [
-          {"slug": "sapphire", "kind": "gem", "name": "Sapphire", "effect_text": "DATA UNAVAILABLE"},
-          {"slug": "sapphire", "kind": "gem", "name": "Sapphire", "effect_text": "DATA UNAVAILABLE"}
+          {
+            "slug": "sapphire",
+            "kind": "gem",
+            "name": "Sapphire",
+            "effect_text": "150 Willpower"
+          },
+          {
+            "slug": "sapphire",
+            "kind": "gem",
+            "name": "Sapphire",
+            "effect_text": "150 Willpower"
+          }
         ],
         "tempering": [
-          {"recipe_name": "Worldly Endurance", "group": "DATA UNAVAILABLE", "tier": "DATA UNAVAILABLE", "affix": "Maximum Life"}
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "DATA UNAVAILABLE"
+          }
         ]
       },
       {
@@ -259,7 +2266,11 @@
         "rarity": "Legendary",
         "aspect": "Aspect of Ignition",
         "tempering": [
-          {"recipe_name": "Worldly Finesse", "group": "DATA UNAVAILABLE", "tier": "DATA UNAVAILABLE", "affix": "Critical Strike Damage"}
+          {
+            "recipe_name": "Worldly Finesse",
+            "group": "Offensive",
+            "tier": "DATA UNAVAILABLE"
+          }
         ]
       },
       {
@@ -267,11 +2278,25 @@
         "item_name": "Temerity",
         "rarity": "Mythic",
         "sockets": [
-          {"slug": "igni", "kind": "rune", "name": "Igni (Ritual)", "effect_text": "DATA UNAVAILABLE"},
-          {"slug": "que", "kind": "rune", "name": "Que (Invocation)", "effect_text": "DATA UNAVAILABLE"}
+          {
+            "slug": "igni",
+            "kind": "rune",
+            "name": "Igni (Ritual)",
+            "effect_text": "Stores Offering every 0.3 seconds. Cast a Non-Basic Skill to gain the stored Offering. (Up to 500 Offering)."
+          },
+          {
+            "slug": "que",
+            "kind": "rune",
+            "name": "Que (Invocation)",
+            "effect_text": "Invoke the Druid's Earthen Bulwark Skill for 3 seconds, granting yourself a Barrier."
+          }
         ],
         "tempering": [
-          {"recipe_name": "Worldly Endurance", "group": "DATA UNAVAILABLE", "tier": "DATA UNAVAILABLE", "affix": "Maximum Life"}
+          {
+            "recipe_name": "Worldly Endurance",
+            "group": "Defensive",
+            "tier": "DATA UNAVAILABLE"
+          }
         ]
       },
       {
@@ -280,18 +2305,31 @@
         "rarity": "Legendary",
         "aspect": "Embattled Aspect",
         "tempering": [
-          {"recipe_name": "Natural Motion", "group": "DATA UNAVAILABLE", "tier": "DATA UNAVAILABLE", "affix": "Movement Speed"}
+          {
+            "recipe_name": "Natural Motion",
+            "group": "Mobility",
+            "tier": "DATA UNAVAILABLE"
+          }
         ]
       },
       {
-        "slot": "Weapon",
+        "slot": "Weapon — Sword (One-Handed)",
         "item_name": "Elegy",
         "rarity": "Legendary",
         "sockets": [
-          {"slug": "ruby", "kind": "gem", "name": "Ruby", "effect_text": "DATA UNAVAILABLE"}
+          {
+            "slug": "ruby",
+            "kind": "gem",
+            "name": "Ruby",
+            "effect_text": "x32% Fire and Holy Damage Multiplier"
+          }
         ],
         "tempering": [
-          {"recipe_name": "Worldly Destruction", "group": "DATA UNAVAILABLE", "tier": "DATA UNAVAILABLE", "affix": "Critical Strike Chance"}
+          {
+            "recipe_name": "Worldly Destruction",
+            "group": "Weapons",
+            "tier": "DATA UNAVAILABLE"
+          }
         ]
       },
       {
@@ -299,10 +2337,19 @@
         "item_name": "Moloch's Beating Flame",
         "rarity": "Legendary",
         "sockets": [
-          {"slug": "splinter-of-sin", "kind": "gem", "name": "Splinter of Sin", "effect_text": "DATA UNAVAILABLE"}
+          {
+            "slug": "splinter-of-sin",
+            "kind": "gem",
+            "name": "Splinter of Sin",
+            "effect_text": "You gain 50% Maximum Life, but your Maximum Primary Resource is reduced by 30%. 4375 Lightning Resistance"
+          }
         ],
         "tempering": [
-          {"recipe_name": "Worldly Stability", "group": "DATA UNAVAILABLE", "tier": "DATA UNAVAILABLE", "affix": "Resource Cost Reduction"}
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "DATA UNAVAILABLE"
+          }
         ],
         "kullean_transfigured": "Undying Aspect"
       },
@@ -311,7 +2358,12 @@
         "item_name": "The Eightfold Idol",
         "rarity": "Legendary",
         "sockets": [
-          {"slug": "splinter-of-the-black-soulstone", "kind": "gem", "name": "Splinter of the Black Soulstone", "effect_text": "DATA UNAVAILABLE"}
+          {
+            "slug": "splinter-of-the-black-soulstone",
+            "kind": "gem",
+            "name": "Splinter of the Black Soulstone",
+            "effect_text": "Your kills absorb a soul for 10 seconds. Each soul increases your damage by 2.5% but increases your damage taken by 1%. This effect stacks up to 200 times, but does not refresh. 50 All Stats"
+          }
         ],
         "tempering": []
       },
@@ -321,32 +2373,79 @@
         "rarity": "Legendary",
         "aspect": "Aspect of Scorching Heat",
         "sockets": [
-          {"slug": "splinter-of-anguish", "kind": "gem", "name": "Splinter of Anguish", "effect_text": "DATA UNAVAILABLE"}
+          {
+            "slug": "splinter-of-anguish",
+            "kind": "gem",
+            "name": "Splinter of Anguish",
+            "effect_text": "You gain 20% Attack Speed and Critical Strike Chance, but your Primary Resource Costs are increased by 30%. 4375 Fire Resistance"
+          }
         ],
         "tempering": [
-          {"recipe_name": "Worldly Stability", "group": "DATA UNAVAILABLE", "tier": "DATA UNAVAILABLE", "affix": "Resource Cost Reduction"}
+          {
+            "recipe_name": "Worldly Stability",
+            "group": "Resource",
+            "tier": "DATA UNAVAILABLE"
+          }
         ]
       },
       {
-        "slot": "Offhand",
+        "slot": "Offhand — Focus",
         "item_name": "Infernal Homunculus",
         "rarity": "Legendary",
         "sockets": [
-          {"slug": "ruby", "kind": "gem", "name": "Ruby", "effect_text": "DATA UNAVAILABLE"}
+          {
+            "slug": "ruby",
+            "kind": "gem",
+            "name": "Ruby",
+            "effect_text": "x32% Fire and Holy Damage Multiplier"
+          }
         ],
         "tempering": [
-          {"recipe_name": "Worldly Destruction", "group": "DATA UNAVAILABLE", "tier": "DATA UNAVAILABLE", "affix": "Lucky Hit Chance to Make Enemies Vulnerable for 2 Seconds"}
+          {
+            "recipe_name": "Worldly Destruction",
+            "group": "Weapons",
+            "tier": "DATA UNAVAILABLE"
+          }
         ]
       }
     ],
     "talisman": [
-      {"slot": "Charm 1", "item_name": "Fer of Abaddon's Flesh", "rarity": "Set"},
-      {"slot": "Charm 2", "item_name": "Linta of Abaddon's Flesh", "rarity": "Set"},
-      {"slot": "Charm 3", "item_name": "Phoba of Abaddon's Flesh", "rarity": "Set"},
-      {"slot": "Charm 4", "item_name": "Anathema of the Primes", "rarity": "Unique", "note": "Swap-in for Helltides/Undercity/Nightmare Dungeons — not part of the default loadout."},
-      {"slot": "Charm 5", "item_name": "Mlor of Abaddon's Flesh", "rarity": "Set"},
-      {"slot": "Charm 6", "item_name": "Berú of Abaddon's Flesh", "rarity": "Set"},
-      {"slot": "Seal", "item_name": "Seal of the Diamond Mind", "rarity": "Legendary"}
+      {
+        "slot": "Charm 1",
+        "item_name": "Fer of Abaddon's Flesh",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Charm 2",
+        "item_name": "Linta of Abaddon's Flesh",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Charm 3",
+        "item_name": "Phoba of Abaddon's Flesh",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Charm 4",
+        "item_name": "Anathema of the Primes",
+        "rarity": "Unique",
+        "note": "Swap-in for Helltides/Undercity/Nightmare Dungeons — not part of the default loadout."
+      },
+      {
+        "slot": "Charm 5",
+        "item_name": "Mlor of Abaddon's Flesh",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Charm 6",
+        "item_name": "Berú of Abaddon's Flesh",
+        "rarity": "Set"
+      },
+      {
+        "slot": "Seal",
+        "item_name": "Seal of the Diamond Mind",
+        "rarity": "Legendary"
+      }
     ]
   }
 }
