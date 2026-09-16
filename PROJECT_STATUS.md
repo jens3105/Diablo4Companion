@@ -4,10 +4,83 @@ _Sidst opdateret: 2026-09-16_
 
 ## Current phase
 
-**Production Validation — First Real Release (v1.0.1)** — **Server-side
-delen er DONE og bekræftet med ægte, levende data. Den fulde Windows-
-klik-igennem-test kræver brugerens egen hånd på en rigtig Windows-PC —
-se "Krævede manuelle Windows-tests" nedenfor, ikke udført herfra.**
+**Production Validation — Real bug fundet og rettet under brugerens
+egen Windows-test (v1.0.2)**
+
+Brugeren havde en rigtig installeret build der viser "Version 1.0.0"
+(bygget/installeret før denne Production Validation-fase), bekræftede
+Check for Updates fandt v1.0.1 korrekt, men "Update Now" gjorde
+**absolut ingenting** — ingen Preparing/Downloading/Verifying/
+Installing/Restarting, ingen installer åbnede.
+
+### Root cause — fundet med bevis, ikke gæt
+
+En midlertidig diagnostik-CI-step blev tilføjet (`dd13e85`, fjernet
+igen i `c894381`) der kørte `_on_update_now_clicked` PRÆCIST som en
+frozen Windows-build ville, mod den ÆGTE v1.0.1-release, på en RIGTIG
+`windows-latest`-runner. Resultat: **hele flowet fuldførte korrekt**
+end-to-end — rigtig progress-sporet download, rigtig verifikation,
+rigtig backup, `launch_installer` kaldt med den korrekte rigtige sti.
+Selve opdaterings-logikken var altså IKKE i stykker.
+
+Det reelle hul: `subprocess.Popen()` der lykkes betyder kun at Windows
+accepterede at starte en proces — intet om hvorvidt processen stadig
+lever et øjeblik senere. `_on_update_now_clicked` stolede blindt på
+dette og lukkede appen ubetinget 1 sekund efter. En rigtig gaming-PC's
+antivirus/sikkerhedssoftware kan — og gjorde efter alt at dømme —
+dræbe en lige-downloadet, usigneret .exe næsten øjeblikkeligt efter
+start. Når det sker, lukker den gamle app sig stadig pligtskyldigt på
+skema, ingen installer-vindue viser sig nogensinde, og der er intet
+tilbage at genstarte fra — uadskilleligt fra "der skete ingenting" set
+fra brugeren, selvom flere ting teknisk skete meget hurtigt forinden.
+
+### Fix
+
+`src/updater.py`s `launch_installer()` returnerer nu sit `Popen`-håndtag.
+`_on_update_now_clicked` (`src/app.py`) venter kort og tjekker
+`proc.poll()` FØR appen lukkes — er processen allerede afsluttet, vises
+nu en tydelig, handlingsorienteret fejl ("The installer closed
+immediately after starting - it may have been blocked by antivirus/
+security software...") i stedet for at appen stille forsvinder uden
+forklaring, og appen lukkes IKKE, så brugeren kan prøve igen eller
+downloade manuelt.
+
+**Filer ændret:** `src/updater.py`, `src/app.py`,
+`.github/workflows/windows-build.yml` (diagnostik tilføjet og igen
+fjernet — permanent tilstand er uændret bortset fra selve fixet).
+
+**Tests:** Headless, simuleret frozen Windows-miljø: "processen døde
+med det samme"-tilfældet viser nu den nye fejlbesked, genaktiverer
+Update Now-knappen, og kalder IKKE `QApplication.quit()`; det normale
+"processen lever"-tilfælde er upåvirket (viser stadig "Installer
+started..." og lukker via den eksisterende 1-sekunds-timer). Fuld
+26-build-regression: 0 fejl.
+
+**Windows CI:** Diagnostik-kørslen (`35074507467`) beviste selve
+opdaterings-logikken virker korrekt på ren Windows — det var netop
+denne kørsel der gjorde det muligt at udelukke en kode-fejl i selve
+flowet og pege præcist på Popen-livstjek-hullet i stedet. Efter fixet:
+ny build (`35075313284`) **success**.
+
+### Ny release til gentest
+
+**`v1.0.2`** oprettet (samme metode som v1.0.1 — eksisterende CI-
+pipeline, ingen manuel build), assets: `Diablo4Companion-Setup.exe`
+(39 369 377 bytes) + `.sha256`, checksum uafhængigt bekræftet.
+`isDraft: false`, `isPrerelease: false`.
+
+**Brugeren skal:** åbne den installerede app → Settings → "Check for
+Updates" → skal nu finde v1.0.2 → "Update Now" — hvis antivirus/
+sikkerhedssoftware er den reelle årsag, vil brugeren nu se den nye,
+tydelige fejlbesked i stedet for stilhed, hvilket bekræfter diagnosen;
+hvis installationen derimod lykkes helt, er problemet løst.
+
+**v1.0.1 (tidligere Production Validation-fund, stadig gyldigt
+server-side):** Server-side flow (Check for Updates → asset-
+identifikation) blev bekræftet med ægte, levende data mod v1.0.1 —
+se detaljer nedenfor. Det var netop DENNE release brugerens
+installerede 1.0.0-build fandt og forsøgte at opdatere til, hvilket
+afslørede ovenstående fejl.
 
 ### Hvad der blev gjort
 
@@ -593,10 +666,12 @@ Windows Product Phase W10 — Build Data Updates (denne fase).
 
 ## Last commit
 
-`30f69d4` — "Fix Windows CI: derive expected builds/*.json count from
-source, not a hardcoded 26" (pushet). Fulde Production Validation-
-kæde: `9385f0a` (version 1.0.1) → `30f69d4` (CI-fix). GitHub Release
-`v1.0.1` oprettet separat (ikke et commit — se ovenfor).
+`eac4dd6` — "Bump version to 1.0.2: includes the installer-liveness-
+check fix" (pushet). Fulde Production Validation-kæde: `9385f0a`
+(version 1.0.1) → `30f69d4` (CI-fix, hardcoded 26-tjek) → `dd13e85`
+(midlertidig diagnostik) → `c894381` (den rigtige fix: Popen-
+livstjek) → `eac4dd6` (version 1.0.2). GitHub Releases `v1.0.1` og
+`v1.0.2` oprettet separat (ikke commits — se ovenfor).
 
 Branch: `feature/dashboard-v2` (repoets eneste/default branch — der er
 ikke noget `main`, det er normalt for dette repo).
@@ -944,11 +1019,13 @@ scope.
 
 ## Next phase
 
-Ingen planlagt. **Production Validation (server-side) er DONE. W5-W10
-forbliver DONE, uændrede. Den fulde Windows-klik-igennem-test (se
-"Krævede manuelle Windows-tests" ovenfor) venter på brugeren.
-Character State er stadig ON HOLD.** Vent på konkret instruktion fra
-brugeren (se PROJECT_ROADMAP.md's regel: "Start ikke
+Ingen planlagt. **En reel W8-fejl blev fundet og rettet ud fra
+brugerens egen Windows-test af v1.0.1 (se ovenfor) — v1.0.2 er
+udgivet med fixet. W5-W10 forbliver DONE, uændrede udover selve
+fixet. Venter på at brugeren gentester "Check for Updates" →
+"Update Now" mod v1.0.2.** Character State er stadig ON HOLD.
+Vent på konkret instruktion fra brugeren (se PROJECT_ROADMAP.md's
+regel: "Start ikke
 næste roadmap-fase uden en konkret instruktion"). Mulig fremtidig
 opfølgning (ikke startet, kræver eksplicit instruktion): rette
 `leveling_manager.py`'s frozen-path-logik til selv at være
@@ -956,6 +1033,13 @@ opfølgning (ikke startet, kræver eksplicit instruktion): rette
 
 ## Kort changelog (seneste faser, nyeste øverst)
 
+- `v1.0.2` (GitHub Release) + `c894381` — Rigtig bug fundet under
+  brugerens Windows-test: "Update Now" gjorde ingenting, fordi appen
+  lukkede sig selv ubetinget uden at tjekke om den startede installer-
+  proces reelt overlevede (sandsynlig antivirus-interferens). Rettet:
+  `launch_installer()` returnerer nu sit Popen-håndtag, tjekkes for
+  liv før app-luk, viser en tydelig fejl i stedet for stilhed hvis
+  processen allerede er død.
 - `v1.0.1` (GitHub Release) — Production Validation: første rigtige,
   publicerede release. Server-side flow (Check for Updates → asset-
   identifikation) bekræftet med ægte live-data. `30f69d4` fandt/rettede
