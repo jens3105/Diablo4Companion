@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 class DiabloAPI:
 
-    URL = "http://192.168.10.11:8080/api/v1/schedule"
+    URL = "https://events.boil.dk/api/v1/schedule"
 
     # Officielt bekræftet af Blizzard på BlizzCon 2026-09-12:
     # "Season of Hell's Legacy" - 2026-09-15, 09:30 PT / 18:30 CEST.
