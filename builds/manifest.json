@@ -1,0 +1,31 @@
+{
+  "version": "2026-09-16",
+  "files": [
+    "apocalypse_warlock.json",
+    "blazing_scream_warlock.json",
+    "blessed_hammer_paladin.json",
+    "blight_necromancer.json",
+    "blizzard_sorcerer.json",
+    "bone_spear_necromancer.json",
+    "crushing_hand_spiritborn.json",
+    "dance_of_knives_rogue.json",
+    "divine_lance_paladin.json",
+    "dread_claws_warlock.json",
+    "eviscerate_warlock.json",
+    "flurry_rogue.json",
+    "frenzy_barbarian.json",
+    "hammer_of_the_ancients_barbarian.json",
+    "heartseeker_rogue.json",
+    "judgement_paladin.json",
+    "lunatic_warlock.json",
+    "minion_necromancer.json",
+    "minion_warlock.json",
+    "penetrating_shot_rogue.json",
+    "rend_barbarian.json",
+    "shield_of_retribution_paladin.json",
+    "stinger_spiritborn.json",
+    "twisting_blades_rogue.json",
+    "whirlwind_barbarian.json",
+    "zeal_paladin.json"
+  ]
+}

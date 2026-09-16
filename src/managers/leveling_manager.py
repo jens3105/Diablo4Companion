@@ -119,6 +119,17 @@ class LevelingManager:
     def _normalize(name: str) -> str:
         return name.strip().lower()
 
+    @staticmethod
+    def is_valid_build_schema(data: dict) -> bool:
+        """The minimal schema check every build JSON must pass to be
+        considered a real build file (``_load_builds`` below). Windows
+        Product Phase W10's ``src/build_data_updater.py`` reuses this
+        exact check when verifying downloaded Build Data updates, so
+        there is exactly one definition of "is this a valid build
+        file" in the whole app - never a second, drifting copy."""
+
+        return isinstance(data, dict) and "build_name" in data and "milestones" in data
+
     def _load_builds(self):
 
         self._builds = {}
@@ -140,7 +151,7 @@ class LevelingManager:
                 print(f"Kunne ikke indlaese build '{filename}': {exc}")
                 continue
 
-            if "build_name" not in data or "milestones" not in data:
+            if not self.is_valid_build_schema(data):
                 continue
 
             data["milestones"] = sorted(

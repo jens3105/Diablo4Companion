@@ -30,6 +30,7 @@ from qfluentwidgets import (
     SwitchButton,
 )
 
+from src import build_data_updater
 from src import theme
 from src.api import DiabloAPI
 from src import updater
@@ -111,10 +112,18 @@ class SettingsInterface(QWidget):
     this app's own hard-coded colors - see ``MainWindow._on_theme_changed``)
     and are persisted to ``settings`` so they survive a restart."""
 
-    def __init__(self, settings: QSettings, parent=None):
+    def __init__(self, settings: QSettings, leveling_manager: LevelingManager, parent=None):
         super().__init__(parent)
 
         self.settings = settings
+        # Windows Product Phase W10: needed so "Update Build Data" can
+        # call ``leveling_manager._load_builds()`` after a successful
+        # download to pick up the new data immediately, without a
+        # restart, and so the local Build Data version can be read from
+        # the exact directory LevelingManager itself resolves (source
+        # checkout vs. frozen Windows build - see that class's
+        # ``sys.frozen`` branch).
+        self.leveling_manager = leveling_manager
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(32, 32, 32, 32)
@@ -243,6 +252,71 @@ class SettingsInterface(QWidget):
         check_row.addStretch(1)
 
         layout.addLayout(check_row)
+
+        layout.addSpacing(16)
+
+        # -------------------------
+        # Build Data updates (Windows Product Phase W10)
+        # -------------------------
+        # A completely separate update flow from "App Updates" above -
+        # this refreshes the Diablo 4 build JSON files (builds/*.json)
+        # via a manifest.json committed to the repo and served raw from
+        # GitHub, WITHOUT installing a new app version. Own widgets/
+        # state/handlers throughout - never touches
+        # self._pending_update_release or anything from the App Updates
+        # section above.
+
+        build_data_title = StrongBodyLabel("Build Data", self)
+        layout.addWidget(build_data_title)
+
+        local_manifest = build_data_updater.read_local_manifest(
+            self.leveling_manager.builds_dir
+        )
+        local_version_text = (
+            local_manifest["version"]
+            if local_manifest
+            else "unknown (no manifest found)"
+        )
+        self._local_build_data_version = local_manifest["version"] if local_manifest else None
+
+        self.build_data_version_label = CaptionLabel(
+            f"Build Data Version: {local_version_text}", self
+        )
+        layout.addWidget(self.build_data_version_label)
+
+        self.build_data_status_label = BodyLabel("", self)
+        self.build_data_status_label.setWordWrap(True)
+        self.build_data_status_label.hide()
+        layout.addWidget(self.build_data_status_label)
+
+        # The confirmed newer remote manifest dict (version + file list)
+        # once a check finds one - mirrors the shape of W7's
+        # ``_pending_update_release`` but is its own, separate variable
+        # for a separate concept. ``None`` whenever there is nothing
+        # safe to update to.
+        self._pending_build_data_manifest: dict | None = None
+
+        build_data_row = QHBoxLayout()
+        build_data_row.setSpacing(10)
+
+        self.check_build_data_button = PrimaryPushButton(
+            "Check for Build Data Updates", self
+        )
+        self.check_build_data_button.clicked.connect(
+            self._on_check_build_data_updates_clicked
+        )
+        build_data_row.addWidget(self.check_build_data_button)
+
+        self.update_build_data_button = PrimaryPushButton("Update Build Data", self)
+        self.update_build_data_button.clicked.connect(
+            self._on_update_build_data_clicked
+        )
+        self.update_build_data_button.hide()
+        build_data_row.addWidget(self.update_build_data_button)
+
+        build_data_row.addStretch(1)
+
+        layout.addLayout(build_data_row)
 
         layout.addStretch(1)
 
@@ -514,6 +588,122 @@ class SettingsInterface(QWidget):
         except OSError:
             pass
 
+    def _on_check_build_data_updates_clicked(self):
+        """Windows Product Phase W10: check the remote
+        ``builds/manifest.json`` (served raw from GitHub) against the
+        local one, entirely independent of the App Updates section
+        above - never touches ``_pending_update_release``.
+
+        Comparison is a plain string comparison of the ``version``
+        field. Safe here specifically because this phase's version
+        format is ``YYYY-MM-DD`` (zero-padded, fixed-width) - that
+        format sorts identically under lexicographic string comparison
+        and chronological date comparison, so no date-parsing library
+        is needed. This would NOT be safe for an unpadded or
+        variable-width format.
+        """
+
+        self.check_build_data_button.setEnabled(False)
+        self.check_build_data_button.setText("Checking...")
+        self.build_data_status_label.setText(
+            "Checking for Build Data updates..."
+        )
+        self.build_data_status_label.show()
+        self._pending_build_data_manifest = None
+        self.update_build_data_button.hide()
+        QApplication.processEvents()
+
+        try:
+            remote_manifest = build_data_updater.fetch_remote_manifest()
+        except (requests.RequestException, ValueError) as exc:
+            print(f"Kunne ikke tjekke for build data-opdateringer: {exc}")
+            self.build_data_status_label.setText(
+                "Could not check for Build Data updates (network error) - "
+                "try again later."
+            )
+            self.check_build_data_button.setEnabled(True)
+            self.check_build_data_button.setText("Check for Build Data Updates")
+            return
+
+        remote_version = remote_manifest["version"]
+        local_version = self._local_build_data_version
+
+        if local_version is not None and remote_version <= local_version:
+            self.build_data_status_label.setText(
+                f"Build data is up to date (version {local_version})."
+            )
+        else:
+            local_display = local_version or "unknown"
+            self.build_data_status_label.setText(
+                f"New build data available: {remote_version} "
+                f"(currently {local_display})."
+            )
+            self._pending_build_data_manifest = remote_manifest
+            self.update_build_data_button.show()
+
+        self.check_build_data_button.setEnabled(True)
+        self.check_build_data_button.setText("Check for Build Data Updates")
+
+    def _on_update_build_data_clicked(self):
+        """Windows Product Phase W10: download+verify+atomically install
+        the confirmed newer ``_pending_build_data_manifest`` target, then
+        reload ``LevelingManager`` in place so the new data is picked up
+        immediately without an app restart.
+
+        Refuses to act unless a confirmed target exists (defensive,
+        even though the button is only shown right after a check
+        confirms one). On any exception, ``download_build_data`` has
+        guaranteed nothing on disk was partially replaced - the old
+        build files and the already-loaded ``LevelingManager`` state are
+        both still exactly what they were before this call, so no
+        rollback step is needed here (unlike App Updates' installer
+        flow, this never touches a running installation)."""
+
+        manifest = self._pending_build_data_manifest
+        if not manifest:
+            return
+
+        total_files = len(manifest.get("files") or [])
+
+        self.update_build_data_button.setEnabled(False)
+        self.build_data_status_label.setText(
+            f"Downloading build data... 0/{total_files}"
+        )
+        self.build_data_status_label.show()
+        QApplication.processEvents()
+
+        def _on_progress(files_done: int, files_total: int):
+            self.build_data_status_label.setText(
+                f"Downloading build data... {files_done}/{files_total}"
+            )
+            QApplication.processEvents()
+
+        try:
+            build_data_updater.download_build_data(
+                manifest, self.leveling_manager.builds_dir, _on_progress
+            )
+        except (requests.RequestException, OSError, RuntimeError, ValueError) as exc:
+            print(f"Kunne ikke opdatere build data: {exc}")
+            self.build_data_status_label.setText(
+                f"Build Data update failed: {exc}"
+            )
+            self.update_build_data_button.setEnabled(True)
+            return
+
+        # Success: reload in place (no restart needed) and reflect the
+        # new version in the UI.
+        self.leveling_manager._load_builds()
+
+        new_version = manifest["version"]
+        self._local_build_data_version = new_version
+        self.build_data_version_label.setText(f"Build Data Version: {new_version}")
+        self.build_data_status_label.setText(
+            f"Build data updated successfully to version {new_version}."
+        )
+        self._pending_build_data_manifest = None
+        self.update_build_data_button.hide()
+        self.update_build_data_button.setEnabled(True)
+
 
 class MainWindow(FluentWindow):
 
@@ -632,7 +822,7 @@ class MainWindow(FluentWindow):
         self.advisor_interface = BuildAdvisorInterface(self.advisor_card)
         self.advisor_interface.setObjectName("buildAdvisorInterface")
 
-        self.settings_interface = SettingsInterface(self.settings)
+        self.settings_interface = SettingsInterface(self.settings, self.leveling_manager)
         self.settings_interface.setObjectName("settingsInterface")
 
         self.addSubInterface(self.dashboard, FIF.HOME, "Dashboard")
