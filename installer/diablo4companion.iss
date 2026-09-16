@@ -56,9 +56,13 @@ OutputBaseFilename=Diablo4Companion-Setup
 Compression=lzma
 SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64compatible
-; No custom setup/wizard icon ships in this repo (see ARCHITECTURE.md
-; notes for W3) — deliberately left as Inno Setup's default rather than
-; fabricating a fake .ico asset.
+; V1.0.3: real, original app icon now ships at ../assets/icon.ico (see
+; scripts/generate_icon.py) — used for the setup wizard/uninstaller
+; icon here. The installed app's own shortcuts (below) already get
+; their icon for free from the exe's embedded resource (PyInstaller's
+; EXE(icon=...) in diablo4companion.spec), so no explicit IconFilename
+; is needed on the [Icons] entries.
+SetupIconFile=..\assets\icon.ico
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

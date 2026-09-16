@@ -1,6 +1,8 @@
+import os
 import sys
 
 from PySide6.QtCore import QSettings
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
 from src.app import MainWindow
@@ -8,8 +10,24 @@ from src.api import DiabloAPI
 from src.theme import MODE_DARK, PRESET_DEFAULT, apply_theme
 
 
+def _resolve_icon_path() -> str:
+    """Same sys.frozen pattern as LevelingManager's builds_dir lookup
+    (src/managers/leveling_manager.py) - PyInstaller's onedir layout
+    places bundled datas under a "_internal" folder beside the exe,
+    while running from source resolves relative to this file (main.py
+    already lives at the repo root)."""
+
+    if getattr(sys, "frozen", False):
+        base_dir = os.path.join(os.path.dirname(os.path.abspath(sys.executable)), "_internal")
+    else:
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+
+    return os.path.join(base_dir, "assets", "icon.ico")
+
+
 def main():
     app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon(_resolve_icon_path()))
 
     # Restore the last-saved dark/light mode + seasonal accent preset (same
     # QSettings the rest of the app uses - see MainWindow.settings) before

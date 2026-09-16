@@ -27,11 +27,20 @@ builds_datas = [
     for build_file in sorted(glob.glob(os.path.join(repo_root, "builds", "*.json")))
 ]
 
+# App icon (assets/icon.ico): bundled as a data file (same "beside the
+# exe" convention as builds_datas above) so main.py can load it at
+# runtime via QIcon for the window/taskbar icon, in addition to being
+# passed to EXE()'s own icon= below (which embeds it into the .exe's
+# Windows resources - what Explorer/Start Menu/taskbar shortcuts show
+# even before the app sets anything at runtime).
+icon_path = os.path.join(repo_root, "assets", "icon.ico")
+icon_datas = [(icon_path, "assets")]
+
 a = Analysis(
     ["main.py"],
     pathex=[repo_root],
     binaries=[],
-    datas=builds_datas,
+    datas=builds_datas + icon_datas,
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -59,6 +68,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=icon_path,
 )
 
 coll = COLLECT(
