@@ -4,8 +4,76 @@ _Sidst opdateret: 2026-09-15_
 
 ## Current phase
 
-**Windows Product Phase W8 — Download → Verify → Install → Restart** —
-**DONE.** "Update Now" (W7) er nu en reel, virkende Windows-opdaterer:
+**Windows Product Phase W9 — Safe Rollback** — **DONE**, bekræftet på
+den rigtige Windows-runner. Kerne-indsigt: Inno Setup beskytter allerede
+selv mod at en afbrudt installation efterlader halvkopierede filer
+(indbygget transaktionslogik) — appens egen kode dækker i stedet det
+ene tilfælde Inno Setup ikke kan se: at den nye version installeres
+"succesfuldt", men rent faktisk ikke virker. Løsning: backup lige før
+installeren startes + selv-tjek ved næste opstart, uden nogen ny
+overvågnings-proces.
+
+- **`src/updater.py`**: 3 nye funktioner —
+  `backup_install_dir`/`cleanup_backup`/`restore_backup`. Begge
+  destruktive funktioner nægter (rejser/logger, sletter intet) med
+  mindre stien er en ægte underkatalog af det forventede backup-root
+  (`os.path.commonpath`-baseret tjek), og `restore_backup` nægter
+  desuden med mindre install-mappens navn matcher det rigtige
+  `"Diablo4Companion"` (fra `.iss`'s `DefaultDirName`) — aldrig et gæt.
+  `restore_backup` er en testet, men **ikke automatisk koblet**
+  primitiv (manuel genopretning), bevidst, se begrænsningen nedenfor.
+- **`src/app.py`**: `_on_update_now_clicked` laver nu en rigtig backup
+  af den nuværende installation (kun når frozen — intet at sikkerhedskopiere
+  ved kørsel fra kilde) lige før `launch_installer`, og gemmer 3
+  QSettings-nøgler (`update/pending_backup_path`/`previous_version`/
+  `target_version`). Hvis backuppen selv fejler, annulleres opdateringen
+  helt i stedet for at risikere den nuværende installation.
+  `MainWindow.__init__` tjekker disse nøgler ved HVER opstart (ét billigt
+  QSettings-opslag i det normale "intet ventende" tilfælde): matcher
+  den nuværende version target — ryd op i backuppen (opdatering lykkedes).
+  Matcher den ikke (stadig den gamle version) — intet gendannes (appen
+  kører jo fint), men en ærlig, afvisbar InfoBar-besked vises, og
+  backuppen bevares til evt. manuel genopretning.
+- **Dokumenteret begrænsning (ikke skjult)**: hvis den nye .exe slet
+  ikke kan starte, findes der ingen kørende proces til at udføre
+  selv-tjekket — dette kræver bevidst ingen ny overvågnings-proces,
+  da det er en væsentligt større feature end en rollback-sikkerhedsfase
+  bør koste. Backuppen giver stadig et menneske en ligetil manuel vej
+  til at gendanne via `restore_backup`.
+- **`.github/workflows/windows-build.yml`**: nyt step tester
+  `backup_install_dir`/`cleanup_backup`/`restore_backup` mod den RIGTIGE
+  installerede app-mappe fra det eksisterende W3 silent-install-step —
+  bekræftede reelt: komplet byte-for-byte backup, korrekt afvisning af
+  en rigtig sti uden for backup-root (`C:\Windows` selv!), korrekt
+  afvisning af CI-testens forkert navngivne install-mappe, og en reel
+  gendannelse der rydder en simuleret "ødelagt installation" og lægger
+  den rigtige .exe tilbage.
+
+**Note om denne fase:** Den oprindelige agent ramte en UGENTLIG
+rate-limit (nulstillet kl. 09:00) lige efter at have skrevet al kode og
+CI-testen, men FØR den nåede at trigge/overvåge den rigtige
+Windows-kørsel. Jeg (den koordinerende session) gennemgik al kode
+personligt (path-sikkerhedstjek, `.iss`-navn-match, QSettings-logik),
+kørte selvstændige lokale tests af alle 3 startup-scenarier (intet
+ventende, match, mismatch) samt en fuld 26-build-regression — alt rent
+— committede (`2695c3d`), og triggede/overvågede selv den rigtige
+Windows CI-kørsel (`35068798145`): **success, 2m58s**, alle 5 W9-tjek
+bekræftet i loggen ("ALL W9 REAL-WINDOWS CHECKS PASSED").
+
+**Kræver stadig brugerens egen manuelle Windows-test** (kan ikke
+bevises i CI, jf. denne fases eksplicitte (a)/(b)/(c)-skelnen): den
+fulde flow mod en ægte nyere release (ingen findes endnu), reelt at
+annullere installer-wizarden og se "Update did not complete"-beskeden,
+reelt at simulere en ny version der ikke kan starte og bruge
+`restore_backup` manuelt til at komme tilbage, og at InfoBar-beskederne
+faktisk vises/kan afvises i en rigtig GUI-session.
+
+W10 (Build Data Updates) er stadig **IKKE STARTET**. Character State
+er stadig **ON HOLD**.
+
+### Tidligere: W8 — Download → Verify → Install → Restart
+
+"Update Now" (W7) er nu en reel, virkende Windows-opdaterer:
 finder installer-asset'et på det bekræftede GitHub Release-target
 (`_pending_update_release`), downloader det til en
 `tempfile.mkdtemp()`-sti, verificerer det (størrelse altid, SHA256 når
@@ -290,8 +358,8 @@ Build Advisor (denne fase).
 
 ## Last commit
 
-`1f38fce` — "Windows Product Phase W8: Download -> Verify -> Install ->
-Restart" (pushet).
+`2695c3d` — "Windows Product Phase W9: safe rollback via
+backup-before-install" (pushet).
 
 Branch: `feature/dashboard-v2` (repoets eneste/default branch — der er
 ikke noget `main`, det er normalt for dette repo).
@@ -307,6 +375,43 @@ Output: `dist/Diablo4Companion/` (onedir), inkl.
 
 ## Tests
 
+- **W9 — (a) Lokal unit/integration (2026-09-16, Linux):**
+  `backup_install_dir`/`cleanup_backup`/`restore_backup` testet mod
+  rigtige lokale temp-mappetræer — bekræftet: reel kopiering virker,
+  `cleanup_backup` nægter korrekt at røre en sti uden for backup-root
+  (testet med `/etc`), `restore_backup` nægter korrekt en
+  forkert-navngivet install-mappe, og lykkes korrekt ind i en
+  rigtigt-navngivet mappe (rydder en simuleret "broken_marker.txt" og
+  lægger den rigtige exe tilbage). App-opstarts-tjekket
+  (`_check_pending_update`) testet for alle 3 scenarier: intet
+  ventende (hurtig no-op), matchende version (rydder backup op, viser
+  "Update complete"), mismatch (backup IKKE slettet, viser "Update did
+  not complete"). Fuld 26-build-regression: 0 fejl.
+- **W9 — (b) Windows CI (2026-09-16, run `35068798145`, windows-latest):**
+  **success, 2m58s.** Nyt step testede `backup_install_dir`/
+  `cleanup_backup`/`restore_backup` mod den RIGTIGE app-installation
+  W3's silent-install-step producerer (rigtig `_internal/`, rigtige
+  `builds/*.json`, rigtig exe) — alle 5 tjek bestod i loggen: komplet
+  byte-for-byte backup (filantal + total størrelse matcher exakt),
+  `cleanup_backup` nægtede korrekt at røre `C:\Windows` (en rigtig,
+  eksisterende Windows-systemmappe — den blev IKKE rørt), `restore_
+  backup` nægtede korrekt CI-testens forkert navngivne install-mappe
+  (`D4CInstallTest` ≠ `Diablo4Companion`), en reel gendannelse ind i en
+  korrekt navngivet mappe ryddede en simuleret "ødelagt installation"
+  og lagde den rigtige exe tilbage, og en reel `cleanup_backup` fjernede
+  den rigtige backup-mappe bagefter. Uafhængigt genbekræftet af mig
+  (den koordinerende session) direkte i workflow-loggen, ikke kun
+  agentens egen rapport.
+- **W9 — (c) Kræver manuel Windows-test** (kan ikke bevises i CI): den
+  fulde `_on_update_now_clicked`-flow mod en ægte nyere release (ingen
+  findes — ingen GitHub Release blev oprettet, jf. den fortsatte hårde
+  begrænsning fra W8), reelt at annullere installer-wizarden midtvejs
+  og se "Update did not complete"-beskeden ved næste opstart, reelt at
+  simulere en ny version der slet ikke kan starte og bekræfte en
+  person kan bruge `restore_backup` manuelt til at komme tilbage
+  (ingen automatisk detektion findes for dette specifikke tilfælde,
+  bevidst — se begrænsningen ovenfor), og at InfoBar-beskederne
+  faktisk vises/kan afvises korrekt i en rigtig GUI-session.
 - **W8 lokal verifikation (2026-09-15, Linux) — rene funktioner
   (`src/updater.py`), ingen netværk/GitHub:**
   `find_installer_asset`/`find_checksum_asset` testet mod konstruerede
@@ -560,8 +665,9 @@ scope.
 
 ## Next phase
 
-Ingen planlagt. W8 er DONE. **W9 (safe rollback) og W10 (Build Data
-updater) er begge IKKE STARTET.** Vent på konkret instruktion fra
+Ingen planlagt. W9 er DONE. **W10 (Build Data updater) er stadig IKKE
+STARTET, og Character State er stadig ON HOLD.** Vent på konkret
+instruktion fra
 brugeren (se PROJECT_ROADMAP.md's regel: "Start ikke næste
 roadmap-fase uden en konkret instruktion"). Mulig fremtidig
 opfølgning (ikke startet, kræver eksplicit instruktion): rette
@@ -570,6 +676,9 @@ opfølgning (ikke startet, kræver eksplicit instruktion): rette
 
 ## Kort changelog (seneste faser, nyeste øverst)
 
+- `2695c3d` — Windows Product Phase W9: Safe Rollback. Backup-før-
+  install + selv-tjek-ved-næste-opstart, ingen overvågnings-proces.
+  Bekræftet på rigtig Windows-runner (run `35068798145`, success).
 - `1f38fce` — Windows Product Phase W8: reelt Download → Verify →
   Install → Restart. Ny `src/updater.py` (find/download/verify/launch),
   `_on_update_now_clicked` udvidet til fuld pipeline, Inno Setup
