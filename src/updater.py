@@ -17,9 +17,18 @@ installer running and then gets this (old) process out of its way.
 
 import hashlib
 import os
+import shutil
 import subprocess
 
 import requests
+
+# Windows Product Phase W9 -- Safe Rollback: the real install-directory
+# name this app's Inno Setup installer actually produces (see
+# installer/diablo4companion.iss's DefaultDirName,
+# "{localappdata}\Diablo4Companion"). restore_backup() below asserts
+# against this exact name as a sanity check before ever touching an
+# install directory - never a guess.
+EXPECTED_INSTALL_DIR_NAME = "Diablo4Companion"
 
 # Exact filenames a build of this app's Inno Setup installer produces
 # (see installer/diablo4companion.iss's OutputBaseFilename) and the
@@ -160,6 +169,137 @@ def verify_download(
         )
 
     return True, "size and SHA256 checksum both verified"
+
+
+def _path_is_within_root(path: str, root: str) -> bool:
+    """True iff ``path`` is a real subdirectory of ``root`` (not equal
+    to it, and not merely string-prefixed - uses ``os.path.commonpath``
+    on absolute paths so e.g. root ``/a/b`` never matches path
+    ``/a/bc``). Used defensively by ``cleanup_backup``/``restore_backup``
+    below before any destructive filesystem operation."""
+
+    path_abs = os.path.abspath(path)
+    root_abs = os.path.abspath(root)
+
+    if path_abs == root_abs:
+        return False
+
+    try:
+        return os.path.commonpath([path_abs, root_abs]) == root_abs
+    except ValueError:
+        # Different drives on Windows, or otherwise incomparable paths -
+        # never treat this as safe.
+        return False
+
+
+def backup_install_dir(install_dir: str, backup_root: str, version: str) -> str:
+    """Windows Product Phase W9 -- Safe Rollback.
+
+    Copies the entire ``install_dir`` tree into
+    ``os.path.join(backup_root, version)`` (real ``shutil.copytree``,
+    real files) and returns that destination path.
+
+    Called right before an installer is launched, so that if the newly
+    installed version turns out to be broken there is a known-good copy
+    of the CURRENT install to recover from. ``backup_root`` must be a
+    sibling of ``install_dir`` (the caller's responsibility, see
+    ``src/app.py``'s ``_on_update_now_clicked``) so Inno Setup's own
+    file operations during install never touch it.
+
+    Raises whatever ``shutil.copytree`` raises (``OSError`` and
+    subclasses - disk full, permission error, the destination already
+    existing, etc.) - the caller MUST treat any exception here as a
+    hard stop and refuse to proceed with the update, per this phase's
+    explicit safety rule: never risk the current, working installation
+    to save a failed backup attempt.
+    """
+
+    destination = os.path.join(backup_root, version)
+    shutil.copytree(install_dir, destination)
+    return destination
+
+
+def cleanup_backup(backup_path: str, backup_root: str) -> None:
+    """Windows Product Phase W9 -- Safe Rollback.
+
+    Removes a backup directory created by ``backup_install_dir`` once it
+    is no longer needed (the update it was insurance for succeeded).
+
+    Defensive path-containment check: refuses (logs a warning, deletes
+    nothing) unless ``backup_path`` is a genuine subdirectory of
+    ``backup_root`` - this is called with a path read back out of
+    QSettings, so it must never trust that value blindly before running
+    ``shutil.rmtree`` on it.
+    """
+
+    if not _path_is_within_root(backup_path, backup_root):
+        print(
+            f"WARNING: refusing to delete backup path "
+            f"{os.path.abspath(backup_path)!r} - it is not a subdirectory "
+            f"of the expected backup root {os.path.abspath(backup_root)!r}. "
+            f"Nothing was deleted."
+        )
+        return
+
+    shutil.rmtree(os.path.abspath(backup_path))
+
+
+def restore_backup(backup_path: str, install_dir: str, backup_root: str) -> None:
+    """Windows Product Phase W9 -- Safe Rollback: manual-recovery primitive.
+
+    Copies a backup created by ``backup_install_dir`` back over
+    ``install_dir`` (clears ``install_dir`` first, then
+    ``shutil.copytree``s the backup into it - a safe replace-in-place).
+
+    NOT wired to any automatic trigger in this phase. This app
+    deliberately does not run a supervisor/watchdog process that could
+    detect "the newly-installed version crashes on launch" and call
+    this automatically - see PROJECT_STATUS.md's W9 entry for why. This
+    function exists as the safe, tested primitive a human (or a future
+    phase) can invoke for manual recovery: reinstall from the backup
+    folder this phase creates, or point a script at it and call this.
+
+    Two defensive checks, both required, before anything is touched:
+    - ``backup_path`` must be a genuine subdirectory of ``backup_root``
+      (same check as ``cleanup_backup``).
+    - ``install_dir``'s basename must match
+      ``EXPECTED_INSTALL_DIR_NAME`` (the real folder name this app's
+      Inno Setup installer uses - see installer/diablo4companion.iss's
+      DefaultDirName), a sanity check that this really looks like a
+      Diablo4Companion install and not an arbitrary directory.
+
+    Raises ``ValueError`` with a descriptive message if either check
+    fails, or if ``backup_path`` doesn't actually exist - never
+    silently proceeds, never silently no-ops.
+    """
+
+    backup_path_abs = os.path.abspath(backup_path)
+    backup_root_abs = os.path.abspath(backup_root)
+
+    if not _path_is_within_root(backup_path_abs, backup_root_abs):
+        raise ValueError(
+            f"Refusing to restore from {backup_path_abs!r}: it is not a "
+            f"subdirectory of the expected backup root {backup_root_abs!r}."
+        )
+
+    if not os.path.isdir(backup_path_abs):
+        raise ValueError(
+            f"Refusing to restore: backup path does not exist or is not a "
+            f"directory: {backup_path_abs!r}."
+        )
+
+    install_dir_abs = os.path.abspath(install_dir)
+    if os.path.basename(os.path.normpath(install_dir_abs)) != EXPECTED_INSTALL_DIR_NAME:
+        raise ValueError(
+            f"Refusing to restore into {install_dir_abs!r}: its folder name "
+            f"does not match the expected Diablo4Companion install "
+            f"directory name ({EXPECTED_INSTALL_DIR_NAME!r}, see "
+            f"installer/diablo4companion.iss's DefaultDirName)."
+        )
+
+    if os.path.isdir(install_dir_abs):
+        shutil.rmtree(install_dir_abs)
+    shutil.copytree(backup_path_abs, install_dir_abs)
 
 
 def launch_installer(installer_path: str) -> None:

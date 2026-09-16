@@ -1,5 +1,6 @@
 import os
 import shutil
+import sys
 import tempfile
 from datetime import datetime, timezone
 
@@ -428,6 +429,57 @@ class SettingsInterface(QWidget):
             self.update_now_button.setEnabled(True)
             return
 
+        # Windows Product Phase W9 -- Safe Rollback: back up the CURRENT
+        # install before ever handing control to the installer, so a
+        # newly-installed version that turns out to be broken has a
+        # known-good copy to manually recover from (see
+        # src/updater.py's backup_install_dir/restore_backup docstrings
+        # and PROJECT_STATUS.md's W9 entry for the full design/limits).
+        # Only meaningful when actually running as a frozen Windows
+        # build - there is no "installation" to back up when running
+        # from source, so this step is skipped entirely in that case
+        # (same sys.frozen check src/managers/leveling_manager.py's
+        # frozen branch already uses).
+        if getattr(sys, "frozen", False):
+            install_dir = os.path.dirname(sys.executable)
+            backup_root = os.path.join(
+                os.path.dirname(install_dir), "Diablo4Companion_backup"
+            )
+
+            target_version_tuple = _parse_semver(release.get("tag_name", ""))
+            target_version = (
+                "%d.%d.%d" % target_version_tuple
+                if target_version_tuple is not None
+                else (release.get("tag_name") or "").strip()
+            )
+
+            self.update_status_label.setText(
+                "Creating a safety backup before updating..."
+            )
+            QApplication.processEvents()
+
+            try:
+                backup_path = updater.backup_install_dir(
+                    install_dir, backup_root, target_version
+                )
+            except Exception as exc:  # noqa: BLE001 - disk full, permission
+                # error, anything: per this phase's explicit safety rule,
+                # a failed backup must cancel the whole update rather than
+                # risk the current, working installation.
+                print(f"Kunne ikke oprette sikkerhedskopi før opdatering: {exc}")
+                self.update_status_label.setText(
+                    "Could not create a safety backup before updating - "
+                    "update cancelled to avoid risking your current "
+                    "installation."
+                )
+                self._cleanup_update_temp_dir(temp_dir)
+                self.update_now_button.setEnabled(True)
+                return
+
+            self.settings.setValue("update/pending_backup_path", backup_path)
+            self.settings.setValue("update/pending_previous_version", __version__)
+            self.settings.setValue("update/pending_target_version", target_version)
+
         self.update_status_label.setText("Starting installer...")
         QApplication.processEvents()
 
@@ -485,6 +537,16 @@ class MainWindow(FluentWindow):
         # dependency). Written from on_build_changed/on_level_changed,
         # read back once at startup in _restore_leveling_selection.
         self.settings = QSettings("Diablo4Companion", "DesktopCompanion")
+
+        # Windows Product Phase W9 -- Safe Rollback: startup half of the
+        # backup-before-install + self-check-on-next-startup mechanism
+        # (see _on_update_now_clicked's backup step in SettingsInterface
+        # and PROJECT_STATUS.md's W9 entry for the full design). Must
+        # run early, and stays a single cheap QSettings read with zero
+        # file I/O in the overwhelmingly common "no pending update"
+        # case - see _check_pending_update's docstring.
+        self._startup_update_notice = None
+        self._check_pending_update()
 
         # The manager's own baked-in default build (Blazing Scream Warlock,
         # or whatever build sorts first) - captured once, before anything
@@ -683,6 +745,96 @@ class MainWindow(FluentWindow):
         # shown, rather than racing main.py's ``window.show()``.
         if self.leveling_manager.build_changes:
             QTimer.singleShot(300, self._show_build_change_notices)
+
+        # Windows Product Phase W9 -- Safe Rollback: the deferred half of
+        # the startup check set up by _check_pending_update above - same
+        # "wait for the window to actually be shown" reasoning as the
+        # build-change notices just above.
+        if self._startup_update_notice:
+            QTimer.singleShot(300, self._show_pending_update_notice)
+
+    # ---------------------------------------------------------
+    # Windows Product Phase W9 -- Safe Rollback (startup check)
+    # ---------------------------------------------------------
+
+    def _check_pending_update(self):
+        """Check whether an update was in flight when this process last
+        ran (``update/pending_backup_path`` set by
+        ``SettingsInterface._on_update_now_clicked``'s backup step) and,
+        if so, resolve it - either confirming the update completed
+        (cleans up the now-unneeded backup) or noting honestly that it
+        didn't (leaves the backup in place for possible manual
+        recovery). See PROJECT_STATUS.md's W9 entry for the full design
+        and its one documented limitation.
+
+        Deliberately front-loaded to a single QSettings read: the
+        overwhelmingly common case (no update was ever started, or the
+        previous one already resolved on an earlier launch) must stay
+        free of any file I/O. Only sets ``self._startup_update_notice``
+        for the caller to show later (deferred, see __init__) - never
+        shows UI itself, so this can safely run before any page exists.
+        """
+
+        backup_path = self.settings.value("update/pending_backup_path", "", type=str)
+        if not backup_path:
+            return
+
+        target_version = self.settings.value(
+            "update/pending_target_version", "", type=str
+        )
+
+        self.settings.remove("update/pending_backup_path")
+        self.settings.remove("update/pending_previous_version")
+        self.settings.remove("update/pending_target_version")
+
+        if __version__ == target_version:
+            # First successful launch of the newly-installed version -
+            # the backup has done its job and is no longer needed.
+            backup_root = os.path.dirname(backup_path)
+            try:
+                updater.cleanup_backup(backup_path, backup_root)
+            except OSError as exc:
+                print(
+                    f"Kunne ikke rydde op i backup efter vellykket "
+                    f"opdatering: {exc}"
+                )
+            self._startup_update_notice = (
+                "Update complete",
+                f"Updated to version {target_version}.",
+            )
+        else:
+            # NOT a "something is broken" state: this running app is
+            # demonstrably fine, it's just still the old version (most
+            # likely pending_previous_version) - the installer wizard
+            # was probably cancelled, or failed silently. Nothing is
+            # restored here: there is nothing to restore FROM, since
+            # we're already successfully running the pre-update
+            # install. The backup folder is deliberately left in place
+            # (not auto-deleted) in case a future manual recovery or
+            # retry could still use it.
+            self._startup_update_notice = (
+                "Update did not complete",
+                f"A previous update to version {target_version} didn't "
+                f"complete - you're still on version {__version__}.",
+            )
+
+    def _show_pending_update_notice(self):
+        """Deferred display half of ``_check_pending_update`` - same
+        dismissible-InfoBar style as ``_show_build_change_notices``."""
+
+        if not self._startup_update_notice:
+            return
+
+        title, content = self._startup_update_notice
+        InfoBar.info(
+            title=title,
+            content=content,
+            orient=Qt.Vertical,
+            isClosable=True,
+            position=InfoBarPosition.TOP_RIGHT,
+            duration=10000,
+            parent=self,
+        )
 
     # ---------------------------------------------------------
     # Theme / appearance

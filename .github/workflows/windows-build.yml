@@ -207,3 +207,108 @@ jobs:
           "
           Start-Sleep -Seconds 2
           Get-Process -Name notepad -ErrorAction SilentlyContinue | Stop-Process -Force
+
+      # --- Windows Product Phase W9: Safe Rollback - real Windows backup/
+      # cleanup/restore test ------------------------------------------------
+      # Exercises src/updater.py's backup_install_dir/cleanup_backup/
+      # restore_backup against the REAL installed app directory this
+      # runner's own W3 silent-install step just produced above
+      # ($env:INSTALL_DIR - real _internal/, real builds/, real exe, not a
+      # fake fixture), and against the REAL install_dir/backup_root path
+      # shapes this Windows environment actually produces (not a
+      # Linux-simulated path shape). No GitHub Release involved at all -
+      # pure local-filesystem testing of this phase's rollback primitives.
+      - name: Test W9 backup/cleanup/restore against the real Windows install
+        shell: pwsh
+        env:
+          PYTHONPATH: "."
+        run: |
+          $installDir = $env:INSTALL_DIR
+          $backupRoot = Join-Path (Split-Path $installDir -Parent) "Diablo4Companion_backup"
+
+          @'
+          import os
+          import sys
+
+          from src import updater
+
+          install_dir = sys.argv[1]
+          backup_root = sys.argv[2]
+
+
+          def count_and_size(path):
+              total_count = 0
+              total_size = 0
+              for root, dirs, files in os.walk(path):
+                  for f in files:
+                      total_count += 1
+                      total_size += os.path.getsize(os.path.join(root, f))
+              return total_count, total_size
+
+
+          src_count, src_size = count_and_size(install_dir)
+          print(f"Source install dir: {src_count} files, {src_size} bytes")
+          if src_count < 10:
+              raise SystemExit(
+                  f"Sanity check failed: real install dir only has {src_count} "
+                  f"files - not a valid test target."
+              )
+
+          backup_path = updater.backup_install_dir(install_dir, backup_root, "9.9.9-citest")
+          print(f"OK: backup_install_dir -> {backup_path}")
+
+          dst_count, dst_size = count_and_size(backup_path)
+          print(f"Backup dir: {dst_count} files, {dst_size} bytes")
+          if dst_count != src_count or dst_size != src_size:
+              raise SystemExit(
+                  f"Backup mismatch: source had {src_count} files/{src_size} "
+                  f"bytes, backup has {dst_count} files/{dst_size} bytes."
+              )
+          print("OK: backup is a complete, same-file-count-and-size copy of the real install.")
+
+          # --- path-safety: refuse a real out-of-bounds Windows path --------
+          outside_target = os.environ["SystemRoot"]  # e.g. C:\Windows
+          before_exists = os.path.isdir(outside_target)
+          updater.cleanup_backup(outside_target, backup_root)
+          after_exists = os.path.isdir(outside_target)
+          if not (before_exists and after_exists):
+              raise SystemExit("cleanup_backup did not correctly refuse a real out-of-bounds Windows path!")
+          print(f"OK: cleanup_backup correctly refused to touch {outside_target}.")
+
+          # --- restore_backup refuses the REAL CI install dir name ----------
+          # (this runner's real silent-install test dir is deliberately
+          # named "D4CInstallTest", not "Diablo4Companion" - proving the
+          # sanity check against the REAL path this Windows environment
+          # actually produced, not a Linux-simulated shape.)
+          try:
+              updater.restore_backup(backup_path, install_dir, backup_root)
+              raise SystemExit("restore_backup should have refused the real CI install dir name but did not!")
+          except ValueError as exc:
+              print(f"OK: restore_backup correctly refused the real (non-Diablo4Companion-named) CI install dir: {exc}")
+
+          # --- restore_backup real copy mechanics, properly-named target ----
+          restore_target = os.path.join(os.path.dirname(backup_root), "RestoreTest", "Diablo4Companion")
+          os.makedirs(restore_target, exist_ok=True)
+          marker = os.path.join(restore_target, "broken_marker.txt")
+          with open(marker, "w") as fh:
+              fh.write("simulated broken newly-installed version")
+
+          updater.restore_backup(backup_path, restore_target, backup_root)
+          if os.path.exists(marker):
+              raise SystemExit("restore_backup did not clear the pre-existing install_dir contents before restoring.")
+          restored_exe = os.path.join(restore_target, "Diablo4Companion.exe")
+          if not os.path.isfile(restored_exe):
+              raise SystemExit(f"restore_backup did not restore the real exe to {restored_exe}")
+          print("OK: restore_backup correctly cleared the old contents and restored the real exe.")
+
+          # --- cleanup_backup real removal -----------------------------------
+          updater.cleanup_backup(backup_path, backup_root)
+          if os.path.exists(backup_path):
+              raise SystemExit(f"cleanup_backup did not remove {backup_path}")
+          print("OK: cleanup_backup actually removed the real backup directory.")
+
+          print("ALL W9 REAL-WINDOWS CHECKS PASSED")
+          '@ | Out-File -FilePath w9_ci_test.py -Encoding utf8
+
+          python w9_ci_test.py $installDir $backupRoot
+          if ($LASTEXITCODE -ne 0) { throw "W9 backup/cleanup/restore test failed" }
