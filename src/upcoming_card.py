@@ -125,8 +125,7 @@ class UpcomingCard(BaseCard):
                 timezone.utc
             ).astimezone()
 
-            suffix = " (est.)" if event.get("estimated") else ""
-            event_lbl.setText(f"{event['icon']} {event['title']}{suffix}")
+            event_lbl.setText(f"{event['icon']} {event['title']}")
             location_lbl.setText(event.get("location") or _MISSING)
             timer_lbl.setText(countdown)
             clock_lbl.setText(start.strftime("%H:%M"))

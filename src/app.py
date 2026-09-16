@@ -917,11 +917,12 @@ class MainWindow(FluentWindow):
         # separate HTTP requests within milliseconds of each other).
         # Beyond being wasteful, that could let one card's fetch hit
         # helltides.com's live API while another's fetch - moments
-        # later - gets blocked by Cloudflare's bot-challenge and falls
-        # back to the locally-estimated schedule, showing genuinely
-        # inconsistent (different source, different clock) data across
-        # cards in the same refresh. See PROJECT_STATUS.md's Dashboard
-        # Data bugfix entry.
+        # later - gets blocked by Cloudflare's bot-challenge and comes
+        # back empty, showing genuinely inconsistent data across cards
+        # in the same refresh. See PROJECT_STATUS.md's Dashboard Data
+        # bugfix entries (there is no local fallback schedule anymore -
+        # a blocked/empty live fetch means "DATA UNAVAILABLE", never a
+        # fabricated time).
         schedule = self.api.get_schedule()
 
         self.load_world_boss(schedule)
@@ -1167,14 +1168,20 @@ class MainWindow(FluentWindow):
     # ---------------------------------------------------------
 
     @staticmethod
-    def _subtitle(base: str, entry: dict) -> str:
-        """Append an 'estimated' marker when an entry came from the local
-        fallback schedule instead of the live helltides.com API."""
+    def _show_data_unavailable(card, default_title: str):
+        """Dashboard Live Data bugfix: the honest state for an event card
+        when the live helltides.com API couldn't be reached/returned
+        nothing - this used to silently leave the card showing whatever
+        (possibly stale, possibly fabricated-by-the-now-removed-local-
+        fallback) data it last had. Never invents a time - the app has
+        no reliable way to compute Diablo 4's real World Boss/Legion/
+        Helltide schedule on its own, so it says so plainly instead."""
 
-        if entry and entry.get("estimated"):
-            return f"{base} (estimated)"
-
-        return base
+        card.set_title(default_title)
+        card.set_subtitle("DATA UNAVAILABLE")
+        card.set_status("Live schedule unavailable right now.")
+        card.set_timer("--:--:--")
+        card.set_progress(0)
 
     # ---------------------------------------------------------
     # WORLD BOSS
@@ -1184,13 +1191,14 @@ class MainWindow(FluentWindow):
 
         self.current_boss = self.api.get_next_world_boss(schedule)
 
-        if not self.current_boss:
-            return
-
         card = self.dashboard.world_boss_card
 
+        if not self.current_boss:
+            self._show_data_unavailable(card, "World Boss")
+            return
+
         card.set_title(self.current_boss['boss'])
-        card.set_subtitle(self._subtitle("Next Spawn", self.current_boss))
+        card.set_subtitle("Next Spawn")
 
         zone = self.current_boss["zone"][0]["name"]
 
@@ -1210,13 +1218,14 @@ class MainWindow(FluentWindow):
 
         self.current_legion = self.api.get_next_legion(schedule)
 
-        if not self.current_legion:
-            return
-
         card = self.dashboard.legion_card
 
+        if not self.current_legion:
+            self._show_data_unavailable(card, "Legion")
+            return
+
         card.set_title("LEGION")
-        card.set_subtitle(self._subtitle("Next Event", self.current_legion))
+        card.set_subtitle("Next Event")
 
         start = datetime.fromisoformat(
             self.current_legion["startTime"].replace("Z", "+00:00")
@@ -1234,13 +1243,14 @@ class MainWindow(FluentWindow):
 
         self.current_helltide = self.api.get_next_helltide(schedule)
 
-        if not self.current_helltide:
-            return
-
         card = self.dashboard.helltide_card
 
+        if not self.current_helltide:
+            self._show_data_unavailable(card, "Helltide")
+            return
+
         card.set_title("HELLTIDE")
-        card.set_subtitle(self._subtitle("Next Start", self.current_helltide))
+        card.set_subtitle("Next Start")
 
         start = datetime.fromisoformat(
             self.current_helltide["startTime"].replace("Z", "+00:00")

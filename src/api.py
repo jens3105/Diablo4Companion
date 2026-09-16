@@ -1,8 +1,6 @@
 import requests
 from datetime import datetime, timezone
 
-from src import local_schedule
-
 
 class DiabloAPI:
 
@@ -20,12 +18,20 @@ class DiabloAPI:
     def get_schedule(self):
         """Fetch the live schedule from helltides.com.
 
-        If the request fails, or succeeds but comes back with no usable
-        entries (e.g. blocked by Cloudflare's bot challenge, which
-        happens to plain HTTP clients regardless of network/VPN), fall
-        back to a locally-calculated schedule instead of leaving the
-        dashboard empty. Every entry in that fallback is tagged
-        ``"estimated": True`` so the UI can be honest about it.
+        Dashboard Live Data bugfix: this used to fall back to a locally
+        calculated, fixed-interval-based schedule (``src/local_schedule.py``,
+        now deleted) whenever the live request failed - confirmed by the
+        user's own real in-game comparison to be wildly inaccurate (Diablo
+        4's real World Boss/Legion/Helltide cadence is not the simple fixed
+        interval that fallback assumed), and worse, presented as a real
+        countdown with only a small "(estimated)" label most users would
+        never notice on a fast-moving timer. NEVER inventing an event time
+        is more important than always having something to show - if the
+        live API can't be reached or returns nothing, this returns an
+        empty schedule and every caller already handles that as "no data"
+        (see ``get_next_world_boss``/etc. returning ``None``, and the
+        Dashboard cards/Upcoming Events showing "DATA UNAVAILABLE" for
+        that), never a guessed time.
         """
 
         try:
@@ -36,12 +42,12 @@ class DiabloAPI:
             if data.get("world_boss") or data.get("legion") or data.get("helltide"):
                 return data
 
-            print("helltides.com svarede, men uden nogen events - bruger lokalt beregnet estimat.")
+            print("helltides.com svarede, men uden nogen events - ingen data tilgaengelig.")
 
         except requests.RequestException as exc:
-            print(f"Kunne ikke hente schedule fra helltides.com: {exc} - bruger lokalt beregnet estimat.")
+            print(f"Kunne ikke hente schedule fra helltides.com: {exc} - ingen data tilgaengelig.")
 
-        return local_schedule.build_schedule()
+        return {"world_boss": [], "legion": [], "helltide": []}
 
     # -----------------------------
     # World Boss
@@ -56,9 +62,8 @@ class DiabloAPI:
             # Defensive: the live API tags every entry with its own
             # "type" field (confirmed live 2026-09-16 via a real browser
             # session, since requests/WebFetch both get blocked by
-            # Cloudflare's bot-challenge before ever seeing a response -
-            # see local_schedule.py's module docstring for the same
-            # limitation). Skip anything that doesn't actually claim to
+            # Cloudflare's bot-challenge before ever seeing a response).
+            # Skip anything that doesn't actually claim to
             # be a world_boss entry rather than trust the outer
             # "world_boss" key alone - this is the root-cause fix for
             # the class of bug where one event type's card could end up
@@ -140,7 +145,6 @@ class DiabloAPI:
                     "name": boss["boss"],
                     "location": zone_list[0]["name"] if zone_list else None,
                     "icon": "🌍",
-                    "estimated": boss.get("estimated", False),
                 })
 
         for legion in schedule["legion"]:
@@ -154,7 +158,6 @@ class DiabloAPI:
                     "name": None,
                     "location": None,
                     "icon": "👹",
-                    "estimated": legion.get("estimated", False),
                 })
 
         for helltide in schedule["helltide"]:
@@ -168,7 +171,6 @@ class DiabloAPI:
                     "name": None,
                     "location": None,
                     "icon": "🔥",
-                    "estimated": helltide.get("estimated", False),
                 })
 
         events.sort(key=lambda x: x["timestamp"])
