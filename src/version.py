@@ -27,4 +27,4 @@ there is no second hardcoded copy anywhere in the project:
   define (e.g. an ad hoc local ``ISCC`` invocation).
 """
 
-__version__ = "1.0.6"
+__version__ = "1.0.7"
