@@ -4,7 +4,81 @@ _Sidst opdateret: 2026-09-16_
 
 ## Current phase
 
-**Windows Product Phase W10 — Build Data Updates** — **DONE.**
+**Production Validation — First Real Release (v1.0.1)** — **Server-side
+delen er DONE og bekræftet med ægte, levende data. Den fulde Windows-
+klik-igennem-test kræver brugerens egen hånd på en rigtig Windows-PC —
+se "Krævede manuelle Windows-tests" nedenfor, ikke udført herfra.**
+
+### Hvad der blev gjort
+
+1. **Version bumpet 1.0.0 → 1.0.1** (`9385f0a`) — ren version-bump, ingen
+   funktionsændring, specifikt til denne validering.
+2. **Reel CI-fejl fundet og rettet FØR release:** push'et fra W10 (som
+   tilføjede `builds/manifest.json`, en 27. reel `.json`-fil) udløste
+   automatisk en Windows-build der **fejlede** — CI's "Verify installed
+   files"-step havde et hardcodet `-ne 26`-tjek fra før W10 fandtes.
+   Rettet minimalt (`30f69d4`): det forventede antal udledes nu af det
+   faktiske kildetræs `builds/*.json`-antal i stedet for et hardcodet
+   tal, så det ikke kan drifte ud af sync igen. Ny kørsel (`35073222236`)
+   **bestået**.
+3. **Rigtig GitHub Release oprettet:** `v1.0.1`, bygget fra commit
+   `30f69d4` via den EKSISTERENDE Windows-pipeline (ingen manuel build)
+   — `Diablo4Companion-Setup.exe` (39 370 464 bytes) +
+   `Diablo4Companion-Setup.exe.sha256`. Uafhængigt bekræftet: SHA256 i
+   den uploadede checksum-fil matcher en selvstændigt genberegnet
+   `sha256sum` af den downloadede .exe, 100% identisk.
+   `isDraft: false`, `isPrerelease: false` (bekræftet via `gh release
+   view --json`) — nødvendigt for at `GET .../releases/latest` (det
+   endpoint appens Check for Updates rent faktisk bruger) overhovedet
+   finder den.
+4. **Server-side flow bekræftet med ægte, levende data** (headless,
+   simulerede en installeret 1.0.0-app): "Check for Updates" mod den
+   RIGTIGE, nyoprettede v1.0.1-release viste korrekt "A newer version is
+   available: v1.0.1 (currently on 1.0.0)", viste "Update Now"-knappen,
+   og `find_installer_asset`/`find_checksum_asset` fandt begge de
+   rigtige assets (præcist navn + størrelse) fra det rigtige release-
+   objekt — ikke mocket, en ægte GitHub API-response.
+
+### Krævede manuelle Windows-tests (kan IKKE udføres herfra)
+
+Følgende kræver en rigtig installeret Windows-app på en rigtig
+Windows-PC og er **ikke** udført af denne session:
+
+1. Installér `Diablo4Companion-Setup.exe` fra
+   https://github.com/jens3105/Diablo4Companion/releases/tag/v1.0.1
+   som var det en frisk 1.0.0-lignende installation (eller: sæt
+   `src/version.py` midlertidigt til `"1.0.0"` lokalt før du bygger/
+   installerer en test-forgænger, hvis du vil teste en ægte
+   1.0.0→1.0.1-opgradering — dokumentér selv hvilken du valgte).
+2. Åbn appen → Settings → bekræft "Current version: 1.0.0" (eller
+   hvad end forgænger-versionen var).
+3. Tryk "Check for Updates" → bekræft "A newer version is available:
+   v1.0.1 ...".
+4. Tryk "Update Now" → observér hele forløbet: Preparing (backup) →
+   Downloading → Verifying → Installing → Restarting.
+5. Bekræft appen lukker og genstarter (Inno Setups egen "Launch"-
+   checkbox ved enden af wizarden).
+6. Settings → bekræft "Current version: 1.0.1".
+7. Test Dashboard (World Boss/Helltide/Legion/Upcoming Events).
+8. Test mindst 2-3 builds i Build Guide.
+9. Test Paragon, Gear Builder, Gems, Tempering, Build Advisor.
+10. Settings → "Build Data"-sektionen → bekræft version vises korrekt,
+    og at "Check for Build Data Updates" stadig fungerer uafhængigt af
+    app-opdateringen der lige skete.
+
+**Rollback:** W9's backup/cleanup/restore-mekanik er allerede
+uafhængigt verificeret mod en RIGTIG Windows-installation i CI (se W9-
+sektionen nedenfor, run `35068798145`) — men en levende "opdatering
+fejler reelt og rollback redder dagen"-test er bevidst IKKE forsøgt
+her: det ville enten kræve en ægte, uforudset fejl, eller at denne
+session bevidst udgiver en ødelagt release for at fremprovokere en
+fejl — det sidste er præcis den "risikable manipulation af production-
+installationen" fasen selv advarer imod, så det er ikke gjort uden din
+eksplicitte anmodning.
+
+---
+
+**Tidligere fase:** Windows Product Phase W10 — Build Data Updates — **DONE.**
 
 Et helt separat opdateringssystem for Diablo 4 build-JSON-filerne
 (`builds/*.json`), fuldstændig uafhængigt af app-versions-opdateringen
@@ -519,7 +593,10 @@ Windows Product Phase W10 — Build Data Updates (denne fase).
 
 ## Last commit
 
-`f2ba7ad` — "Windows Product Phase W10: Build Data Updates" (pushet).
+`30f69d4` — "Fix Windows CI: derive expected builds/*.json count from
+source, not a hardcoded 26" (pushet). Fulde Production Validation-
+kæde: `9385f0a` (version 1.0.1) → `30f69d4` (CI-fix). GitHub Release
+`v1.0.1` oprettet separat (ikke et commit — se ovenfor).
 
 Branch: `feature/dashboard-v2` (repoets eneste/default branch — der er
 ikke noget `main`, det er normalt for dette repo).
@@ -867,9 +944,11 @@ scope.
 
 ## Next phase
 
-Ingen planlagt. **W10 (Build Data Updates) er nu DONE. W5-W9 forbliver
-DONE, uændrede. Character State er stadig ON HOLD.** Vent på konkret
-instruktion fra brugeren (se PROJECT_ROADMAP.md's regel: "Start ikke
+Ingen planlagt. **Production Validation (server-side) er DONE. W5-W10
+forbliver DONE, uændrede. Den fulde Windows-klik-igennem-test (se
+"Krævede manuelle Windows-tests" ovenfor) venter på brugeren.
+Character State er stadig ON HOLD.** Vent på konkret instruktion fra
+brugeren (se PROJECT_ROADMAP.md's regel: "Start ikke
 næste roadmap-fase uden en konkret instruktion"). Mulig fremtidig
 opfølgning (ikke startet, kræver eksplicit instruktion): rette
 `leveling_manager.py`'s frozen-path-logik til selv at være
@@ -877,6 +956,10 @@ opfølgning (ikke startet, kræver eksplicit instruktion): rette
 
 ## Kort changelog (seneste faser, nyeste øverst)
 
+- `v1.0.1` (GitHub Release) — Production Validation: første rigtige,
+  publicerede release. Server-side flow (Check for Updates → asset-
+  identifikation) bekræftet med ægte live-data. `30f69d4` fandt/rettede
+  en reel CI-regression (hardcodet 26-fil-tjek) forud for releasen.
 - `f2ba7ad` — Windows Product Phase W10: Build Data Updates. Ny
   `builds/manifest.json` (26 filer + dato-version) + ny
   `src/build_data_updater.py` (fetch/read/download-verify-atomisk-
