@@ -1,26 +1,37 @@
 """Fetches the real, live Diablo 4 event schedule from helltides.com using
-a real (headless) browser context, and republishes it as a small canonical
-JSON file committed to this repo (``data/live_schedule.json``).
+a real (headless) browser context, and reshapes it into a small canonical
+JSON structure ({"source", "fetched_at", "events": [...]})..
 
-Why a browser and not a plain HTTP client: ``helltides.com/api/schedule``
-sits behind a genuine Cloudflare fingerprint-level check that blocks plain
-HTTP clients (``requests``, ``curl``, even a full set of ordinary browser
-headers) with a 403 - confirmed by direct testing, not assumed. A real
-browser passes this naturally, the same way any human visitor's browser
-does - this is not a bypass of any access control, it's simply using the
-public site the way it's meant to be used, automated on a schedule instead
-of by a human clicking refresh. Never scrapes anything not already shown
-to any visitor of the public page; never touches auth, a CAPTCHA, or any
-protected content.
+**CONFIRMED NOT VIABLE FROM ANY CLOUD/CI INFRASTRUCTURE - do not wire this
+into a GitHub Actions cron job.** helltides.com/api/schedule sits behind a
+Cloudflare check that blocks not just plain HTTP clients (requests/curl,
+even with a full set of ordinary browser headers - 403 every time) but
+ALSO a real, unmodified headless Chromium running via Playwright, tested
+for real on an actual GitHub Actions ubuntu-latest runner (a genuinely
+different network than this project's dev sandbox) - still a 403. This
+means the block is not (only) about "looks like a script" or "looks
+headless" - it very likely also scores by IP reputation, and GitHub
+Actions' runner IP ranges are well-known datacenter ranges many Cloudflare
+configurations deprioritize/block outright. No further header/fingerprint
+tweaking was attempted past this point - that would cross into the
+fingerprint-spoofing/bypass territory this project has explicitly ruled
+out, not just a compatibility issue to engineer around.
 
-Run from repo root (with ``playwright`` + Chromium installed):
+This script's fetch+reshape LOGIC is still real and correct (confirmed
+against real helltides.com data earlier in this project) and is kept as
+a reusable building block IF a legitimate way to run it from a
+non-datacenter IP is ever found (e.g. manually, or on a schedule, from a
+real residential machine's own browser context - not attempted or
+promised as a shipped feature). It is not currently wired into any
+workflow or into the running desktop app. See PROJECT_STATUS.md's
+"Diablo 4 Live Event Data" entries for the full investigation and
+current honest conclusion (DATA UNAVAILABLE is the correct terminal
+state, not a stopgap).
+
+Run from repo root (with ``playwright`` + Chromium installed) purely for
+manual experimentation:
 
     python scripts/fetch_live_schedule.py
-
-Meant to run on a schedule via ``.github/workflows/live-schedule-sync.yml``
-- not imported by the running desktop app itself (same pattern as
-``maxroll_data_decoder.py``: an offline data-generation helper, not
-application code).
 """
 
 from __future__ import annotations
