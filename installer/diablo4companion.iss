@@ -97,6 +97,40 @@ Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{group}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
+[Code]
+// V1.0.3 icon fix: 1.0.2 and earlier shipped with NO custom icon at all
+// (Inno Setup's/PyInstaller's generic default), so upgrading an existing
+// 1.0.2 install to 1.0.3 in place (same install path, same exe name -
+// exactly what this app's own in-app updater does) replaces the exe's
+// icon resource on disk, but Windows Explorer's shell icon cache is keyed
+// by file path and does not automatically notice/invalidate on a plain
+// file overwrite. This is why Programs and Features already shows the
+// new icon correctly (it re-reads UninstallDisplayIcon fresh each time
+// that page opens) while Desktop/Start Menu shortcuts and the taskbar can
+// keep showing the old cached (generic) icon until the shell is told to
+// refresh - a real, documented Windows shell behavior, not a defect in
+// this app's icon/shortcut configuration (verified separately: the
+// installed .ico is a valid, correctly-sized multi-resolution icon, and
+// is correctly embedded into both Diablo4Companion.exe and Setup.exe).
+//
+// Fix: SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL) is
+// the standard Win32 Shell API call (documented by Microsoft, and Inno
+// Setup's own FAQ recommends the same call for this exact symptom) that
+// tells Explorer to refresh its icon/association cache - no cache files
+// are deleted, nothing else is touched.
+procedure SHChangeNotify(wEventId: Longint; uFlags: Integer; dwItem1: Longint; dwItem2: Longint);
+external 'SHChangeNotify@shell32.dll stdcall';
+
+const
+  SHCNE_ASSOCCHANGED = $08000000;
+  SHCNF_IDLIST = $0000;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if CurStep = ssPostInstall then
+    SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
+end;
+
 [Run]
 ; Windows Product Phase W8: Inno Setup's own built-in "launch after
 ; install" mechanism - deliberately used instead of a custom

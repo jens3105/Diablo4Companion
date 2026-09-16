@@ -10,8 +10,10 @@ from PySide6.QtCore import QSettings, Qt, QTimer
 from PySide6.QtGui import QGuiApplication, QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QApplication,
+    QDialog,
     QHBoxLayout,
     QInputDialog,
+    QLabel,
     QVBoxLayout,
     QWidget,
 )
@@ -22,6 +24,8 @@ from qfluentwidgets import (
     ComboBox,
     FluentIcon as FIF,
     FluentWindow,
+    InfoBadge,
+    InfoBadgePosition,
     InfoBar,
     InfoBarPosition,
     NavigationItemPosition,
@@ -46,6 +50,7 @@ from src.leveling_card import LevelingCard
 from src.managers.leveling_manager import LevelingManager
 from src.paragon_interface import RARITY_LABELS, ParagonCard, ParagonInterface
 from src.quick_search import QuickSearchDialog
+from src.update_dialog import UpdateAvailableDialog
 
 
 # App update check (Windows Product Phase W5): GitHub Releases is the
@@ -78,6 +83,53 @@ def _parse_semver(version_text: str) -> tuple[int, int, int] | None:
         return None
 
     return tuple(int(p) for p in parts)
+
+
+def _check_for_newer_release(timeout=8):
+    """Single shared implementation of "fetch the latest GitHub Release
+    and compare it against the running app version" - used by BOTH
+    ``SettingsInterface._on_check_updates_clicked`` (explicit button)
+    and ``MainWindow``'s automatic startup check, so there is exactly
+    one place that talks to the GitHub Releases API for app-update
+    purposes (never a second, slightly-different copy of this logic).
+
+    Returns ``(status, data)`` where ``status`` is one of
+    ``"update_available"``, ``"up_to_date"``, ``"no_releases"``,
+    ``"network_error"``, ``"unparseable"``, and ``data`` is the full
+    release dict when one was actually fetched (``None`` for
+    ``"no_releases"``/``"network_error"``).
+    """
+
+    try:
+        response = requests.get(GITHUB_RELEASES_API_URL, timeout=timeout)
+
+        if response.status_code == 404:
+            # No GitHub Release has been published yet - an honest,
+            # expected state, not a network error or a bug.
+            return "no_releases", None
+
+        response.raise_for_status()
+        data = response.json()
+
+        remote_tag = data.get("tag_name", "")
+        if not remote_tag:
+            return "unparseable", data
+
+        remote_version = _parse_semver(remote_tag)
+        local_version = _parse_semver(__version__)
+
+        if remote_version is None or local_version is None:
+            # Never guess which is newer.
+            return "unparseable", data
+
+        if remote_version > local_version:
+            return "update_available", data
+
+        return "up_to_date", data
+
+    except (requests.RequestException, ValueError) as exc:
+        print(f"Kunne ikke tjekke for opdateringer: {exc}")
+        return "network_error", None
 
 
 class BuildsInterface(QWidget):
@@ -228,6 +280,18 @@ class SettingsInterface(QWidget):
         self.update_status_label.hide()
         layout.addWidget(self.update_status_label)
 
+        # Release notes for a found update - GitHub Release ``body`` is
+        # the single, central changelog source (no per-version changelog
+        # ever hardcoded here). Rendered as Markdown (Qt's built-in
+        # QLabel Markdown support) since that's exactly the format
+        # GitHub Release bodies are written in. Hidden whenever there is
+        # nothing to show.
+        self.update_release_notes_label = QLabel("", self)
+        self.update_release_notes_label.setWordWrap(True)
+        self.update_release_notes_label.setTextFormat(Qt.TextFormat.MarkdownText)
+        self.update_release_notes_label.hide()
+        layout.addWidget(self.update_release_notes_label)
+
         # Windows Product Phase W7: the confirmed newer-release payload
         # (the full GitHub Releases API object, not just its tag) once
         # _on_check_updates_clicked finds one - the target W8's actual
@@ -332,76 +396,82 @@ class SettingsInterface(QWidget):
         theme.set_appearance(theme.current_mode(), preset)
 
     def _on_check_updates_clicked(self):
+        """Explicit user-triggered check. Reuses the exact same
+        ``_check_for_newer_release`` function the automatic startup
+        check calls (see ``MainWindow``) - never a second copy of the
+        fetch/compare logic - and, unlike the passive startup check,
+        always re-shows the "New version available" popup when it finds
+        one (an explicit click is never spam)."""
 
         self.check_updates_button.setEnabled(False)
         self.check_updates_button.setText("Checking...")
         self.update_status_label.setText("Checking GitHub Releases for updates...")
         self.update_status_label.show()
-        # Windows Product Phase W7: every check starts by clearing any
-        # previously-confirmed update target and hiding "Update Now" -
-        # re-armed below only if THIS check finds a genuinely newer
-        # release. Never leaves a stale target visible/actionable from
-        # an earlier click.
-        self._pending_update_release = None
-        self.update_now_button.hide()
         # Force the "Checking..." state to actually paint before the
         # (blocking) network call below - same synchronous-call style
         # DiabloAPI.get_schedule uses, just with the UI given a chance to
         # repaint first since this runs off a click instead of a timer.
         QApplication.processEvents()
 
-        try:
-            response = requests.get(GITHUB_RELEASES_API_URL, timeout=8)
+        status, data = _check_for_newer_release()
+        self.apply_release_check_result(status, data)
 
-            if response.status_code == 404:
-                # No GitHub Release has been published yet (true today -
-                # release automation is a later phase, W2/W3/W4 only ever
-                # produced CI build artifacts, not a Release). Not a
-                # network error, not a bug - an honest, expected state.
-                self.update_status_label.setText(
-                    "No published releases found yet."
-                )
-                return
+        self.check_updates_button.setEnabled(True)
+        self.check_updates_button.setText("Check for Updates")
 
-            response.raise_for_status()
-            data = response.json()
+        if status == "update_available":
+            main_window = self.window()
+            if main_window is not None and hasattr(main_window, "show_update_available_dialog"):
+                main_window.show_update_available_dialog(data, force=True)
 
-            remote_tag = data.get("tag_name", "")
-            if not remote_tag:
-                raise ValueError("GitHub Release havde ingen tag_name")
+    def apply_release_check_result(self, status: str, data: dict | None):
+        """Applies the outcome of ``_check_for_newer_release`` to this
+        page's widgets - the single place both the manual "Check for
+        Updates" button and MainWindow's automatic startup check update
+        this UI, so the Settings page always reflects the most recent
+        check regardless of which of the two triggered it.
 
-            remote_version = _parse_semver(remote_tag)
-            local_version = _parse_semver(__version__)
+        Windows Product Phase W7: ``self._pending_update_release`` is
+        cleared here first and only ever re-armed by the
+        ``"update_available"`` branch - never left stale/actionable from
+        an earlier check.
+        """
 
-            if remote_version is None or local_version is None:
-                # Can't safely compare - never guess which is newer, and
-                # never offer "Update Now" for an unconfirmed target.
-                self.update_status_label.setText(
-                    f"Latest release: {remote_tag} (current: {__version__}) - "
-                    f"could not compare versions automatically."
-                )
-            elif remote_version > local_version:
-                release_name = (data.get("name") or remote_tag).strip()
-                self.update_status_label.setText(
-                    f"A newer version is available: {release_name} "
-                    f"(currently on {__version__})."
-                )
-                # W7: this is the ONLY branch that ever arms "Update Now" -
-                # a confirmed newer release, nothing else.
-                self._pending_update_release = data
-                self.update_now_button.show()
-            else:
-                self.update_status_label.setText(f"Up to date (version {__version__}).")
+        self._pending_update_release = None
+        self.update_now_button.hide()
+        self.update_release_notes_label.hide()
+        self.update_release_notes_label.setText("")
 
-        except (requests.RequestException, ValueError) as exc:
-            print(f"Kunne ikke tjekke for opdateringer: {exc}")
+        if status == "no_releases":
+            # No GitHub Release has been published yet - an honest,
+            # expected state, not a network error or a bug.
+            self.update_status_label.setText("No published releases found yet.")
+        elif status == "network_error":
             self.update_status_label.setText(
                 "Could not check for updates (network error) - try again later."
             )
+        elif status == "unparseable":
+            remote_tag = (data or {}).get("tag_name", "unknown")
+            self.update_status_label.setText(
+                f"Latest release: {remote_tag} (current: {__version__}) - "
+                f"could not compare versions automatically."
+            )
+        elif status == "update_available":
+            release_name = (data.get("name") or data.get("tag_name") or "").strip()
+            self.update_status_label.setText(f"Version {release_name} is available.")
+            release_notes = (data.get("body") or "").strip()
+            self.update_release_notes_label.setText(
+                release_notes or "No release notes were provided for this version."
+            )
+            self.update_release_notes_label.show()
+            # W7: this is the ONLY branch that ever arms "Update Now" -
+            # a confirmed newer release, nothing else.
+            self._pending_update_release = data
+            self.update_now_button.show()
+        else:  # "up_to_date"
+            self.update_status_label.setText("You're running the latest version.")
 
-        finally:
-            self.check_updates_button.setEnabled(True)
-            self.check_updates_button.setText("Check for Updates")
+        self.update_status_label.show()
 
     def _on_update_now_clicked(self):
         """Windows Product Phase W8: the real download -> verify ->
@@ -985,6 +1055,18 @@ class MainWindow(FluentWindow):
         if self._startup_update_notice:
             QTimer.singleShot(300, self._show_pending_update_notice)
 
+        # App-update notification: passive, automatic check for a newer
+        # GitHub Release - deferred past window-show so it never blocks
+        # startup on a slow/failed network call (same reasoning as the
+        # two deferred notices just above). Session-scoped state only
+        # (never persisted): the big popup shows at most once per run
+        # unless the user explicitly clicks "Check for Updates" again
+        # (see show_update_available_dialog's ``force`` parameter) -
+        # "INFORMER, IKKE SPAM".
+        self._update_notification_shown = False
+        self._update_info_badge = None
+        QTimer.singleShot(800, self._check_for_app_update_on_startup)
+
     # ---------------------------------------------------------
     # Windows Product Phase W9 -- Safe Rollback (startup check)
     # ---------------------------------------------------------
@@ -1067,6 +1149,84 @@ class MainWindow(FluentWindow):
             duration=10000,
             parent=self,
         )
+
+    # ---------------------------------------------------------
+    # App-update notification (New version available popup + indicator)
+    # ---------------------------------------------------------
+
+    def _check_for_app_update_on_startup(self):
+        """Passive, automatic app-update check - fires once shortly
+        after the window is shown (see the ``QTimer.singleShot`` call in
+        ``__init__``, which keeps this off the startup critical path).
+
+        Calls the exact same ``_check_for_newer_release`` function
+        ``SettingsInterface``'s "Check for Updates" button uses - never
+        a second copy of the fetch/compare logic - and always syncs the
+        Settings page's own status/release-notes display, regardless of
+        whether the popup ends up shown."""
+
+        status, data = _check_for_newer_release()
+        self.settings_interface.apply_release_check_result(status, data)
+
+        if status == "update_available":
+            self.show_update_available_dialog(data, force=False)
+        else:
+            self._set_update_indicator_visible(False)
+
+    def show_update_available_dialog(self, release: dict, force: bool):
+        """Shows the "New version available" popup for ``release``.
+
+        ``force=False`` (the automatic startup check): shows at most
+        once per running session - "INFORMER, IKKE SPAM" - the discreet
+        nav-bar indicator (``_set_update_indicator_visible``) stays
+        visible regardless, so the update is always easy to find even
+        after the popup is dismissed with "Later".
+
+        ``force=True`` (the user explicitly clicked "Check for
+        Updates"): always shows it again, since an explicit click is
+        never spam.
+
+        "Update Now" always delegates to the Settings page's existing
+        ``_on_update_now_clicked`` - the app's one and only real
+        download/verify/install/restart pipeline - never a second copy
+        of it here."""
+
+        self._set_update_indicator_visible(True)
+
+        if not force and self._update_notification_shown:
+            return
+        self._update_notification_shown = True
+
+        dialog = UpdateAvailableDialog(__version__, release, self)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            self.switchTo(self.settings_interface)
+            self.settings_interface._on_update_now_clicked()
+
+    def _set_update_indicator_visible(self, visible: bool):
+        """Discreet update indicator on the Settings nav item (a small
+        ``InfoBadge`` dot - qfluentwidgets' standard, built-in pattern
+        for exactly this, via its dedicated ``NAVIGATION_ITEM``
+        position). Shown whenever a confirmed newer release exists,
+        removed once back on the latest version. Never itself a popup -
+        just makes an available update easy to notice without
+        re-showing the big dialog."""
+
+        if visible:
+            if self._update_info_badge is not None:
+                return
+            nav_item = self.navigationInterface.widget(self.settings_interface.objectName())
+            if nav_item is None:
+                return
+            self._update_info_badge = InfoBadge.attension(
+                text="!",
+                parent=self.navigationInterface,
+                target=nav_item,
+                position=InfoBadgePosition.NAVIGATION_ITEM,
+            )
+        elif self._update_info_badge is not None:
+            self._update_info_badge.hide()
+            self._update_info_badge.deleteLater()
+            self._update_info_badge = None
 
     # ---------------------------------------------------------
     # Theme / appearance

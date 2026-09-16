@@ -25,7 +25,32 @@ def _resolve_icon_path() -> str:
     return os.path.join(base_dir, "assets", "icon.ico")
 
 
+def _set_windows_app_user_model_id() -> None:
+    """Windows-only: gives the process a stable, explicit AppUserModelID
+    so the taskbar treats every launch of this app as the same identity
+    (correct grouping/pinning behavior) instead of Windows deriving one
+    implicitly from the exe path - the standard Microsoft-documented
+    fix (SetCurrentProcessExplicitAppUserModelID), unrelated to but
+    complementing the shell-icon-cache-refresh fix in
+    installer/diablo4companion.iss. Must be called before any window is
+    created. No-op (and safe) on non-Windows platforms."""
+
+    if sys.platform != "win32":
+        return
+
+    import ctypes
+
+    try:
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
+            "jens3105.Diablo4Companion.DesktopCompanion"
+        )
+    except Exception as exc:
+        print(f"Kunne ikke saette AppUserModelID: {exc}")
+
+
 def main():
+    _set_windows_app_user_model_id()
+
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon(_resolve_icon_path()))
 
