@@ -2,7 +2,60 @@
 
 _Sidst opdateret: 2026-09-16_
 
-## Current phase — Dashboard Live Data: legitim kilde-undersøgelse afsluttet
+## Current phase — Dashboard Live Data: foreslået løsning testet og MODBEVIST
+
+**Opdatering til gårsdagens research-konklusion:** Den anbefalede
+arkitektur ("skemalagt GitHub Action + rigtig headless browser →
+republicerer til `raw.githubusercontent.com`") blev rent faktisk
+**bygget og testet** — og **fejlede** med ægte bevis.
+
+**Test udført:** `scripts/fetch_live_schedule.py` (Playwright + rigtig
+Chromium) kørt på en ægte GitHub Actions `ubuntu-latest`-runner (ikke
+denne udviklings-sandbox, hvis IP allerede vides blokeret). Resultat:
+**stadig 403** — samme blokering som en almindelig `requests`-klient
+får.
+
+**Konklusion (opdateret, evidensbaseret):** Blokeringen er sandsynligvis
+ikke kun "ligner et script" (allerede udelukket: alm. `requests`/`curl`,
+selv med fulde browser-headers, giver alle 403) eller
+"ligner headless" — den scorer højst sandsynligt OGSÅ efter
+IP-omdømme, og GitHub Actions' runner-IP-ranges er velkendte
+datacenter-ranges mange Cloudflare-konfigurationer nedprioriterer/
+blokerer. Yderligere fingerprint-/header-spoofing blev IKKE forsøgt
+herfra — det ville være en reel omgåelse af Cloudflares beskyttelse,
+udelukket fra start, ikke et kompatibilitetsproblem at omgå.
+
+**Det midlertidige test-workflow er fjernet** (`eb4eecb`) — det
+byggede på en nu-modbevist antagelse. `scripts/fetch_live_schedule.py`s
+hente-/omform-logik er bevaret (dens docstring opdateret til at sige
+det tydeligt) som en genbrugelig byggesten, HVIS en legitim måde at
+køre den fra en ikke-datacenter-IP nogensinde findes — ikke leveret,
+ikke lovet, ikke koblet til noget lige nu.
+
+**Reelt tilbageværende, legitime muligheder** (ingen implementeret
+endnu, kræver brugerens stillingtagen):
+1. Direkte henvendelse til helltides.com's ejere om en API-aftale/
+   whitelisting — en menneskelig/kommunity-handling, ikke noget kode
+   kan løse.
+2. En rigtig browser-kontekst der kører fra en IKKE-datacenter-IP —
+   fx brugerens egen computer (ikke en cloud-tjeneste) — men dette er
+   utestet og ville kræve brugerens egen maskine til at køre noget
+   periodisk, hvilket er en anden kompleksitet end den oprindeligt
+   foreslåede "usynlig baggrunds-pipeline".
+3. Acceptere **DATA UNAVAILABLE som den korrekte, endelige tilstand**
+   (allerede implementeret, `b08db7d`) — ikke en midlertidig fallback,
+   men den ærlige konsekvens af at den eneste kendte datakilde er
+   teknisk utilgængelig for enhver form for automatiseret, cloud-hostet
+   løsning uden at krydse ind i forbudt omgåelses-territorium.
+
+**Ingen kodeændring i selve appen i denne fase** — kun forsknings-
+infrastrukturen (test-script/-workflow) blev tilføjet og efterfølgende
+oprydnings-committet. `get_schedule()` viser fortsat ærligt DATA
+UNAVAILABLE, uændret fra forrige fase.
+
+---
+
+## Tidligere fase — Dashboard Live Data: legitim kilde-undersøgelse afsluttet
 
 Efter at `local_schedule.py`-fabrikationen blev fjernet (`b08db7d`),
 blev det undersøgt om der findes en LEGITIM måde for selve den
