@@ -1,0 +1,32 @@
+name: TEST - Live schedule fetch feasibility
+
+# Temporary, manual-only test workflow: proves or disproves whether a
+# real (headless) browser running on a GitHub Actions runner can
+# actually get past helltides.com's Cloudflare check, before building
+# the full recurring-cron republishing pipeline around that assumption.
+# To be removed once the answer is known either way.
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  test-fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Playwright + Chromium
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+
+      - name: Attempt real fetch via headless browser
+        run: python scripts/fetch_live_schedule.py
+
+      - name: Show result if successful
+        if: success()
+        run: cat data/live_schedule.json
