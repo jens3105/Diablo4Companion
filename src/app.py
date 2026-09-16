@@ -693,10 +693,23 @@ class MainWindow(FluentWindow):
         self.navigationInterface.setReturnButtonVisible(False)
         self.navigationInterface.expand(useAni=False)
 
-        self.load_world_boss()
-        self.load_legion()
-        self.load_helltide()
-        self.load_upcoming_events()
+        # Dashboard data bugfix: fetch the schedule ONCE and hand the
+        # exact same snapshot to all four consumers below, instead of
+        # each independently calling self.api.get_schedule() (four
+        # separate HTTP requests within milliseconds of each other).
+        # Beyond being wasteful, that could let one card's fetch hit
+        # helltides.com's live API while another's fetch - moments
+        # later - gets blocked by Cloudflare's bot-challenge and falls
+        # back to the locally-estimated schedule, showing genuinely
+        # inconsistent (different source, different clock) data across
+        # cards in the same refresh. See PROJECT_STATUS.md's Dashboard
+        # Data bugfix entry.
+        schedule = self.api.get_schedule()
+
+        self.load_world_boss(schedule)
+        self.load_legion(schedule)
+        self.load_helltide(schedule)
+        self.load_upcoming_events(schedule)
         self.load_season_15()
 
         self.leveling_card.set_characters(self.characters, self.active_character_id)
@@ -949,9 +962,9 @@ class MainWindow(FluentWindow):
     # WORLD BOSS
     # ---------------------------------------------------------
 
-    def load_world_boss(self):
+    def load_world_boss(self, schedule=None):
 
-        self.current_boss = self.api.get_next_world_boss()
+        self.current_boss = self.api.get_next_world_boss(schedule)
 
         if not self.current_boss:
             return
@@ -975,9 +988,9 @@ class MainWindow(FluentWindow):
     # LEGION
     # ---------------------------------------------------------
 
-    def load_legion(self):
+    def load_legion(self, schedule=None):
 
-        self.current_legion = self.api.get_next_legion()
+        self.current_legion = self.api.get_next_legion(schedule)
 
         if not self.current_legion:
             return
@@ -999,9 +1012,9 @@ class MainWindow(FluentWindow):
     # HELLTIDE
     # ---------------------------------------------------------
 
-    def load_helltide(self):
+    def load_helltide(self, schedule=None):
 
-        self.current_helltide = self.api.get_next_helltide()
+        self.current_helltide = self.api.get_next_helltide(schedule)
 
         if not self.current_helltide:
             return
@@ -3018,9 +3031,9 @@ class MainWindow(FluentWindow):
     # UPCOMING EVENTS
     # ---------------------------------------------------------
 
-    def load_upcoming_events(self):
+    def load_upcoming_events(self, schedule=None):
 
-        events = self.api.get_upcoming_events()
+        events = self.api.get_upcoming_events(schedule=schedule)
 
         self.dashboard.upcoming_card.set_events(events)
 
@@ -3044,8 +3057,9 @@ class MainWindow(FluentWindow):
 
             if seconds <= 0:
 
-                self.load_world_boss()
-                self.load_upcoming_events()
+                schedule = self.api.get_schedule()
+                self.load_world_boss(schedule)
+                self.load_upcoming_events(schedule)
 
             else:
 
@@ -3074,8 +3088,9 @@ class MainWindow(FluentWindow):
 
             if seconds <= 0:
 
-                self.load_legion()
-                self.load_upcoming_events()
+                schedule = self.api.get_schedule()
+                self.load_legion(schedule)
+                self.load_upcoming_events(schedule)
 
             else:
 
@@ -3102,8 +3117,9 @@ class MainWindow(FluentWindow):
             seconds = int((start - now).total_seconds())
 
             if seconds <= 0:
-                self.load_helltide()
-                self.load_upcoming_events()
+                schedule = self.api.get_schedule()
+                self.load_helltide(schedule)
+                self.load_upcoming_events(schedule)
             else:
                 hours = seconds // 3600
                 minutes = (seconds % 3600) // 60

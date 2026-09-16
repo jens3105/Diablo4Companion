@@ -47,12 +47,25 @@ class DiabloAPI:
     # World Boss
     # -----------------------------
 
-    def get_next_world_boss(self):
+    def get_next_world_boss(self, schedule=None):
 
-        schedule = self.get_schedule()
+        schedule = schedule if schedule is not None else self.get_schedule()
         now = datetime.now(timezone.utc).timestamp()
 
         for boss in schedule["world_boss"]:
+            # Defensive: the live API tags every entry with its own
+            # "type" field (confirmed live 2026-09-16 via a real browser
+            # session, since requests/WebFetch both get blocked by
+            # Cloudflare's bot-challenge before ever seeing a response -
+            # see local_schedule.py's module docstring for the same
+            # limitation). Skip anything that doesn't actually claim to
+            # be a world_boss entry rather than trust the outer
+            # "world_boss" key alone - this is the root-cause fix for
+            # the class of bug where one event type's card could end up
+            # displaying another type's fields if the API ever nests an
+            # unexpected entry under the wrong key.
+            if boss.get("type", "world_boss") != "world_boss":
+                continue
             if boss["timestamp"] > now:
                 return boss
 
@@ -62,12 +75,14 @@ class DiabloAPI:
     # Legion
     # -----------------------------
 
-    def get_next_legion(self):
+    def get_next_legion(self, schedule=None):
 
-        schedule = self.get_schedule()
+        schedule = schedule if schedule is not None else self.get_schedule()
         now = datetime.now(timezone.utc).timestamp()
 
         for legion in schedule["legion"]:
+            if legion.get("type", "legion") != "legion":
+                continue
             if legion["timestamp"] > now:
                 return legion
 
@@ -77,12 +92,14 @@ class DiabloAPI:
     # Helltide
     # -----------------------------
 
-    def get_next_helltide(self):
+    def get_next_helltide(self, schedule=None):
 
-        schedule = self.get_schedule()
+        schedule = schedule if schedule is not None else self.get_schedule()
         now = datetime.now(timezone.utc).timestamp()
 
         for helltide in schedule["helltide"]:
+            if helltide.get("type", "helltide") != "helltide":
+                continue
             if helltide["timestamp"] > now:
                 return helltide
 
@@ -92,36 +109,64 @@ class DiabloAPI:
     # Upcoming
     # -----------------------------
 
-    def get_upcoming_events(self, limit=5):
+    def get_upcoming_events(self, limit=8, schedule=None):
+        """Every real upcoming event across all 3 types, merged and
+        sorted by real start time. Each entry only ever carries fields
+        the live helltides.com schedule actually provides for that
+        event's own ``type`` - confirmed live (2026-09-16, via a real
+        browser session, see ``get_next_world_boss``'s comment): only
+        ``world_boss`` entries have a real ``boss`` name and a real
+        ``zone``; ``legion``/``helltide`` entries have neither, so
+        ``name``/``location`` are ``None`` for those (never a copied or
+        invented value from a different event type) - the UI layer
+        shows "DATA UNAVAILABLE" for a ``None`` here, it is never
+        silently left blank or filled with a guess.
+        """
 
-        schedule = self.get_schedule()
+        schedule = schedule if schedule is not None else self.get_schedule()
         now = datetime.now(timezone.utc).timestamp()
 
         events = []
 
         for boss in schedule["world_boss"]:
+            if boss.get("type", "world_boss") != "world_boss":
+                continue
             if boss["timestamp"] > now:
+                zone_list = boss.get("zone") or []
                 events.append({
+                    "type": "world_boss",
                     "timestamp": boss["timestamp"],
                     "title": boss["boss"],
+                    "name": boss["boss"],
+                    "location": zone_list[0]["name"] if zone_list else None,
                     "icon": "🌍",
                     "estimated": boss.get("estimated", False),
                 })
 
         for legion in schedule["legion"]:
+            if legion.get("type", "legion") != "legion":
+                continue
             if legion["timestamp"] > now:
                 events.append({
+                    "type": "legion",
                     "timestamp": legion["timestamp"],
                     "title": "Legion",
+                    "name": None,
+                    "location": None,
                     "icon": "👹",
                     "estimated": legion.get("estimated", False),
                 })
 
         for helltide in schedule["helltide"]:
+            if helltide.get("type", "helltide") != "helltide":
+                continue
             if helltide["timestamp"] > now:
                 events.append({
+                    "type": "helltide",
                     "timestamp": helltide["timestamp"],
                     "title": "Helltide",
+                    "name": None,
+                    "location": None,
                     "icon": "🔥",
                     "estimated": helltide.get("estimated", False),
                 })

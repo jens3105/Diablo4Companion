@@ -4,12 +4,19 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QGridLayout, QSizePolicy
 
-from qfluentwidgets import BodyLabel, CaptionLabel, FluentIcon as FIF
+from qfluentwidgets import CaptionLabel, FluentIcon as FIF
 
 from src import theme
 from src.base_card import BaseCard
 
-ROW_COUNT = 5
+# Dashboard Data bugfix: widened from 5 to 8 rows (real events the API
+# actually delivers - never fabricated) and switched every row cell to
+# CaptionLabel (smaller line-height than the previous BodyLabel) with
+# tighter grid spacing, so showing more real events still takes up
+# LESS vertical space overall than the old 5-row/BodyLabel layout.
+ROW_COUNT = 8
+
+_MISSING = "DATA UNAVAILABLE"
 
 
 class UpcomingCard(BaseCard):
@@ -21,12 +28,17 @@ class UpcomingCard(BaseCard):
         self.setMinimumSize(260, 190)
 
         self.grid = QGridLayout()
-        self.grid.setHorizontalSpacing(16)
-        self.grid.setVerticalSpacing(8)
+        self.grid.setHorizontalSpacing(14)
+        self.grid.setVerticalSpacing(3)
 
         self.add_layout(self.grid)
 
-        headers = ["Event", "Starts In", "Time"]
+        # Location only ever has a real value for World Boss events
+        # (the live schedule provides no location for Legion/Helltide -
+        # see src/api.py's get_upcoming_events docstring) - shown as its
+        # own column, literally "DATA UNAVAILABLE" rather than blank,
+        # so absence is never ambiguous with "not loaded yet".
+        headers = ["Event", "Location", "Starts In", "Time"]
 
         self.header_labels = []
 
@@ -39,22 +51,26 @@ class UpcomingCard(BaseCard):
         self.rows = []
 
         for row in range(ROW_COUNT):
-            event = BodyLabel("-", self.content)
-            timer = BodyLabel("--:--", self.content)
-            clock = BodyLabel("--:--", self.content)
+            event = CaptionLabel("-", self.content)
+            location = CaptionLabel("-", self.content)
+            timer = CaptionLabel("--:--", self.content)
+            clock = CaptionLabel("--:--", self.content)
 
+            location.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
             timer.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
             clock.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
 
             self.grid.addWidget(event, row + 1, 0)
-            self.grid.addWidget(timer, row + 1, 1)
-            self.grid.addWidget(clock, row + 1, 2)
+            self.grid.addWidget(location, row + 1, 1)
+            self.grid.addWidget(timer, row + 1, 2)
+            self.grid.addWidget(clock, row + 1, 3)
 
-            self.rows.append((event, timer, clock))
+            self.rows.append((event, location, timer, clock))
 
         self.grid.setColumnStretch(0, 3)
-        self.grid.setColumnStretch(1, 1)
+        self.grid.setColumnStretch(1, 2)
         self.grid.setColumnStretch(2, 1)
+        self.grid.setColumnStretch(3, 1)
 
         self.empty_label = CaptionLabel("No data available right now.", self.content)
         self.empty_label.setAlignment(Qt.AlignCenter)
@@ -79,10 +95,11 @@ class UpcomingCard(BaseCard):
 
         for i, widgets in enumerate(self.rows):
 
-            event_lbl, timer_lbl, clock_lbl = widgets
+            event_lbl, location_lbl, timer_lbl, clock_lbl = widgets
 
             if i >= len(self.events):
                 event_lbl.setText("")
+                location_lbl.setText("")
                 timer_lbl.setText("")
                 clock_lbl.setText("")
                 continue
@@ -110,6 +127,7 @@ class UpcomingCard(BaseCard):
 
             suffix = " (est.)" if event.get("estimated") else ""
             event_lbl.setText(f"{event['icon']} {event['title']}{suffix}")
+            location_lbl.setText(event.get("location") or _MISSING)
             timer_lbl.setText(countdown)
             clock_lbl.setText(start.strftime("%H:%M"))
 
@@ -119,7 +137,8 @@ class UpcomingCard(BaseCard):
         for lbl in self.header_labels:
             lbl.setTextColor(QColor(theme.ACCENT_GOLD), QColor(theme.ACCENT_GOLD))
 
-        for _event, timer_lbl, clock_lbl in self.rows:
+        for _event, location_lbl, timer_lbl, clock_lbl in self.rows:
+            location_lbl.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
             timer_lbl.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
             clock_lbl.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
 
