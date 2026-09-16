@@ -4,8 +4,73 @@ _Sidst opdateret: 2026-09-16_
 
 ## Current phase
 
-**Production Validation — Real bug fundet og rettet under brugerens
-egen Windows-test (v1.0.2)**
+**CRITICAL Dashboard Live Data Bug — fundet og rettet (commit
+`b08db7d`)**
+
+Brugeren sammenlignede Dashboardet direkte med de faktiske in-game
+Diablo 4-timere: World Boss/Legion/Helltide/Upcoming Events var alle
+markant forkerte (fx in-game ~37 min vs. appens `01:36:58`), og hver
+eneste post var mærket "(estimated)"/"(est.)".
+
+### Root cause (fundet med bevis, ikke gæt)
+
+`get_schedule()` (`src/api.py`) faldt tilbage til `src/local_schedule.py`
+hver gang det live helltides.com-kald fejlede eller kom tomt tilbage —
+hvilket, bekræftet gentagne gange tidligere i dette projekt, er
+Cloudflare der blokerer almindelige `requests`-klienter uafhængigt af
+netværk, så denne fallback reelt set ALTID udløses uden for en rigtig
+browser-session. `local_schedule.py` beregnede World Boss/Legion/
+Helltide-tider ud fra faste referencedatoer + simple gentagne
+intervaller (en 2023-anker-dato, en gættet 6-timers World Boss-cyklus,
+en gættet 25-minutters Legion-cyklus) — dens egen docstring
+erkendte allerede at disse cadencer var "widely-cited community
+knowledge, not tied to a confirmed official anchor timestamp".
+Brugerens direkte in-game-sammenligning bekræfter nu at disse gæt ikke
+bare er upræcise, men markant forkerte. **Hvert eneste Dashboard-kort
+og hver eneste Upcoming Events-række kom fra denne ene generator** —
+der var aldrig en separat, anden generator; det er derfor ALT var
+mærket "(estimated)"/"(est.)".
+
+### Fix
+
+`src/local_schedule.py` slettet HELT, og dens import/kald fjernet fra
+`get_schedule()` — en blokeret/fejlet/tom live-hentning returnerer nu
+et ægte tomt schedule (`{"world_boss": [], "legion": [], "helltide": []}`),
+aldrig et beregnet gæt. Alle forbrugere håndterede allerede et tomt
+schedule korrekt (`get_next_world_boss` osv. returnerer `None`) — det
+ene reelle hul var at `src/app.py`s `load_world_boss`/`load_legion`/
+`load_helltide` stille lod et kort stå med gammel/standard-tekst ved
+"ingen data" i stedet for at sige det tydeligt; ny
+`_show_data_unavailable()` sørger nu for at hvert kort tydeligt viser
+"DATA UNAVAILABLE" (titel, undertekst, status, timer nulstillet) i
+stedet for at ligne en ægte nedtælling. Al nu-død "estimated"-felt-/
+label-logik fjernet (`src/api.py`s `get_upcoming_events`, `src/app.py`s
+`_subtitle`, `src/upcoming_card.py`s "(est.)"-suffiks).
+
+**Kanonisk data-flow er nu præcis:** ét live-kald → rå schedule →
+World Boss/Legion/Helltide-kort + Upcoming Events, alle læser SAMME
+schedule-snapshot (allerede sandt siden den tidligere Dashboard-fix,
+`cc10305`/`4d47baf` — den fix var korrekt og er urørt; denne fix
+fjerner den separate fabrikations-kilde de stadig kunne falde tilbage
+til).
+
+**Tests:** Ægte, live-verificeret API-respons renderer korrekt uden
+nogen "(estimated)"/"(est.)"-tekst nogen steder. Blokeret/tom API viser
+nu DATA UNAVAILABLE på alle tre kort + tom Upcoming Events (matcher
+denne udviklingsmaskines faktiske, bekræftet blokerede scenarie).
+Ugyldig JSON og netværksfejl degraderer begge til samme tomme schedule
+uden crash. `get_next_world_boss`/`get_next_legion`/`get_next_helltide`/
+`get_upcoming_events` bekræftet at returnere `None`/`[]` for et tomt
+schedule. Fuld 26-build-regression: 0 fejl.
+
+**W5-W10 er ikke ændret eller markeret fejlet pga. denne bug** — den er
+helt isoleret til Dashboard-event-koden. Character State forbliver ON
+HOLD.
+
+---
+
+**Tidligere fase:** Production Validation — Real bug fundet og rettet
+under brugerens egen Windows-test (v1.0.2)
 
 Brugeren havde en rigtig installeret build der viser "Version 1.0.0"
 (bygget/installeret før denne Production Validation-fase), bekræftede
@@ -666,12 +731,17 @@ Windows Product Phase W10 — Build Data Updates (denne fase).
 
 ## Last commit
 
-`eac4dd6` — "Bump version to 1.0.2: includes the installer-liveness-
-check fix" (pushet). Fulde Production Validation-kæde: `9385f0a`
-(version 1.0.1) → `30f69d4` (CI-fix, hardcoded 26-tjek) → `dd13e85`
-(midlertidig diagnostik) → `c894381` (den rigtige fix: Popen-
-livstjek) → `eac4dd6` (version 1.0.2). GitHub Releases `v1.0.1` og
-`v1.0.2` oprettet separat (ikke commits — se ovenfor).
+`b08db7d` — "CRITICAL Dashboard fix: remove fabricated local schedule
+fallback entirely" (pushet).
+
+Forudgående Production Validation-kæde (stadig gyldig, uændret):
+`9385f0a` (version 1.0.1) → `30f69d4` (CI-fix, hardcoded 26-tjek) →
+`dd13e85` (midlertidig diagnostik) → `c894381` (Popen-livstjek-fix) →
+`eac4dd6` (version 1.0.2). GitHub Releases `v1.0.1` og `v1.0.2`
+oprettet separat (ikke commits). **Denne Dashboard-fix er endnu ikke
+udgivet som en ny release/version** — den ligger på `feature/dashboard-v2`,
+klar til at blive inkluderet i en fremtidig version-bump når brugeren
+ønsker det.
 
 Branch: `feature/dashboard-v2` (repoets eneste/default branch — der er
 ikke noget `main`, det er normalt for dette repo).
@@ -1019,11 +1089,10 @@ scope.
 
 ## Next phase
 
-Ingen planlagt. **En reel W8-fejl blev fundet og rettet ud fra
-brugerens egen Windows-test af v1.0.1 (se ovenfor) — v1.0.2 er
-udgivet med fixet. W5-W10 forbliver DONE, uændrede udover selve
-fixet. Venter på at brugeren gentester "Check for Updates" →
-"Update Now" mod v1.0.2.** Character State er stadig ON HOLD.
+Ingen planlagt. **Den kritiske Dashboard-fabrikations-bug er fundet og
+rettet (`b08db7d`) — ikke udgivet som release endnu.** Den tidligere
+W8-fix (Popen-livstjek, `v1.0.2`) venter stadig på brugerens gentest.
+W5-W10 forbliver DONE, uændrede. Character State er stadig ON HOLD.
 Vent på konkret instruktion fra brugeren (se PROJECT_ROADMAP.md's
 regel: "Start ikke
 næste roadmap-fase uden en konkret instruktion"). Mulig fremtidig
@@ -1033,6 +1102,11 @@ opfølgning (ikke startet, kræver eksplicit instruktion): rette
 
 ## Kort changelog (seneste faser, nyeste øverst)
 
+- `b08db7d` — CRITICAL Dashboard fix: `src/local_schedule.py` (den
+  hjemmelavede fallback-tidsberegning) slettet helt. Blokeret/tom live
+  API giver nu ærligt DATA UNAVAILABLE i stedet for opfundne
+  World Boss/Legion/Helltide/Upcoming Events-tider. Fundet via
+  brugerens direkte sammenligning med in-game-timere.
 - `v1.0.2` (GitHub Release) + `c894381` — Rigtig bug fundet under
   brugerens Windows-test: "Update Now" gjorde ingenting, fordi appen
   lukkede sig selv ubetinget uden at tjekke om den startede installer-
