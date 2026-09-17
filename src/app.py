@@ -41,7 +41,6 @@ from src.api import DiabloAPI
 from src import updater
 from src.version import __version__
 from src.build_advisor_interface import BuildAdvisorCard, BuildAdvisorInterface
-from src.build_goals_card import MAX_GOALS as MAX_BUILD_GOALS
 from src.character_interface import CharacterCard, CharacterInterface
 from src.compact_window import CompactWindow
 from src.dashboard import DashboardWidget
@@ -900,33 +899,16 @@ class MainWindow(FluentWindow):
             position=NavigationItemPosition.BOTTOM,
         )
 
-        # Current Build card on the Dashboard jumps straight to the Build
-        # Guide page when clicked (Phase 7 nice-to-have) - trivial thanks
-        # to FluentWindow's built-in switchTo.
-        self.dashboard.build_card.clicked.connect(
-            lambda: self.switchTo(self.builds_interface)
-        )
-
-        # Dashboard card's and Build Advisor page's NEXT ACTION line jump
-        # straight to the relevant page/tab when clicked (this phase) -
-        # skill -> Build Guide's Skills tab, paragon -> its Paragon tab,
-        # gear -> the Character page. See _navigate_to_next_action.
-        self.dashboard.build_card.next_action_clicked.connect(
-            self._navigate_to_next_action
-        )
+        # Build Advisor page's NEXT ACTION line jumps straight to the
+        # relevant page/tab when clicked - skill -> Build Guide's Skills
+        # tab, paragon -> its Paragon tab, gear -> the Character page.
+        # See _navigate_to_next_action.
         self.advisor_card.next_action_clicked.connect(
             self._navigate_to_next_action
         )
 
         # Phase 11: Paragon page's node-detail "Have it" toggle.
         self.paragon_card.node_owned_changed.connect(self.on_paragon_node_toggled)
-
-        # Phase 13: Dashboard's compact Paragon block jumps straight to
-        # the Paragon page when clicked, same pattern as the whole-card
-        # click above.
-        self.dashboard.build_card.paragon_clicked.connect(
-            lambda: self.switchTo(self.paragon_interface)
-        )
 
         # Dashboard Quick Actions card (replaces the old Upcoming Events
         # table): pure navigation, reuses the exact same switchTo() every
@@ -938,11 +920,14 @@ class MainWindow(FluentWindow):
 
         # Phase 9: Compact Mode - lazily created on first use, torn down
         # (set back to None) when the user closes it, so re-opening it
-        # always starts from a clean, freshly-synced window.
+        # always starts from a clean, freshly-synced window. The trigger
+        # button now lives on Quick Actions (see that card's docstring)
+        # since the Dashboard's old Current Build panel that used to
+        # host it is gone.
         self.compact_window = None
         self._compact_action_kind = None
         self._compact_action_key = None
-        self.dashboard.build_card.compact_mode_requested.connect(
+        self.dashboard.quick_actions_card.compact_mode_requested.connect(
             self.open_compact_mode
         )
 
@@ -1226,9 +1211,8 @@ class MainWindow(FluentWindow):
             self.dashboard.world_boss_card,
             self.dashboard.helltide_card,
             self.dashboard.legion_card,
-            self.dashboard.build_card,
-            self.dashboard.build_goals_card,
             self.dashboard.quick_actions_card,
+            self.dashboard.hellwyrm_card,
             self.leveling_card,
             self.character_card,
             self.gear_builder_card,
@@ -1396,6 +1380,16 @@ class MainWindow(FluentWindow):
         ).astimezone()
 
         card.set_status(f"🕒 {start:%H:%M}")
+
+        # Hellwyrm Locations: try to auto-select the region the live
+        # Helltide is actually in - see HellwyrmCard.set_active_helltide_
+        # region's docstring for why "location" is never present today
+        # (DiabloAPI's Helltide entries carry no location field at all,
+        # unlike World Boss) and why that's handled safely rather than
+        # guessed.
+        self.dashboard.hellwyrm_card.set_active_helltide_region(
+            self.current_helltide.get("location")
+        )
 
     # ---------------------------------------------------------
     # BUILD-GUIDE / LEVELING
@@ -2793,11 +2787,11 @@ class MainWindow(FluentWindow):
 
     def _refresh_dashboard_build_card(self):
         """Push the current build/level/status/next-action onto the
-        Dashboard's Current Build card, the Character page's header, and
-        the Build Advisor page. Called whenever anything that could move
-        the needle changes: build/class switch, level input, or any
-        checkbox/toggle in the Build Guide's three tabs or the Character
-        page's gear planner (via ``_refresh_build_status``)."""
+        Character page's header and the Build Advisor page. Called
+        whenever anything that could move the needle changes: build/
+        class switch, level input, or any checkbox/toggle in the Build
+        Guide's three tabs or the Character page's gear planner (via
+        ``_refresh_build_status``)."""
 
         build_name = self.leveling_manager.current_build_name
         char_name = next(
@@ -2806,9 +2800,6 @@ class MainWindow(FluentWindow):
         )
 
         if not build_name:
-            self.dashboard.build_card.set_build("", 0, [], "")
-            self.dashboard.build_card.set_paragon_summary(None)
-            self.dashboard.build_goals_card.set_goals(None, [])
             self.character_card.set_header(char_name, "", 0)
             self.gear_builder_card.set_header(char_name, "", 0)
             self.gems_card.set_header(char_name, "", 0)
@@ -2821,19 +2812,6 @@ class MainWindow(FluentWindow):
         rows, footer_text, ready = self._compute_build_status(build_name)
         next_kind, next_action = self._advisor_next_action(build_name)
 
-        self.dashboard.build_card.set_build(build_name, level, rows, next_action, next_kind)
-        self.dashboard.build_card.set_paragon_summary(
-            self._paragon_dashboard_summary(build_name, rows[2])
-        )
-        # Build Goals: the same _advisor_pending_actions list Current
-        # Build's own NEXT ACTION line and Build Advisor already use,
-        # just showing a few more of it - never a second way of deciding
-        # what's pending. overall_percent is _build_validation's own
-        # already-computed figure, not recomputed here.
-        pending_actions = self._advisor_pending_actions(build_name)
-        goals = [(kind, text) for kind, text, _key in pending_actions[:MAX_BUILD_GOALS]]
-        overall_percent = self._build_validation(build_name)["overall_percent"]
-        self.dashboard.build_goals_card.set_goals(overall_percent, goals)
         self.character_card.set_header(char_name, build_name, level)
         self.gear_builder_card.set_header(char_name, build_name, level)
         self.gems_card.set_header(char_name, build_name, level)
@@ -2869,43 +2847,6 @@ class MainWindow(FluentWindow):
         # from this one spot is enough to keep everything live-synced
         # without extra signal wiring.
         self._refresh_compact_window()
-
-    def _paragon_dashboard_summary(
-        self, build_name: str, paragon_status_row: tuple[str, str, str] | None
-    ) -> tuple[str, str, str] | None:
-        """Phase 13: the Dashboard's compact Paragon block - ``(pct_text,
-        current_board_label, next_action_text)``, or ``None`` when this
-        build has no verified board data to summarize (Heartseeker
-        Rogue). Purely a display-formatting pass over data already
-        computed elsewhere - ``paragon_status_row`` is ``_compute_build_
-        status``'s "Paragon" row (same one shown everywhere else) and the
-        next-action text reuses ``_build_validation``'s Paragon actions -
-        no second Paragon calculation."""
-
-        verified_build = self.leveling_manager.get_verified_build(build_name)
-        verified_boards = (verified_build or {}).get("paragon_boards") or []
-
-        if not verified_boards:
-            return None
-
-        completed_nodes = self._load_completed_paragon_nodes(build_name)
-
-        current_board_label = "All boards complete"
-        for i, board in enumerate(verified_boards):
-            board_id = LevelingCard._board_id(board, i)
-            if not self._board_fully_taken(board, board_id, completed_nodes):
-                current_board_label = f"Board {i + 1}"
-                break
-
-        node_actions = [
-            action["text"]
-            for action in self._build_validation(build_name)["categories"]["Paragon"]["actions"]
-            if action["kind"] == "paragon_node"
-        ]
-        next_text = node_actions[0] if node_actions else "All paragon nodes taken"
-        pct_text = paragon_status_row[2] if paragon_status_row else "N/A"
-
-        return pct_text, current_board_label, next_text
 
     def _advisor_missing_summary(
         self, build_name: str, cap: int = 5

@@ -40,11 +40,24 @@ class QuickActionsCard(BaseCard):
     """
 
     action_clicked = Signal(str)
+    # Dashboard's Current Build panel used to host the only "Compact
+    # Mode" trigger in the whole app (Phase 9's always-on-top companion
+    # window). Removing that panel would have made Compact Mode
+    # unreachable, so its button moves here instead - same signal name,
+    # same title-row placement convention CurrentBuildCard used (see
+    # BaseCard's title_row), just on a different card.
+    compact_mode_requested = Signal()
 
     def __init__(self, parent=None):
         super().__init__("QUICK ACTIONS", icon=FIF.MENU, parent=parent)
 
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+
+        self.compact_mode_button = PushButton("Compact Mode", self)
+        self.compact_mode_button.setFixedHeight(24)
+        self.compact_mode_button.clicked.connect(self.compact_mode_requested)
+        self.title_row.addStretch(1)
+        self.title_row.addWidget(self.compact_mode_button)
 
         grid = QGridLayout()
         grid.setHorizontalSpacing(8)
