@@ -256,7 +256,12 @@ class HellwyrmCard(BaseCard):
         scene.addEllipse(wx - 9, wy - 9, 18, 18, QPen(Qt.NoPen), QBrush(QColor(theme.ACCENT_GOLD)))
         waypoint_label = scene.addText(area["landmark"])
         waypoint_label.setDefaultTextColor(QColor(theme.TEXT_PRIMARY))
-        waypoint_label.setPos(wx + 14, wy - 12)
+        # Positioned fully above the waypoint (using the label's own
+        # rendered height) rather than beside it at marker height - a
+        # route line can leave the waypoint in any documented direction,
+        # including due east/west, which would otherwise cut through the
+        # label text (seen with Dry Steppes' "center -> east" route).
+        waypoint_label.setPos(wx + 14, wy - waypoint_label.boundingRect().height() - 4)
 
         hx, hy = points[-1]
         marker = scene.addEllipse(
