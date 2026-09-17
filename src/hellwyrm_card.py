@@ -46,6 +46,12 @@ class HellwyrmSceneView(QGraphicsView):
 
     marker_clicked = Signal(str)
 
+    # Zoom limits are relative to the fitted baseline (see
+    # _fit_to_viewport), not absolute transform values - the baseline
+    # itself now varies with the view's actual size, so "0.5x-4x" means
+    # "how far the player can zoom in/out from the natural fit", the
+    # same range this always meant back when the baseline was fixed
+    # at identity (1.0).
     _MIN_SCALE = 0.5
     _MAX_SCALE = 4.0
     _ZOOM_STEP = 1.15
@@ -59,6 +65,7 @@ class HellwyrmSceneView(QGraphicsView):
         self._pan_start = None
         self._press_pos = None
         self._press_region = None
+        self._user_transformed = False
 
     def wheelEvent(self, event):
         factor = self._ZOOM_STEP if event.angleDelta().y() > 0 else 1 / self._ZOOM_STEP
@@ -66,11 +73,35 @@ class HellwyrmSceneView(QGraphicsView):
         if self._MIN_SCALE <= new_scale <= self._MAX_SCALE:
             self.scale(factor, factor)
             self._scale = new_scale
+            self._user_transformed = True
         event.accept()
 
-    def reset_view(self):
-        self.resetTransform()
+    def set_scene_fitted(self, scene):
+        """Show a new scene, fit to the current viewport size with the
+        correct aspect ratio - used on first display of a region and on
+        every region switch, which is a deliberate zoom/pan reset (see
+        HellwyrmCard._show_region). Resizing the view afterwards keeps
+        re-fitting via resizeEvent() below, unless/until the player
+        manually zooms or pans, at which point their view is never
+        overwritten by a resize."""
+
+        self.setScene(scene)
+        self._user_transformed = False
+        self._fit_to_viewport()
+
+    def _fit_to_viewport(self):
+        scene = self.scene()
+        if scene is None:
+            return
+        self.fitInView(scene.sceneRect(), Qt.KeepAspectRatio)
+        # _scale tracks zoom RELATIVE to this fit, so it always resets
+        # to 1.0 right after fitting - see _MIN_SCALE/_MAX_SCALE above.
         self._scale = 1.0
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if not self._user_transformed:
+            self._fit_to_viewport()
 
     def mousePressEvent(self, event):
         if event.button() != Qt.LeftButton:
@@ -96,6 +127,7 @@ class HellwyrmSceneView(QGraphicsView):
             self._pan_start = event.pos()
             self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() - delta.x())
             self.verticalScrollBar().setValue(self.verticalScrollBar().value() - delta.y())
+            self._user_transformed = True
             return
         super().mouseMoveEvent(event)
 
@@ -176,8 +208,7 @@ class HellwyrmCard(BaseCard):
         if region not in self._scenes:
             self._scenes[region] = self._build_scene(region)
 
-        self.view.setScene(self._scenes[region])
-        self.view.reset_view()
+        self.view.set_scene_fitted(self._scenes[region])
         self.detail_label.setText("Select a region and click the Hellwyrm marker for details.")
 
     def set_active_helltide_region(self, region: str | None):
