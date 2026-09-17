@@ -928,6 +928,14 @@ class MainWindow(FluentWindow):
             lambda: self.switchTo(self.paragon_interface)
         )
 
+        # Dashboard Quick Actions card (replaces the old Upcoming Events
+        # table): pure navigation, reuses the exact same switchTo() every
+        # nav-bar click already uses - never a second navigation system,
+        # and never build-specific (it doesn't read any build data at all).
+        self.dashboard.quick_actions_card.action_clicked.connect(
+            self._on_quick_action
+        )
+
         # Phase 9: Compact Mode - lazily created on first use, torn down
         # (set back to None) when the user closes it, so re-opening it
         # always starts from a clean, freshly-synced window.
@@ -961,7 +969,6 @@ class MainWindow(FluentWindow):
         self.load_world_boss(schedule)
         self.load_legion(schedule)
         self.load_helltide(schedule)
-        self.load_upcoming_events(schedule)
         self.load_season_15()
 
         self.leveling_card.set_characters(self.characters, self.active_character_id)
@@ -1222,7 +1229,7 @@ class MainWindow(FluentWindow):
             self.dashboard.legion_card,
             self.dashboard.season_card,
             self.dashboard.build_card,
-            self.dashboard.upcoming_card,
+            self.dashboard.quick_actions_card,
             self.leveling_card,
             self.character_card,
             self.gear_builder_card,
@@ -3044,6 +3051,28 @@ class MainWindow(FluentWindow):
 
         return {"overall_percent": overall_percent, "categories": categories}
 
+    def _on_quick_action(self, key: str):
+        """Dashboard Quick Actions card was clicked - jump straight to
+        the named page via the same ``switchTo`` every nav-bar click
+        already uses. Never reads/depends on the active build - this is
+        pure navigation, so it works identically regardless of which
+        build/class is selected. ``"tempering"`` routes to Gear Builder
+        (same as ``_navigate_to_next_action``'s "tempering" case below)
+        since tempering has no page of its own."""
+
+        targets = {
+            "build_guide": self.builds_interface,
+            "gear_builder": self.gear_builder_interface,
+            "paragon": self.paragon_interface,
+            "gems": self.gems_interface,
+            "tempering": self.gear_builder_interface,
+            "build_advisor": self.advisor_interface,
+        }
+
+        target = targets.get(key)
+        if target is not None:
+            self.switchTo(target)
+
     def _navigate_to_next_action(self, kind: str):
         """Dashboard card's / Build Advisor page's NEXT ACTION line was
         clicked - jump to the page (and, for Leveling/Skills/Paragon, the
@@ -3389,16 +3418,6 @@ class MainWindow(FluentWindow):
         return items
 
     # ---------------------------------------------------------
-    # UPCOMING EVENTS
-    # ---------------------------------------------------------
-
-    def load_upcoming_events(self, schedule=None):
-
-        events = self.api.get_upcoming_events(schedule=schedule)
-
-        self.dashboard.upcoming_card.set_events(events)
-
-    # ---------------------------------------------------------
     # UPDATE TIMER
     # ---------------------------------------------------------
 
@@ -3420,7 +3439,6 @@ class MainWindow(FluentWindow):
 
                 schedule = self.api.get_schedule()
                 self.load_world_boss(schedule)
-                self.load_upcoming_events(schedule)
 
             else:
 
@@ -3451,7 +3469,6 @@ class MainWindow(FluentWindow):
 
                 schedule = self.api.get_schedule()
                 self.load_legion(schedule)
-                self.load_upcoming_events(schedule)
 
             else:
 
@@ -3480,7 +3497,6 @@ class MainWindow(FluentWindow):
             if seconds <= 0:
                 schedule = self.api.get_schedule()
                 self.load_helltide(schedule)
-                self.load_upcoming_events(schedule)
             else:
                 hours = seconds // 3600
                 minutes = (seconds % 3600) // 60
@@ -3514,7 +3530,3 @@ class MainWindow(FluentWindow):
                 progress = max(0, min(progress, 100))
 
                 self.dashboard.season_card.set_progress(progress)
-
-        # ---------- Upcoming ----------
-
-        self.dashboard.upcoming_card.refresh()
