@@ -55,9 +55,22 @@ HELLWYRM_AREAS = {
         "sources": 2,
         "confidence": "High",
     },
-    # Scosglen, Hawezar, Kehjistan: no two independently-written sources
-    # agreed on the same waypoint + direction yet (see research notes) -
-    # left out deliberately rather than guessed.
+    "Hawezar": {
+        "landmark": "Wejinhani",
+        "directions": ["northwest"],
+        "description": (
+            "Two independently published player guides describe a Hellwyrm "
+            "farming route starting at the Wejinhani waypoint and heading "
+            "northwest, patrolling a circular loop back toward the "
+            "waypoint. This diagram shows that documented direction only - "
+            "not an exact spawn point."
+        ),
+        "sources": 2,
+        "confidence": "High",
+    },
+    # Scosglen, Kehjistan: no two independently-written sources agreed
+    # on the same waypoint + direction yet (see research notes) - left
+    # out deliberately rather than guessed.
 }
 
 # Unit vectors for an 8-point compass plus "center" (no movement). A
