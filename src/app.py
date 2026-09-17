@@ -41,6 +41,7 @@ from src.api import DiabloAPI
 from src import updater
 from src.version import __version__
 from src.build_advisor_interface import BuildAdvisorCard, BuildAdvisorInterface
+from src.build_goals_card import MAX_GOALS as MAX_BUILD_GOALS
 from src.character_interface import CharacterCard, CharacterInterface
 from src.compact_window import CompactWindow
 from src.dashboard import DashboardWidget
@@ -779,7 +780,6 @@ class MainWindow(FluentWindow):
         self.current_boss = None
         self.current_legion = None
         self.current_helltide = None
-        self.season_15_start = None
 
         self.leveling_manager = LevelingManager()
 
@@ -969,7 +969,6 @@ class MainWindow(FluentWindow):
         self.load_world_boss(schedule)
         self.load_legion(schedule)
         self.load_helltide(schedule)
-        self.load_season_15()
 
         self.leveling_card.set_characters(self.characters, self.active_character_id)
         # Show milestones for the restored (or default) build/level
@@ -1227,8 +1226,8 @@ class MainWindow(FluentWindow):
             self.dashboard.world_boss_card,
             self.dashboard.helltide_card,
             self.dashboard.legion_card,
-            self.dashboard.season_card,
             self.dashboard.build_card,
+            self.dashboard.build_goals_card,
             self.dashboard.quick_actions_card,
             self.leveling_card,
             self.character_card,
@@ -1397,25 +1396,6 @@ class MainWindow(FluentWindow):
         ).astimezone()
 
         card.set_status(f"🕒 {start:%H:%M}")
-
-    # ---------------------------------------------------------
-    # SEASON 15 COUNTDOWN
-    # ---------------------------------------------------------
-
-    def load_season_15(self):
-
-        self.season_15_start = self.api.get_season_15_start()
-
-        card = self.dashboard.season_card
-
-        card.set_title("SEASON 15")
-        card.set_subtitle("Hell's Legacy")
-
-        local_start = self.season_15_start.astimezone()
-
-        card.set_status(
-            f"🕒 {local_start:%d/%m %H:%M}"
-        )
 
     # ---------------------------------------------------------
     # BUILD-GUIDE / LEVELING
@@ -2828,6 +2808,7 @@ class MainWindow(FluentWindow):
         if not build_name:
             self.dashboard.build_card.set_build("", 0, [], "")
             self.dashboard.build_card.set_paragon_summary(None)
+            self.dashboard.build_goals_card.set_goals(None, [])
             self.character_card.set_header(char_name, "", 0)
             self.gear_builder_card.set_header(char_name, "", 0)
             self.gems_card.set_header(char_name, "", 0)
@@ -2844,6 +2825,15 @@ class MainWindow(FluentWindow):
         self.dashboard.build_card.set_paragon_summary(
             self._paragon_dashboard_summary(build_name, rows[2])
         )
+        # Build Goals: the same _advisor_pending_actions list Current
+        # Build's own NEXT ACTION line and Build Advisor already use,
+        # just showing a few more of it - never a second way of deciding
+        # what's pending. overall_percent is _build_validation's own
+        # already-computed figure, not recomputed here.
+        pending_actions = self._advisor_pending_actions(build_name)
+        goals = [(kind, text) for kind, text, _key in pending_actions[:MAX_BUILD_GOALS]]
+        overall_percent = self._build_validation(build_name)["overall_percent"]
+        self.dashboard.build_goals_card.set_goals(overall_percent, goals)
         self.character_card.set_header(char_name, build_name, level)
         self.gear_builder_card.set_header(char_name, build_name, level)
         self.gems_card.set_header(char_name, build_name, level)
@@ -3505,28 +3495,3 @@ class MainWindow(FluentWindow):
                 progress = int((1 - seconds / 3600) * 100)
                 progress = max(0, min(progress, 100))
                 self.dashboard.helltide_card.set_progress(progress)
-
-        # ---------- Season 15 ----------
-
-        if self.season_15_start:
-
-            seconds = int((self.season_15_start - now).total_seconds())
-
-            if seconds <= 0:
-                self.dashboard.season_card.set_timer("LIVE NOW!")
-                self.dashboard.season_card.set_progress(100)
-            else:
-                days = seconds // 86400
-                hours = (seconds % 86400) // 3600
-                minutes = (seconds % 3600) // 60
-
-                self.dashboard.season_card.set_timer(
-                    f"{days}d {hours:02}h {minutes:02}m"
-                )
-
-                # Countdown starts 14 days before season start
-                total_window = 14 * 86400
-                progress = int((1 - seconds / total_window) * 100)
-                progress = max(0, min(progress, 100))
-
-                self.dashboard.season_card.set_progress(progress)

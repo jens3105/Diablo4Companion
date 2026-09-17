@@ -1,5 +1,5 @@
 from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QSizePolicy
+from PySide6.QtWidgets import QGridLayout, QSizePolicy
 
 from qfluentwidgets import FluentIcon as FIF, PushButton
 
@@ -13,6 +13,11 @@ from src.base_card import BaseCard
 # hardcoding (see MainWindow's single ``_on_quick_action`` dispatcher,
 # which just calls the same ``switchTo`` every nav-bar click already
 # uses - no parallel navigation system).
+#
+# Laid out as a compact 2x3 grid (not a tall vertical stack) so this
+# card takes only the space it needs, leaving Build Goals - which shows
+# actual dynamic per-build information - the larger of the two bottom
+# panels.
 ACTIONS = [
     ("build_guide", FIF.GAME, "Build Guide"),
     ("gear_builder", FIF.SHOPPING_CART, "Gear Builder"),
@@ -21,6 +26,8 @@ ACTIONS = [
     ("tempering", FIF.DEVELOPER_TOOLS, "Tempering"),
     ("build_advisor", FIF.ROBOT, "Build Advisor"),
 ]
+
+_GRID_COLUMNS = 3
 
 
 class QuickActionsCard(BaseCard):
@@ -37,12 +44,20 @@ class QuickActionsCard(BaseCard):
     def __init__(self, parent=None):
         super().__init__("QUICK ACTIONS", icon=FIF.MENU, parent=parent)
 
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.setMinimumSize(260, 190)
+        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
 
-        for key, icon, label in ACTIONS:
+        grid = QGridLayout()
+        grid.setHorizontalSpacing(8)
+        grid.setVerticalSpacing(8)
+
+        for i, (key, icon, label) in enumerate(ACTIONS):
+            row, col = divmod(i, _GRID_COLUMNS)
             button = PushButton(icon, label, self.content)
+            button.setFixedHeight(32)
             button.clicked.connect(lambda checked=False, k=key: self.action_clicked.emit(k))
-            self.add_widget(button)
+            grid.addWidget(button, row, col)
 
-        self.add_stretch()
+        for col in range(_GRID_COLUMNS):
+            grid.setColumnStretch(col, 1)
+
+        self.add_layout(grid)
