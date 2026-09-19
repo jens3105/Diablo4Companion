@@ -298,10 +298,13 @@ class UniqueDropsCard(BaseCard):
         if boss_filter != _ALL:
             boss = next((b for b in service.all_bosses() if b["name"] == boss_filter), None)
             if boss:
-                self.boss_info_label.setText(
+                text = (
                     f"{boss['name']} — Tier: {boss['tier']} · Zone: {boss['location']} · "
                     f"Key: {boss['key']} (obtained via: {boss['key_source']})"
                 )
+                if boss.get("mythic_note"):
+                    text += f"\nMythic pool: {boss['mythic_note']}"
+                self.boss_info_label.setText(text)
                 self.boss_info_label.show()
         else:
             self.boss_info_label.hide()
@@ -332,11 +335,16 @@ class UniqueDropsCard(BaseCard):
         notes = entry.get("notes")
 
         if bosses:
-            boss_lines = "\n".join(
-                f"  - {b['name']} — Tier: {b['tier']} · Zone: {b['location']} · "
-                f"Key: {b['key']} (obtained via: {b['key_source']})"
-                for b in bosses
-            )
+            lines = []
+            for b in bosses:
+                line = (
+                    f"  - {b['name']} — Tier: {b['tier']} · Zone: {b['location']} · "
+                    f"Key: {b['key']} (obtained via: {b['key_source']})"
+                )
+                if b.get("mythic_note"):
+                    line += f"\n    Mythic pool: {b['mythic_note']}"
+                lines.append(line)
+            boss_lines = "\n".join(lines)
         else:
             boss_lines = f"  {notes or _UNKNOWN}"
 

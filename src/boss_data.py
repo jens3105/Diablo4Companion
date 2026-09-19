@@ -130,6 +130,11 @@ BOSSES: list[dict] = [
         "location": "Skovos Isles, The Birthplace",
         "key": "1x Crux of the False Prophet",
         "key_source": "High Torment-difficulty endgame activities",
+        "mythic_note": (
+            "Guarantees one Mythic Unique per kill from the general Mythic pool - not a "
+            "specific item, and not the only way to obtain a Mythic (see Season 15's Iconic "
+            "Mythic crafting, e.g. Harlequin Crest's own notes)."
+        ),
         "source": "aoeah.com",
         "confidence": "Medium",
     },
