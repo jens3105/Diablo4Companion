@@ -50,6 +50,7 @@ from src.leveling_card import LevelingCard
 from src.managers.leveling_manager import LevelingManager
 from src.paragon_interface import RARITY_LABELS, ParagonCard, ParagonInterface
 from src.quick_search import QuickSearchDialog
+from src.unique_drops_interface import UniqueDropsCard, UniqueDropsInterface
 from src.update_dialog import UpdateAvailableDialog
 
 
@@ -885,6 +886,15 @@ class MainWindow(FluentWindow):
         self.settings_interface = SettingsInterface(self.settings, self.leveling_manager)
         self.settings_interface.setObjectName("settingsInterface")
 
+        # Unique Drop Locations page: standalone, build-independent -
+        # "which boss drops this Unique" / "what can I target-farm from
+        # this boss", answered by one filterable list (see
+        # src/unique_drops_interface.py's module docstring).
+        self.unique_drops_card = UniqueDropsCard()
+
+        self.unique_drops_interface = UniqueDropsInterface(self.unique_drops_card)
+        self.unique_drops_interface.setObjectName("uniqueDropsInterface")
+
         self.addSubInterface(self.dashboard, FIF.HOME, "Dashboard")
         self.addSubInterface(self.builds_interface, FIF.GAME, "Build Guide")
         self.addSubInterface(self.character_interface, FIF.FINGERPRINT, "Character")
@@ -892,6 +902,7 @@ class MainWindow(FluentWindow):
         self.addSubInterface(self.gems_interface, FIF.CERTIFICATE, "Gems")
         self.addSubInterface(self.paragon_interface, FIF.TILES, "Paragon")
         self.addSubInterface(self.advisor_interface, FIF.ROBOT, "Build Advisor")
+        self.addSubInterface(self.unique_drops_interface, FIF.FLAG, "Unique Drops")
         self.addSubInterface(
             self.settings_interface,
             FIF.SETTING,
@@ -1219,6 +1230,7 @@ class MainWindow(FluentWindow):
             self.gems_card,
             self.paragon_card,
             self.advisor_card,
+            self.unique_drops_card,
         ):
             card.refresh_theme()
 
