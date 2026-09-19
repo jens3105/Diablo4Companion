@@ -17,7 +17,6 @@ data access layer this UI calls into - it never reads UNIQUES/BOSSES or
 hardcodes a loot table itself."""
 
 import os
-import sys
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QColor, QPixmap
@@ -34,7 +33,7 @@ from qfluentwidgets import (
     StrongBodyLabel,
 )
 
-from src import theme, unique_drop_service as service
+from src import item_icon_assets, theme, unique_drop_service as service
 from src.base_card import BaseCard
 
 _ALL = "All"
@@ -74,7 +73,7 @@ def _load_item_pixmap(image_path: str | None) -> QPixmap | None:
     if not image_path:
         return None
 
-    full_path = _resolve_asset_path(image_path)
+    full_path = image_path if os.path.isabs(image_path) else _resolve_asset_path(image_path)
     if not os.path.isfile(full_path):
         return None
 
@@ -83,6 +82,15 @@ def _load_item_pixmap(image_path: str | None) -> QPixmap | None:
         return None
 
     return pixmap.scaled(44, 44, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+
+
+def _resolve_icon_for(unique: dict) -> str | None:
+    """User-provided icon lookup (see src/item_icon_assets.py and
+    scripts/import_item_icons.py) takes priority - falls back to the
+    data record's own ``image`` field only if explicitly set (never
+    guessed from the display name alone)."""
+
+    return item_icon_assets.find_icon_path(unique["id"]) or unique.get("image")
 
 
 class UniqueItemCard(QFrame):
@@ -110,7 +118,7 @@ class UniqueItemCard(QFrame):
         image_layout = QVBoxLayout(self.image_box)
         image_layout.setContentsMargins(0, 0, 0, 0)
 
-        pixmap = _load_item_pixmap(unique.get("image"))
+        pixmap = _load_item_pixmap(_resolve_icon_for(unique))
         if pixmap is not None:
             image_label = QLabel(self.image_box)
             image_label.setPixmap(pixmap)

@@ -27,3 +27,9 @@ dist/
 # PyInstaller (diablo4companion.spec is intentionally committed - W2 phase)
 *.spec
 !diablo4companion.spec
+
+# User-provided Unique item icons (src/item_icon_assets.py) - the
+# user's own files, never committed to this public repo. Keep the
+# folder's README so `git status` shows where to put them.
+assets/items/uniques/*
+!assets/items/uniques/README.md
