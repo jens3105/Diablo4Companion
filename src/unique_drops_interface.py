@@ -16,9 +16,12 @@ this data is sourced/verified, and src/unique_drop_service.py for the
 data access layer this UI calls into - it never reads UNIQUES/BOSSES or
 hardcodes a loot table itself."""
 
+import os
+import sys
+
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QFrame, QHBoxLayout, QSizePolicy, QVBoxLayout, QWidget
+from PySide6.QtGui import QColor, QPixmap
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout, QWidget
 
 from qfluentwidgets import (
     BodyLabel,
@@ -50,6 +53,38 @@ def _boss_names_for(unique: dict) -> str:
     return unique.get("notes") or _UNKNOWN
 
 
+def _resolve_asset_path(relative_path: str) -> str:
+    """Same sys.frozen-relative-to-exe pattern as LevelingManager's
+    builds_dir lookup (src/managers/leveling_manager.py) - a frozen
+    PyInstaller build's __file__-relative paths aren't reliable."""
+
+    if getattr(sys, "frozen", False):
+        repo_root = os.path.dirname(os.path.abspath(sys.executable))
+    else:
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(repo_root, relative_path)
+
+
+def _load_item_pixmap(image_path: str | None) -> QPixmap | None:
+    """Loads a Unique's image if - and only if - ``image_path`` is set
+    AND the file actually exists AND Qt can decode it. Returns None for
+    every other case (unset/missing/corrupt) so the caller shows the
+    neutral placeholder instead - this never crashes the card."""
+
+    if not image_path:
+        return None
+
+    full_path = _resolve_asset_path(image_path)
+    if not os.path.isfile(full_path):
+        return None
+
+    pixmap = QPixmap(full_path)
+    if pixmap.isNull():
+        return None
+
+    return pixmap.scaled(44, 44, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+
+
 class UniqueItemCard(QFrame):
     """One compact result row: image placeholder + name/type/class/slot
     + drop source. Never crashes on a missing image - shows a neutral
@@ -74,10 +109,19 @@ class UniqueItemCard(QFrame):
         )
         image_layout = QVBoxLayout(self.image_box)
         image_layout.setContentsMargins(0, 0, 0, 0)
-        placeholder = CaptionLabel("No\nImage", self.image_box)
-        placeholder.setAlignment(Qt.AlignCenter)
-        placeholder.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
-        image_layout.addWidget(placeholder)
+
+        pixmap = _load_item_pixmap(unique.get("image"))
+        if pixmap is not None:
+            image_label = QLabel(self.image_box)
+            image_label.setPixmap(pixmap)
+            image_label.setAlignment(Qt.AlignCenter)
+            image_layout.addWidget(image_label)
+        else:
+            placeholder = CaptionLabel("No\nImage", self.image_box)
+            placeholder.setAlignment(Qt.AlignCenter)
+            placeholder.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
+            image_layout.addWidget(placeholder)
+
         layout.addWidget(self.image_box)
 
         text_col = QVBoxLayout()
