@@ -246,6 +246,67 @@ class UniqueDropServiceTests(unittest.TestCase):
         crest = service.find_unique("Harlequin Crest")
         self.assertEqual(crest["image_filename"], "Harlequin-Crest-1089568.png")
 
+    def test_every_local_mapping_reaches_the_catalogue(self):
+        """The whole boss mapping must survive the merge - this is the
+        test that would fail if name normalization ever regressed."""
+
+        from src.unique_data import UNIQUES
+
+        by_id = {u["id"]: u for u in self.uniques}
+        for local in UNIQUES:
+            self.assertIn(local["id"], by_id, f"{local['name']} fell out of the catalogue")
+            self.assertEqual(
+                by_id[local["id"]]["target_bosses"],
+                local["target_bosses"],
+                f"{local['name']} lost its boss mapping",
+            )
+
+    def test_mapping_coverage_is_what_we_think_it_is(self):
+        # 30 mapped entries, 2 of which deliberately have no target boss
+        # (Season 15 Mythic crafting - see src/unique_data.py). Everything
+        # else has no boss data anywhere, and must say so rather than guess.
+        with_boss = [u for u in self.uniques if u["target_bosses"]]
+        self.assertEqual(len(with_boss), 28)
+        for name in ("Harlequin Crest", "Fists of Fate"):
+            entry = service.find_unique(name)
+            self.assertEqual(entry["target_bosses"], [])
+            self.assertTrue(entry["notes"], f"{name} has no boss and no explanation")
+
+    def test_items_reported_as_data_unavailable_really_have_no_mapping(self):
+        """The items from the Windows end-to-end test. They are in the
+        dataset, they are not in the boss mapping, and no boss may be
+        invented for them."""
+
+        from src.unique_data import UNIQUES
+
+        mapped = {u["id"] for u in UNIQUES}
+        for name in ("Might of the Ursine", "Misericorde", "Mjölnic Ryng",
+                     "Mother's Embrace", "Nails of the Gore-Crowned",
+                     "Nemesis Bracers", "Nesekem, the Herald"):
+            entry = service.find_unique(name)
+            self.assertIsNotNone(entry, f"{name} is missing from the catalogue")
+            self.assertTrue(entry["from_api"], f"{name} did not come from the API")
+            self.assertTrue(entry["description"], f"{name} has no description")
+            self.assertNotIn(entry["id"], mapped)
+            self.assertEqual(entry["target_bosses"], [])
+
+    def test_a_mapped_item_still_shows_its_boss(self):
+        moloch = service.find_unique("Moloch's Beating Flame")
+        self.assertEqual([b["name"] for b in service.get_bosses_for_unique(moloch["id"])],
+                         ["The Butcher"])
+
+    def test_accented_names_survive_normalization(self):
+        import unicodedata
+
+        from src.item_icon_assets import normalize_id
+
+        for name in ("Mjölnic Ryng", "Berú of Arreat - Charm"):
+            self.assertEqual(
+                normalize_id(name),
+                normalize_id(unicodedata.normalize("NFD", name)),
+                "Two spellings of the same name produce different ids",
+            )
+
     def test_no_duplicate_entries_after_merging(self):
         ids = [u["id"] for u in self.uniques]
         names = [u["name"].lower() for u in self.uniques]

@@ -17,6 +17,7 @@ release unless the user's own local machine has them at build time.
 
 import os
 import sys
+import unicodedata
 
 SUPPORTED_EXTENSIONS = (".png", ".jpg", ".jpeg", ".webp")
 
@@ -43,8 +44,16 @@ def normalize_id(text: str) -> str:
     stable ``id`` already uses (src/unique_data.py), so a filename only
     has to normalize-equal an existing id to match. No fuzzy/partial
     matching - an unrecognized name is left unmatched rather than
-    guessed at (see scripts/import_item_icons.py)."""
+    guessed at (see scripts/import_item_icons.py).
 
+    NFC first: "Mjolnic" written with a combining diaeresis and the same
+    name written with a precomposed "o" are the same name to a reader,
+    but would otherwise produce two different ids - and the id is what
+    joins an API record to its boss mapping and to the user's own icon
+    file. Verified 2026-09-20 to change no id in the current data (all
+    483 names are already composed); this is a guard, not a fix."""
+
+    text = unicodedata.normalize("NFC", text)
     cleaned = "".join(ch for ch in text.lower() if ch.isalnum() or ch in " -_")
     cleaned = cleaned.replace("-", "_").replace(" ", "_")
     while "__" in cleaned:

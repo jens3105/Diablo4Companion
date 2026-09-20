@@ -64,10 +64,22 @@ def _no_data_text() -> str:
 
 
 def _boss_names_for(unique: dict) -> str:
+    """Boss names, or an honest reason there are none.
+
+    The catalogue comes from the API (231 items); the boss mapping is
+    this project's own and covers 30 of them, so most items genuinely
+    have no recorded drop source. Saying only "DATA UNAVAILABLE" reads
+    like a failure - it is missing knowledge, and the text says which.
+    A boss is never guessed to fill the gap."""
+
     bosses = service.get_bosses_for_unique(unique["id"])
     if bosses:
         return ", ".join(b["name"] for b in bosses)
-    return unique.get("notes") or _UNKNOWN
+    # An item we *do* have a record for explains itself (e.g. the
+    # Season 15 Mythic crafting path) via its own notes.
+    if unique.get("notes"):
+        return unique["notes"]
+    return f"{_UNKNOWN} - no target boss recorded for this item"
 
 
 def _resolve_asset_path(relative_path: str) -> str:
