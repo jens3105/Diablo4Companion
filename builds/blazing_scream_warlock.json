@@ -4712,6 +4712,18 @@
             ]
           },
           {
+            "slot": "Weapon — Runeword 1",
+            "item_name": "DATA UNAVAILABLE",
+            "rarity": "Unknown",
+            "unresolved_planner_id": "Runeword_Stealth"
+          },
+          {
+            "slot": "Weapon — Runeword 2",
+            "item_name": "DATA UNAVAILABLE",
+            "rarity": "Unknown",
+            "unresolved_planner_id": "Runeword_Ancients_Pledge_FocusBookOffHand"
+          },
+          {
             "slot": "Weapon — Sword",
             "item_name": "Obsidian Blade",
             "rarity": "Legendary",
@@ -7113,6 +7125,12 @@
           }
         ],
         "gear": [
+          {
+            "slot": "Helm",
+            "item_name": "DATA UNAVAILABLE",
+            "rarity": "Unknown",
+            "unresolved_planner_id": "Helm_Unique_Generic_005"
+          },
           {
             "slot": "Chest",
             "item_name": "Runic Mail",
@@ -9574,6 +9592,12 @@
         ],
         "gear": [
           {
+            "slot": "Helm",
+            "item_name": "DATA UNAVAILABLE",
+            "rarity": "Mythic",
+            "unresolved_planner_id": "Helm_Unique_Generic_005"
+          },
+          {
             "slot": "Chest",
             "item_name": "Runic Mail",
             "rarity": "Legendary",
@@ -12033,6 +12057,18 @@
           }
         ],
         "gear": [
+          {
+            "slot": "Helm",
+            "item_name": "DATA UNAVAILABLE",
+            "rarity": "Mythic",
+            "unresolved_planner_id": "Helm_Unique_Generic_005"
+          },
+          {
+            "slot": "Weapon — Runeword",
+            "item_name": "DATA UNAVAILABLE",
+            "rarity": "Unknown",
+            "unresolved_planner_id": "Runeword_Enigma"
+          },
           {
             "slot": "Offhand (Focus)",
             "item_name": "Infernal Homunculus",

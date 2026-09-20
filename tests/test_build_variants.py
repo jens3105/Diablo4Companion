@@ -105,6 +105,65 @@ class ImportedDataTests(unittest.TestCase):
         self.assertNotIn("Leveling", navne)
 
 
+class NoDroppedSlotTests(unittest.TestCase):
+    """The manual test found Helm showing "Not required" for a build
+    that very much requires one. The decoder was dropping any slot whose
+    item id Maxroll's public item dictionary does not define - and it
+    does not define this planner's helm. A dropped slot is invisible; a
+    DATA UNAVAILABLE slot is not."""
+
+    def setUp(self):
+        self.build = json.loads(
+            (BUILDS / "blazing_scream_warlock.json").read_text(encoding="utf-8"))
+
+    def test_every_equipped_planner_slot_reaches_the_build_file(self):
+        import sys as _sys
+
+        _sys.path.insert(0, str(BUILDS.parent / "scripts"))
+        from maxroll_data_decoder import load_profile_data
+
+        planner = load_profile_data("to4erl0e")
+        for variant in self.build["variants"]:
+            profile = next(p for p in planner["profiles"] if p["name"] == variant["name"])
+            self.assertEqual(
+                len(variant["verified_build"]["gear"]),
+                len(profile["items"]),
+                f"{variant['name']}: the planner equips "
+                f"{len(profile['items'])} slots, the build file has "
+                f"{len(variant['verified_build']['gear'])}",
+            )
+
+    def test_the_helm_slot_exists_in_every_variant(self):
+        for variant in self.build["variants"]:
+            helms = [g for g in variant["verified_build"]["gear"]
+                     if g["slot"].startswith("Helm")]
+            self.assertEqual(len(helms), 1, f"{variant['name']} has no helm slot")
+
+    def test_an_unnameable_item_says_so_and_keeps_its_planner_id(self):
+        endgame = next(v for v in self.build["variants"] if v["id"] == "endgame")
+        helm = next(g for g in endgame["verified_build"]["gear"] if g["slot"] == "Helm")
+        self.assertEqual(helm["item_name"], "DATA UNAVAILABLE")
+        self.assertEqual(helm["unresolved_planner_id"], "Helm_Unique_Generic_005")
+        # The planner does state it is a Mythic, so that much is kept.
+        self.assertEqual(helm["rarity"], "Mythic")
+
+    def test_an_unnameable_item_never_gets_an_invented_name_or_image(self):
+        from src import item_images
+
+        for variant in self.build["variants"]:
+            for item in variant["verified_build"]["gear"]:
+                if not item.get("unresolved_planner_id"):
+                    continue
+                self.assertEqual(item["item_name"], "DATA UNAVAILABLE")
+                self.assertIsNone(item_images.image_filename_for_item(item["item_name"]))
+
+    def test_a_resolvable_helm_still_shows_its_real_name(self):
+        starter = next(v for v in self.build["variants"] if v["id"] == "starter")
+        helm = next(g for g in starter["verified_build"]["gear"] if g["slot"] == "Helm")
+        self.assertEqual(helm["item_name"], "Runic Skullcap")
+        self.assertNotIn("unresolved_planner_id", helm)
+
+
 class ManagerTests(unittest.TestCase):
     """1), 2), 7): selecting, and not leaking state between builds."""
 

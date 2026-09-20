@@ -82,6 +82,96 @@ class ItemImageLookupTests(unittest.TestCase):
             self.assertEqual(f.read(4), b"\x89PNG")
 
 
+class ItemIdentityTests(unittest.TestCase):
+    """The two items from the manual report, and the collision classes
+    that could make any item show another item's picture."""
+
+    @classmethod
+    def setUpClass(cls):
+        from src.items_api import ItemsAPI
+
+        cls.katalog = ItemsAPI().items()
+
+    def _post(self, navn: str) -> dict:
+        for post in self.katalog:
+            if post["name"] == navn:
+                return post
+        self.fail(f"{navn} is not in the catalogue")
+
+    def test_the_eightfold_idol_resolves_to_its_own_image(self):
+        post = self._post("The Eightfold Idol")
+        fil = item_images.image_filename_for_item("The Eightfold Idol")
+        self.assertEqual(fil, os.path.basename(post["local_image"]))
+        self.assertIn("The-Eightfold-Idol", fil)
+        # Its picture is its own, verified against the item's own source
+        # page (purediablo.com/diablo4/The_Eightfold_Idol -> 3468537844).
+        self.assertIn("3468537844", fil)
+
+    def test_the_eightfold_idols_image_belongs_to_no_other_item(self):
+        fil = item_images.image_filename_for_item("The Eightfold Idol")
+        delere = [p["name"] for p in self.katalog
+                  if os.path.basename(p["local_image"]) == fil]
+        self.assertEqual(delere, ["The Eightfold Idol"])
+
+    def test_leorics_crown_resolves_to_its_own_image(self):
+        post = self._post("Leoric's Crown")
+        fil = item_images.image_filename_for_item("Leoric's Crown")
+        self.assertEqual(fil, os.path.basename(post["local_image"]))
+        self.assertIn("Leoric", fil)
+        delere = [p["name"] for p in self.katalog
+                  if os.path.basename(p["local_image"]) == fil]
+        self.assertEqual(delere, ["Leoric's Crown"])
+
+    def test_leorics_crown_is_a_helm(self):
+        self.assertEqual(self._post("Leoric's Crown")["type"], "Unique Helm")
+
+    def test_leorics_crown_image_is_fetchable_through_the_normal_pipeline(self):
+        sti = item_images.fetch_image_for_item("Leoric's Crown")
+        self.assertIsNotNone(sti)
+        with open(sti, "rb") as f:
+            self.assertEqual(f.read(4), b"\x89PNG")
+
+    def test_no_two_item_names_normalize_to_the_same_key(self):
+        """A collision here would silently hand one item another item's
+        picture - the exact failure mode being guarded against."""
+
+        import collections
+
+        from src.item_icon_assets import normalize_id
+
+        tael = collections.Counter(normalize_id(p["name"]) for p in self.katalog)
+        kollisioner = {k: v for k, v in tael.items() if v > 1}
+        self.assertEqual(kollisioner, {}, f"Normalized-name collisions: {kollisioner}")
+
+    def test_unicode_spellings_do_not_split_or_merge_an_item(self):
+        import unicodedata
+
+        from src.item_icon_assets import normalize_id
+
+        for navn in ("Berú of Arreat - Charm", "Mjölnic Ryng", "Moloch's Beating Flame"):
+            self.assertEqual(normalize_id(navn),
+                             normalize_id(unicodedata.normalize("NFD", navn)), navn)
+
+    def test_known_shared_artwork_in_the_dataset_has_not_grown(self):
+        """Ten image ids in the catalogue are used by two items each -
+        an upstream scrape defect, so one of each pair shows the other's
+        picture. Three of them are items our builds equip. This is
+        pinned so the app's own pipeline stays provably innocent and a
+        new collision shows up as a failure rather than a mystery."""
+
+        import collections
+
+        # Grouped by the source image URL, not the local filename: the
+        # two items get separate files that hold the same picture, so a
+        # filename comparison sees nothing wrong.
+        efter_kilde = collections.defaultdict(list)
+        for post in self.katalog:
+            efter_kilde[post["image_url"]].append(post["name"])
+        delte = {k: sorted(v) for k, v in efter_kilde.items() if len(v) > 1}
+        self.assertEqual(len(delte), 10, f"The dataset's shared-artwork set changed: {delte}")
+        self.assertIn(["Temerity", "Yen's Blessing"], list(delte.values()))
+
+
 class BuildToSlotTests(unittest.TestCase):
     """Build data -> the right item in the right slot, for both pages."""
 

@@ -369,6 +369,23 @@ _ARMOR_AND_ACCESSORY_SLOT_LABELS = {
 # Offhand types that aren't weapons themselves (Shield/Focus/Totem).
 _OFFHAND_TYPES = {"Shield", "Focus", "Totem"}
 
+# What an item is called when the planner equips an id Maxroll's public
+# item dictionary does not define. The project's existing wording for a
+# fact it cannot confirm - never a placeholder item name.
+UNRESOLVED_ITEM_NAME = "DATA UNAVAILABLE"
+
+
+def _type_from_planner_id(slug: str) -> str:
+    """``"Helm_Unique_Generic_005"`` -> ``"Helm"``.
+
+    A planner item id begins with the item's own type, so an id that
+    cannot be looked up still states which slot it belongs in. That is
+    read out of the id, not inferred from the slot's position in the
+    profile - the position-to-slot mapping is not something this data
+    states anywhere."""
+
+    return (slug or "").split("_")[0]
+
 
 def _humanize_item_type(item_type: str) -> str:
     """Best-effort human label for a ``data.min.json`` item ``type``."""
@@ -383,6 +400,14 @@ def _humanize_item_type(item_type: str) -> str:
         return f"Weapon — {item_type[:-2]} (Two-Handed)"
 
     return f"Weapon — {item_type}" if item_type else "Item"
+
+
+def _planner_rarity(item_instance: dict) -> str:
+    """Rarity from the planner instance alone, for an item whose
+    definition is missing. The instance's own ``mythic`` flag is real
+    data; anything else is left unstated."""
+
+    return "Mythic" if item_instance.get("mythic") else "Unknown"
 
 
 def _resolve_item_rarity(item_instance: dict, item_def: dict) -> str:
@@ -788,6 +813,29 @@ def decode_gear(data: dict, profile: dict, data_dict: dict) -> list[dict]:
         slug = instance.get("id")
         item_def = item_defs.get(slug) if slug else None
         if not item_def or not item_def.get("name"):
+            # The planner has an item here that Maxroll's own public item
+            # dictionary does not define yet - data.min.json trails the
+            # planner for fresh season content (measured 2026-09-20:
+            # planner profile to4erl0e's helm is "Helm_Unique_Generic_005",
+            # and the published dump only goes to _004, with none of its
+            # affix nids present either).
+            #
+            # Dropping the slot was the bug: the page then said "Not
+            # required" for a slot the build very much requires. The slot
+            # is emitted with the name we honestly have - none - plus the
+            # planner's own id, so it reads as DATA UNAVAILABLE and can be
+            # resolved later without guessing which item it is.
+            resolved.append(
+                {
+                    "slot_label": _humanize_item_type(_type_from_planner_id(slug)),
+                    "item_name": UNRESOLVED_ITEM_NAME,
+                    "rarity": _planner_rarity(instance),
+                    "aspect": None,
+                    "sockets": [],
+                    "tempering": [],
+                    "unresolved_planner_id": slug,
+                }
+            )
             continue
 
         aspect_names = []
@@ -832,6 +880,10 @@ def decode_gear(data: dict, profile: dict, data_dict: dict) -> list[dict]:
             label = f"{label} {label_seen[label]}"
 
         gear_entry = {"slot": label, "item_name": entry["item_name"], "rarity": entry["rarity"]}
+        if entry.get("unresolved_planner_id"):
+            # Kept so the slot can be resolved later, by a human or by a
+            # newer data.min.json, without re-deriving which item it was.
+            gear_entry["unresolved_planner_id"] = entry["unresolved_planner_id"]
         if entry["aspect"]:
             gear_entry["aspect"] = entry["aspect"]
         if entry["sockets"]:
