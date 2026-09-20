@@ -1,0 +1,14 @@
+# Diablo4Companion — Data API address.
+#
+# Copy this file to "api_url.txt" next to the application (the folder
+# holding Diablo4Companion.exe, or the repo root when running from
+# source) and put the base URL of your Data API on one line.
+#
+# The address is deliberately NOT in the source code: this repository is
+# public and the API lives on a private LAN.
+#
+# Alternatives, checked before this file:
+#   * D4COMPANION_API_URL environment variable
+#   * QSettings "Diablo4Companion/DesktopCompanion" -> api/base_url
+
+http://<server>:<port>/api/v1
