@@ -72,7 +72,7 @@ The "Have it" ``SwitchButton`` lives directly on the card instead.
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QFrame, QHBoxLayout, QSizePolicy, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout, QWidget
 
 from qfluentwidgets import (
     BodyLabel,
@@ -83,13 +83,17 @@ from qfluentwidgets import (
     SwitchButton,
 )
 
-from src import theme
+from src import item_images, theme
 from src.base_card import BaseCard
 from src.gear_planner import (
     SlotEntry,
     SlotStatus,
     _rarity_color,
     build_entries_from_verified_gear,
+    IMAGE_POOL,
+    ItemImageSignals,
+    ItemImageTask,
+    set_item_pixmap,
 )
 
 # Fixed rendering order for the main body cards - see module docstring's
@@ -114,6 +118,9 @@ _CARD_BUCKET_ORDER = [
 # exceptions once an item genuinely has real decoded data for them (see
 # ``_sockets_summary_row``/``_tempering_summary_row``).
 _UNAVAILABLE_FIELDS = ["Affixes / Stats", "Sockets / Gems", "Tempering", "Masterworking"]
+
+
+_CARD_IMAGE_PX = 48
 
 
 class GearSlotCard(QFrame):
@@ -156,6 +163,16 @@ class GearSlotCard(QFrame):
         header_row = QHBoxLayout()
         header_row.setSpacing(10)
 
+        # The item's own artwork, from the same lookup the Character
+        # page uses (src/gear_planner.py -> src/item_images.py). Never a
+        # per-build image path: the item's name is what finds the
+        # picture, so any build gets its gear illustrated for free.
+        self.image_label = QLabel(self)
+        self.image_label.setAlignment(Qt.AlignCenter)
+        self.image_label.setFixedSize(_CARD_IMAGE_PX, _CARD_IMAGE_PX)
+        self.image_label.hide()
+        header_row.addWidget(self.image_label)
+
         self.swatch = QFrame(self)
         self.swatch.setFixedSize(14, 14)
         header_row.addWidget(self.swatch)
@@ -172,6 +189,8 @@ class GearSlotCard(QFrame):
         self.toggle.checkedChanged.connect(self._on_toggled)
         self.toggle.setEnabled(entry.key is not None)
         header_row.addWidget(self.toggle)
+
+        self._apply_image()
 
         outer.addLayout(header_row)
 
@@ -209,6 +228,28 @@ class GearSlotCard(QFrame):
                 outer.addWidget(self._field_row(field_name, "DATA UNAVAILABLE", muted=True))
 
         self._apply_style()
+
+    def _apply_image(self):
+        """Same rule as the Character page's chips: show it if it is
+        cached, fetch it in the background if the catalogue has one, and
+        otherwise stay blank - an aspect has no artwork, and showing
+        another item's picture would be worse than showing none."""
+
+        if set_item_pixmap(self.image_label, self.entry.item_image, _CARD_IMAGE_PX):
+            return
+
+        self.image_label.hide()
+        name = self.entry.item_name
+        if not name or item_images.image_filename_for_item(name) is None:
+            return
+
+        self._image_signals = ItemImageSignals(self)
+        self._image_signals.ready.connect(self._on_image_ready)
+        IMAGE_POOL.start(ItemImageTask(name, self._image_signals))
+
+    def _on_image_ready(self, path: str):
+        self.entry.item_image = path
+        set_item_pixmap(self.image_label, path, _CARD_IMAGE_PX)
 
     def _sockets_summary_row(self, slot_label: str) -> QWidget:
         """Concise real-data summary for the Sockets/Gems row, e.g.

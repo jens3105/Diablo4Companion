@@ -104,6 +104,77 @@ def fetch(filename: str, api: ItemsAPI | None = None) -> str | None:
     return target
 
 
+# --------------------------------------------------------------------
+# Item name -> image, for gear shown on the Character/Gear Builder pages
+# --------------------------------------------------------------------
+
+_INDEX: dict | None = None
+
+
+def _index(api: ItemsAPI | None = None) -> dict:
+    """Lazily built map of normalized item name -> image filename, from
+    the server's catalogue. Built once per run; a failed fetch leaves it
+    empty rather than half-built, so the next call retries."""
+
+    global _INDEX
+    if _INDEX is not None:
+        return _INDEX
+
+    from src.item_icon_assets import normalize_id
+
+    poster = (api or ItemsAPI()).items()
+    if not poster:
+        return {}
+
+    _INDEX = {}
+    for post in poster:
+        navn = normalize_id(str(post.get("name", "")))
+        fil = os.path.basename(str(post.get("local_image") or "").replace("\\", "/"))
+        if navn and fil:
+            _INDEX.setdefault(navn, fil)
+    return _INDEX
+
+
+def image_filename_for_item(name: str) -> str | None:
+    """The catalogue image filename for an item name, or ``None``.
+
+    ``None`` is the honest answer for most build gear: a Legendary slot
+    names an *aspect* ("Aspect of Ignition"), and the item dataset has
+    no artwork for aspects or set items. The caller shows its existing
+    no-image state - never another item's picture.
+    """
+
+    from src.item_icon_assets import normalize_id
+
+    if not name:
+        return None
+    return _index().get(normalize_id(name))
+
+
+def cached_image_for_item(name: str) -> str | None:
+    """Path to this item's image **if it is already cached** - never
+    touches the network, so it is safe to call while painting."""
+
+    fil = image_filename_for_item(name)
+    return cached_path(fil) if fil else None
+
+
+def fetch_image_for_item(name: str) -> str | None:
+    """Download this item's image if needed and return its path. Safe
+    from a worker thread."""
+
+    fil = image_filename_for_item(name)
+    return fetch(fil) if fil else None
+
+
+def reset_index() -> None:
+    """Forget the cached name->filename map (tests, and a dataset
+    change while the app is running)."""
+
+    global _INDEX
+    _INDEX = None
+
+
 def cache_stats() -> dict:
     """Used by tests and for a quick "is the cache doing anything?"
     answer - never by the data path itself."""

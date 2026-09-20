@@ -34,15 +34,17 @@ Every slot chip renders one of four states (``SlotStatus``):
   wired up to synthesize this state from today's data.
 """
 
+import os
 from dataclasses import dataclass
 from enum import Enum
 
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QColor, QFontMetrics, QPainter, QPen
+from PySide6.QtCore import QObject, QRunnable, Qt, QThreadPool, Signal
+from PySide6.QtGui import QColor, QFontMetrics, QPainter, QPen, QPixmap
 from PySide6.QtWidgets import (
     QFrame,
     QGridLayout,
     QHBoxLayout,
+    QLabel,
     QSizePolicy,
     QVBoxLayout,
     QWidget,
@@ -57,7 +59,55 @@ from qfluentwidgets import (
     SwitchButton,
 )
 
-from src import theme
+from src import item_images, theme
+
+
+_CHIP_IMAGE_PX = 40
+
+# One small pool for every gear image on screen, so a page full of
+# cache misses opens a handful of connections rather than dozens.
+IMAGE_POOL = QThreadPool()
+IMAGE_POOL.setMaxThreadCount(4)
+
+
+class ItemImageSignals(QObject):
+    """Owned by the widget that asked, so the connection dies with it."""
+
+    ready = Signal(str)
+
+
+class ItemImageTask(QRunnable):
+    """Fetch one item's artwork off the UI thread. A miss is silent -
+    the widget keeps its no-image look."""
+
+    def __init__(self, item_name: str, signals: ItemImageSignals):
+        super().__init__()
+        self._item_name = item_name
+        self._signals = signals
+
+    def run(self):
+        path = item_images.fetch_image_for_item(self._item_name)
+        if not path:
+            return
+        try:
+            self._signals.ready.emit(path)
+        except RuntimeError:
+            pass  # the widget went away while the download ran
+
+
+def set_item_pixmap(label, path: str | None, size: int = _CHIP_IMAGE_PX) -> bool:
+    """Put an item's artwork on ``label``, or leave it hidden. Returns
+    whether an image was actually shown - callers use that to decide
+    whether to keep waiting for one."""
+
+    if not path or not os.path.isfile(path):
+        return False
+    pixmap = QPixmap(path)
+    if pixmap.isNull():
+        return False
+    label.setPixmap(pixmap.scaled(size, size, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+    label.show()
+    return True
 
 
 class SlotStatus(Enum):
@@ -163,6 +213,13 @@ class SlotEntry:
     aspect: str | None
     status: SlotStatus
     key: str | None
+    # Path to the item's artwork in the local cache, or None. Filled from
+    # the server's item catalogue by item NAME (src/item_images.py) - never
+    # from a per-build image path, so a new build gets its pictures without
+    # anyone adding a mapping. Aspects and set items legitimately have no
+    # artwork in the dataset; the chip then shows its existing no-image
+    # look rather than some other item's picture.
+    item_image: str | None = None
 
 
 def build_entries_from_verified_gear(gear: list[dict], owned_names: set[str]) -> list[SlotEntry]:
@@ -191,6 +248,7 @@ def build_entries_from_verified_gear(gear: list[dict], owned_names: set[str]) ->
                 aspect=item.get("aspect"),
                 status=status,
                 key=name,
+                item_image=item_images.cached_image_for_item(name),
             )
         )
 
@@ -372,10 +430,18 @@ class SlotChip(QFrame):
         top_row.addWidget(self.swatch)
         top_row.addStretch(1)
 
+        # Item artwork, when the catalogue has any for this item.
+        self.image_label = QLabel(self)
+        self.image_label.setAlignment(Qt.AlignCenter)
+        self.image_label.setFixedHeight(_CHIP_IMAGE_PX)
+        self.image_label.hide()
+
         self.status_label = CaptionLabel("", self)
         top_row.addWidget(self.status_label)
 
         layout.addLayout(top_row)
+
+        layout.addWidget(self.image_label)
 
         self.slot_label = CaptionLabel(display_label or entry.slot_label, self)
         self.slot_label.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
@@ -387,6 +453,33 @@ class SlotChip(QFrame):
         layout.addWidget(self.name_label)
 
         self._apply_entry()
+
+    def _apply_image(self):
+        """Show the item's artwork if it is cached; if the catalogue has
+        a picture we simply haven't downloaded yet, fetch that one image
+        in the background and swap it in when it lands. Painting never
+        waits for the network."""
+
+        entry = self.entry
+        if set_item_pixmap(self.image_label, entry.item_image):
+            return
+
+        self.image_label.hide()
+        if not entry.item_name:
+            return
+        if item_images.image_filename_for_item(entry.item_name) is None:
+            return  # no artwork exists for this item - an honest blank
+
+        self._image_signals = ItemImageSignals(self)
+        self._image_signals.ready.connect(self._on_image_ready)
+        IMAGE_POOL.start(ItemImageTask(entry.item_name, self._image_signals))
+
+    def _on_image_ready(self, path: str):
+        self.entry.item_image = path
+        if set_item_pixmap(self.image_label, path):
+            # The chip is a fixed height, so it has to grow for the row
+            # the picture now occupies.
+            self._recompute_height()
 
     def _label_height_for_text(self, label, text: str) -> int:
         """Exact pixel height ``label`` needs to word-wrap ``text`` at this
@@ -418,6 +511,8 @@ class SlotChip(QFrame):
         self.name_label.setText(name_text)
         self.name_label.setFixedHeight(self._label_height_for_text(self.name_label, name_text))
 
+        self._apply_image()
+
         if entry.item_name:
             self.swatch.setStyleSheet(
                 f"background-color: {_rarity_color(entry.rarity)}; border-radius: 2px;"
@@ -442,6 +537,15 @@ class SlotChip(QFrame):
         # just measured exactly, plus the layout's own margins - set once
         # the sub-heights are known so the whole chip (not just its
         # children) reports the right size to the QGridLayout cell.
+        self._recompute_height()
+
+    def _recompute_height(self):
+        """The chip's own height, from the heights of what is actually in
+        it. The image row is included only when there is an image - it
+        arrives asynchronously, so this is called again when one lands.
+        Forgetting it here is what made the first version draw the item
+        name on top of its own artwork."""
+
         margins = self.layout().contentsMargins()
         spacing = self.layout().spacing()
         swatch_row_height = max(self.swatch.height(), self.status_label.sizeHint().height())
@@ -454,6 +558,8 @@ class SlotChip(QFrame):
             + self.name_label.height()
             + margins.bottom()
         )
+        if not self.image_label.isHidden():
+            total_height += self.image_label.height() + spacing
         self.setFixedHeight(total_height)
 
     def mousePressEvent(self, event):
