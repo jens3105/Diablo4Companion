@@ -182,6 +182,44 @@ jobs:
           }
           Write-Host "OK: uninstaller present ($($uninst.Name))."
 
+      - name: Verify user configuration survives an update (install over install)
+        # The in-app updater's whole promise is that updating does not
+        # wipe the user's settings - above all api_url.txt, without
+        # which the app starts on DATA UNAVAILABLE. Inno Setup only
+        # writes the files it ships and there is no [InstallDelete], so
+        # this should hold; proving it on a real install-over-install is
+        # cheaper than finding out from a user whose config vanished.
+        shell: pwsh
+        run: |
+          $installDir = $env:INSTALL_DIR
+          $configFile = Join-Path $installDir "api_url.txt"
+          $marker = "http://example.invalid:8081/api/v1"
+          $marker | Out-File -FilePath $configFile -Encoding ascii -NoNewline
+
+          $userFile = Join-Path $installDir "user-notes.txt"
+          "kept" | Out-File -FilePath $userFile -Encoding ascii -NoNewline
+
+          $setupExe = "installer\Output\Diablo4Companion-Setup.exe"
+          Start-Process -FilePath $setupExe `
+            -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/DIR=$installDir" `
+            -Wait -PassThru | Out-Null
+
+          if (-not (Test-Path $configFile)) {
+            throw "api_url.txt was removed by the update - user configuration is not safe"
+          }
+          $after = (Get-Content -Path $configFile -Raw).Trim()
+          if ($after -ne $marker) {
+            throw "api_url.txt was overwritten by the update: '$after'"
+          }
+          if (-not (Test-Path $userFile)) {
+            throw "A user file in the install directory was removed by the update"
+          }
+          $exe = Join-Path $installDir "Diablo4Companion.exe"
+          if (-not (Test-Path $exe)) {
+            throw "Diablo4Companion.exe missing after the second install"
+          }
+          Write-Host "OK: api_url.txt and user files survived install-over-install."
+
       - name: Launch-check installed exe (offscreen smoke test)
         shell: pwsh
         env:
