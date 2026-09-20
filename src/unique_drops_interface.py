@@ -17,8 +17,9 @@ data access layer this UI calls into - it never reads UNIQUES/BOSSES or
 hardcodes a loot table itself."""
 
 import os
+import sys
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import QObject, QRunnable, Qt, QThreadPool, Signal
 from PySide6.QtGui import QColor, QPixmap
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QSizePolicy, QVBoxLayout, QWidget
 
@@ -33,7 +34,7 @@ from qfluentwidgets import (
     StrongBodyLabel,
 )
 
-from src import item_icon_assets, theme, unique_drop_service as service
+from src import item_icon_assets, item_images, theme, unique_drop_service as service
 from src.base_card import BaseCard
 
 _ALL = "All"
@@ -43,6 +44,23 @@ _UNKNOWN = "DATA UNAVAILABLE"
 def _sorted_values(items: list[dict], key: str) -> list[str]:
     values = sorted({entry[key] for entry in items if entry.get(key)})
     return [_ALL] + values
+
+
+def _no_data_text() -> str:
+    """One message for both the startup and the lost-connection case -
+    names the server and the actual error, so "it's empty" is a
+    diagnosis rather than a mystery."""
+
+    reason = service.data_error() or "the item server returned no data"
+    server = service.api_base_url()
+    if not server:
+        # Nothing configured at all - the reason already explains how to
+        # set it (src/api_config.py's SETUP_HINT).
+        return f"DATA UNAVAILABLE - no item server configured.\n\n{reason}"
+    return (
+        "DATA UNAVAILABLE - could not load the item catalogue from\n"
+        f"{server}\n\n{reason}"
+    )
 
 
 def _boss_names_for(unique: dict) -> str:
@@ -93,6 +111,44 @@ def _resolve_icon_for(unique: dict) -> str | None:
     return item_icon_assets.find_icon_path(unique["id"]) or unique.get("image")
 
 
+# ---------------------------------------------------------
+# Item images come from the Data API, one at a time, off the UI thread
+# ---------------------------------------------------------
+
+# Canonical item art lives on the server (see src/items_api.py); the app
+# ships no images and never bulk-downloads the catalogue. A card asks
+# the local cache while painting (never the network - that would freeze
+# the list), and only if the file isn't cached yet does it queue this
+# one download. A small pool keeps a full page of misses from opening
+# hundreds of sockets at once.
+_IMAGE_POOL = QThreadPool()
+_IMAGE_POOL.setMaxThreadCount(4)
+
+
+class _ImageFetchSignals(QObject):
+    """Owned by the card, so the connection dies with the card."""
+
+    ready = Signal(str)
+
+
+class _ImageFetchTask(QRunnable):
+    def __init__(self, filename: str, signals: _ImageFetchSignals):
+        super().__init__()
+        self._filename = filename
+        self._signals = signals
+
+    def run(self):
+        path = item_images.fetch(self._filename)
+        if not path:
+            return  # missing/unreachable: the card keeps its placeholder
+        try:
+            self._signals.ready.emit(path)
+        except RuntimeError:
+            # The card was destroyed while the download ran - nothing to
+            # update, and definitely nothing to crash over.
+            pass
+
+
 class UniqueItemCard(QFrame):
     """One compact result row: image placeholder + name/type/class/slot
     + drop source. Never crashes on a missing image - shows a neutral
@@ -118,6 +174,8 @@ class UniqueItemCard(QFrame):
         image_layout = QVBoxLayout(self.image_box)
         image_layout.setContentsMargins(0, 0, 0, 0)
 
+        self._image_layout = image_layout
+
         pixmap = _load_item_pixmap(_resolve_icon_for(unique))
         if pixmap is not None:
             image_label = QLabel(self.image_box)
@@ -130,6 +188,15 @@ class UniqueItemCard(QFrame):
             placeholder.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
             image_layout.addWidget(placeholder)
 
+            # Not cached yet, but the server has a filename for it:
+            # fetch that one image in the background and swap the
+            # placeholder when (and only when) it actually arrives.
+            filename = unique.get("image_filename")
+            if filename:
+                self._fetch_signals = _ImageFetchSignals(self)
+                self._fetch_signals.ready.connect(self._on_image_ready)
+                _IMAGE_POOL.start(_ImageFetchTask(filename, self._fetch_signals))
+
         layout.addWidget(self.image_box)
 
         text_col = QVBoxLayout()
@@ -138,9 +205,12 @@ class UniqueItemCard(QFrame):
         name_label = StrongBodyLabel(unique["name"], self)
         text_col.addWidget(name_label)
 
-        meta_label = CaptionLabel(
-            f"{unique['type']} · {unique['class']} · {unique['slot']}", self
-        )
+        meta_text = f"{unique['type']} · {unique['class']} · {unique['slot']}"
+        if not unique.get("from_api", False):
+            # This item isn't in the canonical dataset - say so on the
+            # card itself, so it can't be mistaken for verified data.
+            meta_text += " · not in dataset"
+        meta_label = CaptionLabel(meta_text, self)
         meta_label.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
         text_col.addWidget(meta_label)
 
@@ -150,6 +220,21 @@ class UniqueItemCard(QFrame):
         text_col.addWidget(source_label)
 
         layout.addLayout(text_col, 1)
+
+    def _on_image_ready(self, path: str):
+        pixmap = _load_item_pixmap(path)
+        if pixmap is None:
+            return  # unreadable file: keep the existing placeholder
+
+        while self._image_layout.count():
+            old = self._image_layout.takeAt(0).widget()
+            if old is not None:
+                old.setParent(None)
+
+        image_label = QLabel(self.image_box)
+        image_label.setPixmap(pixmap)
+        image_label.setAlignment(Qt.AlignCenter)
+        self._image_layout.addWidget(image_label)
 
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -245,7 +330,13 @@ class UniqueDropsCard(BaseCard):
         self.add_layout(body_row)
 
         if not uniques:
-            no_data = BodyLabel("DATA UNAVAILABLE - no verified Unique drop data yet.", self.content)
+            # The catalogue now comes from the Data API, so "no items"
+            # almost always means the server couldn't be reached. Say
+            # which server and why, instead of a blank page - and never
+            # fall back to a bundled copy of the data (see
+            # src/unique_drop_service.py's module docstring).
+            no_data = BodyLabel(_no_data_text(), self.content)
+            no_data.setWordWrap(True)
             no_data.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
             self.add_widget(no_data)
 
@@ -294,6 +385,17 @@ class UniqueDropsCard(BaseCard):
         self._refresh_results()
 
     def _refresh_results(self):
+        if not service.data_available():
+            # Lost the server after startup: drop the stale cards rather
+            # than leave a list on screen that no longer reflects
+            # anything, and say so in the detail panel.
+            for card in self._cards:
+                card.setParent(None)
+            self._cards.clear()
+            self.boss_info_label.hide()
+            self.detail_label.setText(_no_data_text())
+            return
+
         boss_filter = self.boss_combo.currentText()
         if boss_filter != _ALL:
             boss = next((b for b in service.all_bosses() if b["name"] == boss_filter), None)
@@ -358,6 +460,7 @@ class UniqueDropsCard(BaseCard):
             f"Effect: {description}\n"
             f"Target boss(es):\n{boss_lines}\n"
             f"Confidence: {confidence_text}\n"
+            f"Item data: {'Data API (verified dataset)' if entry.get('from_api') else 'local boss mapping - NOT in the verified dataset'}\n"
             f"Source: {entry['source']}"
         )
         if notes and bosses:

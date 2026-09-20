@@ -12,10 +12,18 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src import unique_drop_service as service
+from src.api_config import items_api_base_url
 from src.boss_data import BOSSES
 from src.unique_data import UNIQUES
 
 _VALID_TYPES = {"Unique", "Mythic Unique"}
+
+# The checks on UNIQUES/BOSSES below are pure local data and always run.
+# The few that go through the service need the catalogue, which lives on
+# the Data API - those skip when no server is configured.
+_NEEDS_API = unittest.skipUnless(
+    items_api_base_url(), "No Data API configured (see src/api_config.py)"
+)
 
 
 class UniqueDropDataTests(unittest.TestCase):
@@ -71,6 +79,7 @@ class UniqueDropDataTests(unittest.TestCase):
         # agree there are no problems (same checks, single source of truth).
         self.assertEqual(service.validate_data(), [])
 
+    @_NEEDS_API
     def test_get_uniques_for_boss_and_get_bosses_for_unique_are_consistent(self):
         for unique in UNIQUES:
             for boss in service.get_bosses_for_unique(unique["id"]):
@@ -81,10 +90,17 @@ class UniqueDropDataTests(unittest.TestCase):
                     f"'{unique['name']}' -> '{boss['name']}' relation isn't reflected the other way",
                 )
 
+    @_NEEDS_API
     def test_search_items_never_crashes_on_blank_query(self):
-        self.assertEqual(len(service.search_items("")), len(UNIQUES))
-        self.assertEqual(len(service.search_items("   ")), len(UNIQUES))
+        # A blank query means "everything" - compared against the
+        # service's own catalogue, which now comes from the Data API
+        # (src/unique_drop_service.py), not against the local
+        # boss-mapping table this file otherwise checks.
+        catalogue = len(service.all_uniques())
+        self.assertEqual(len(service.search_items("")), catalogue)
+        self.assertEqual(len(service.search_items("   ")), catalogue)
 
+    @_NEEDS_API
     def test_search_items_case_insensitive_partial_match(self):
         results = service.search_items("elegy")
         self.assertTrue(any(u["name"] == "Elegy" for u in results))

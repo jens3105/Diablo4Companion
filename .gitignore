@@ -33,3 +33,9 @@ dist/
 # folder's README so `git status` shows where to put them.
 assets/items/uniques/*
 !assets/items/uniques/README.md
+# Item image cache - copies of API-served images, never canonical
+cache/
+tests/_image_cache/
+
+# Local Data API address - configuration, never committed (see src/api_config.py)
+api_url.txt
