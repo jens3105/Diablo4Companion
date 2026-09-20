@@ -81,6 +81,43 @@ Masterworking has no corresponding field on any equipped item instance
 at all. All three correctly show `DATA UNAVAILABLE` — do not re-attempt
 without a genuinely new data source.
 
+## Item data — served live from the Data API, not stored in the app
+
+The Unique/Mythic item catalogue is **not** in this repository. It is
+the verified PureDiablo dataset (453 items, 453 images, dataset 1.0.0,
+sha256 `79aacf51…`) held on the NAS and served read-only:
+
+```
+UI (unique_drops_interface)
+  -> src/unique_drop_service.py      merges catalogue + boss mapping
+    -> src/items_api.py              the only module that speaks HTTP
+      -> Data API on the LAN, read-only
+        -> NAS  (read-only mount on the API server)
+```
+
+* **The address is configuration, not code.** This repo is public and
+  the API is on a private LAN, so nothing here contains a server
+  address. `src/api_config.py` resolves it: `D4COMPANION_API_URL` ->
+  QSettings `api/base_url` -> `api_url.txt` next to the executable
+  (gitignored). With none of them set, the page shows DATA UNAVAILABLE
+  explaining what to set - it never guesses a server.
+* The API is read-only; the app issues `GET` only.
+* `src/unique_data.py` is **no longer an item database**. It is this
+  project's Unique <-> Boss mapping, which the dataset does not contain,
+  keyed by the same stable snake_case `id`.
+* 11 of its entries are not in the dataset at all. They are kept because
+  removing them would leave Grigoire and Echo of Varshan with no
+  farmable Uniques - but every record carries `from_api`, and those 11
+  are labelled "not in dataset" on the card and in the detail panel, so
+  local research can never pass for verified data.
+* `src/item_images.py` caches API images on disk, one at a time, only
+  when a card actually needs to draw one. Deleting the cache is always
+  safe; it is never a source of truth, and no images ship with the app.
+* **If the API cannot be reached, the page shows DATA UNAVAILABLE with
+  the server address and the error.** It never falls back to stale or
+  bundled item data - the same rule `src/api.py` learned the hard way
+  with the Dashboard's fabricated event schedule.
+
 ## Feature areas
 
 ### Skills / Leveling (`src/leveling_card.py`, part of "Build Guide" page)

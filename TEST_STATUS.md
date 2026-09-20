@@ -2,8 +2,40 @@
 
 ## Teststrategi
 
-Der findes **ingen automatiseret test-suite** (ingen `pytest`/`unittest`
-filer, ingen CI-pipeline) i dette repo. Al test sker som:
+Der er **54 automatiserede tests** i `tests/` (pytest eller unittest,
+begge virker). Kør dem fra repo-roden:
+
+```bash
+QT_QPA_PLATFORM=offscreen .venv/bin/python3 -m pytest tests/ -q
+```
+
+| Fil | Hvad | Antal |
+|---|---|---|
+| `tests/test_unique_drop_data.py` | den lokale Unique↔Boss-mapping er konsistent | 13 |
+| `tests/test_items_api.py` | Data API'et, gennem appens eget datalag | 33 |
+| `tests/test_ui_smoke.py` | Unique Drop Locations-siden bygger og viser indhold | 8 |
+
+Adressen på Data API'et er **konfiguration, ikke kode** (repoet er
+offentligt, serveren står på LAN'et). Sæt den før kørsel:
+
+```bash
+D4COMPANION_API_URL=http://<server>:<port>/api/v1 \
+  QT_QPA_PLATFORM=offscreen .venv/bin/python3 -m pytest tests/ -q
+```
+
+— eller skriv samme linje i `api_url.txt` i repo-roden (gitignoreret).
+
+> **De to API-afhængige testfiler kan ikke køre i GitHub Actions** —
+> runneren kan ikke nå hjemmenettet. De er bevidst ikke lagt ind i
+> `windows-build.yml`; ville de være det, ville hver eneste build fejle
+> på noget der er helt i orden. Uden konfiguration **springer de over**
+> i stedet for at fejle. De køres på monitoring-serveren før push.
+
+Testene mocker med vilje ikke API'et: spørgsmålet de findes for at
+besvare er, om appen faktisk læser det verificerede datasæt fra
+produktionsserveren, og det kan en mock ikke svare på.
+
+Derudover testes fortsat manuelt:
 
 1. **Headless Qt-røgtest** — den primære metode brugt gennem hele
    projektets udvikling. Kører den rigtige app-kode
