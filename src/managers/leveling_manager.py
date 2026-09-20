@@ -97,6 +97,11 @@ class LevelingManager:
         self._load_builds()
 
         self.current_build_name = None
+        # Which variant of the current build is selected, by its id, or
+        # None for the build's own base data. Cleared whenever the build
+        # changes - a variant belongs to one build and must never carry
+        # over to the next (see set_current_build).
+        self.current_variant_id = None
 
         if self._builds:
             default_key = self._normalize(self.DEFAULT_BUILD_NAME)
@@ -230,7 +235,48 @@ class LevelingManager:
             return False
 
         self.current_build_name = self._builds[key]["build_name"]
+        # Switching build always drops the old build's variant.
+        self.current_variant_id = None
 
+        return True
+
+    # ---------------------------------------------------------
+    # VARIANTS
+    #
+    # A Maxroll guide's variants are its planner profiles, imported by
+    # scripts/maxroll_data_decoder.py --all-variants. Builds without any
+    # simply have no "variants" key and behave exactly as before.
+    # ---------------------------------------------------------
+
+    def get_variants(self, build_name: str | None = None) -> list[dict]:
+        """This build's variants in the planner's own order, or an empty
+        list. Never invented: the names are whatever the planner calls
+        its profiles."""
+
+        key = self._normalize(build_name or self.current_build_name or "")
+        build = self._builds.get(key)
+        if build is None:
+            return []
+        variants = build.get("variants")
+        return list(variants) if isinstance(variants, list) else []
+
+    def get_variant(self, variant_id: str, build_name: str | None = None) -> dict | None:
+        for variant in self.get_variants(build_name):
+            if variant.get("id") == variant_id:
+                return variant
+        return None
+
+    def set_current_variant(self, variant_id: str | None) -> bool:
+        """Select a variant of the current build (``None`` = the build's
+        own base data). Refuses an id this build doesn't have, rather
+        than silently showing something else."""
+
+        if variant_id is None:
+            self.current_variant_id = None
+            return True
+        if self.get_variant(variant_id) is None:
+            return False
+        self.current_variant_id = variant_id
         return True
 
     def get_skills_data(self, build_name: str | None = None) -> dict:
@@ -309,6 +355,15 @@ class LevelingManager:
 
         if build is None:
             return None
+
+        # A selected variant IS the verified build for every consumer -
+        # Character, Gear Builder, Paragon, build validation all read
+        # this one function, so the variant reaches them without any of
+        # them knowing variants exist.
+        if self.current_variant_id and key == self._normalize(self.current_build_name or ""):
+            variant = self.get_variant(self.current_variant_id, build.get("build_name"))
+            if variant is not None:
+                return variant.get("verified_build")
 
         return build.get("verified_build")
 

@@ -58,6 +58,9 @@ class LevelingCard(BaseCard):
 
     level_changed = Signal(int)
     build_changed = Signal(str)
+    # Emits the selected variant's id, or "" for the build's own base
+    # data. Only ever fired for builds that actually have variants.
+    variant_changed = Signal(str)
     class_changed = Signal(str)
     # ``object`` (not ``int``) because a row's completion key is now
     # either a milestone's positional index (Leveling tab, and the
@@ -177,6 +180,28 @@ class LevelingCard(BaseCard):
         build_row.addWidget(self.favorite_button)
 
         self.add_layout(build_row)
+
+        # -------------------------
+        # Variant row - hidden entirely for builds that have none, which
+        # is most of them. The entries come from the build data (the
+        # guide's own planner profiles), never from a list in here.
+        # -------------------------
+
+        self.variant_row = QWidget(self.content)
+        variant_layout = QHBoxLayout(self.variant_row)
+        variant_layout.setContentsMargins(0, 0, 0, 0)
+        variant_layout.setSpacing(8)
+
+        self.variant_caption = CaptionLabel("Variant:", self.variant_row)
+        self.variant_caption.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))
+        variant_layout.addWidget(self.variant_caption)
+
+        self.variant_combo = ComboBox(self.variant_row)
+        self.variant_combo.currentIndexChanged.connect(self._on_variant_selected)
+        variant_layout.addWidget(self.variant_combo, 1)
+
+        self.add_widget(self.variant_row)
+        self.variant_row.hide()
 
         # -------------------------
         # Level input row
@@ -535,6 +560,44 @@ class LevelingCard(BaseCard):
             return
 
         self.class_changed.emit(class_name)
+
+    def set_variants(self, variants: list[dict], current_variant_id: str | None = None):
+        """Fill (or hide) the variant selector from real build data.
+
+        ``variants`` is ``build["variants"]`` - each entry's own ``name``
+        is what the user sees, plus its stated level if the planner gave
+        one. A build with no variants hides the row completely rather
+        than showing an empty or invented selector."""
+
+        self.variant_combo.blockSignals(True)
+        self.variant_combo.clear()
+
+        if not variants:
+            self.variant_combo.blockSignals(False)
+            self.variant_row.hide()
+            return
+
+        for variant in variants:
+            label = variant.get("name", variant.get("id", "?"))
+            level = variant.get("level")
+            if level is not None:
+                label = f"{label} (Lvl {level})"
+            self.variant_combo.addItem(label, userData=variant.get("id"))
+
+        valgt = 0
+        if current_variant_id:
+            for i in range(self.variant_combo.count()):
+                if self.variant_combo.itemData(i) == current_variant_id:
+                    valgt = i
+                    break
+        self.variant_combo.setCurrentIndex(valgt)
+        self.variant_combo.blockSignals(False)
+        self.variant_row.show()
+
+    def _on_variant_selected(self, index: int):
+        if index < 0:
+            return
+        self.variant_changed.emit(self.variant_combo.itemData(index) or "")
 
     def _on_build_selected(self, index: int):
 

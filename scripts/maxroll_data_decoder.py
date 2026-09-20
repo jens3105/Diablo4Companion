@@ -883,6 +883,80 @@ def decode_profile(
 # ---------------------------------------------------------
 
 
+def decode_all_variants(profile_id: str, data_dict: dict) -> list[dict]:
+    """Every saved profile at this planner id, decoded, in the planner's
+    own order.
+
+    A Maxroll build guide's "variants" ARE its planner profiles - the
+    guide's own variant tabs are links into this same planner (the
+    Blazing Scream guide links ``d4/planner/to4erl0e#3``, i.e. profile
+    index 3). So the names here are the guide's names, never ours, and a
+    stage/level label is only carried when the profile actually states
+    one. ``paragon_steps`` records the step names the profile offers,
+    which is where a build's paragon progression lives - it is not a
+    variant of its own.
+    """
+
+    data = load_profile_data(profile_id)
+    variants = []
+
+    for index, profile in enumerate(data["profiles"]):
+        name = profile["name"]
+        decoded = decode_profile(profile_id, name, data_dict)
+        steps = (profile.get("paragon") or {}).get("steps") or []
+
+        variant = {
+            "id": _variant_id(name),
+            "name": name,
+            "planner_index": index,
+            "source": "maxroll_planner",
+            "source_url": f"https://maxroll.gg/d4/planner/{profile_id}#{index}",
+            "verified_build": decoded,
+        }
+        # Only carried when the planner actually states them.
+        if profile.get("level") is not None:
+            variant["level"] = profile["level"]
+        step_names = [s.get("name") for s in steps if isinstance(s, dict) and s.get("name")]
+        if step_names:
+            variant["paragon_steps"] = step_names
+
+        variants.append(variant)
+
+    return variants
+
+
+def _variant_id(name: str) -> str:
+    """Stable snake_case key for a variant name - the same normalization
+    shape the rest of the project uses for ids."""
+
+    cleaned = "".join(ch if ch.isalnum() else "_" for ch in name.lower())
+    while "__" in cleaned:
+        cleaned = cleaned.replace("__", "_")
+    return cleaned.strip("_")
+
+
+def write_variants(build_file: str, variants: list[dict]) -> str:
+    """Write decoded variants into a build file without touching
+    anything else in it.
+
+    The existing top-level ``verified_build`` is deliberately left as it
+    is: it may come from another verified source (Blazing Scream's came
+    from a Mobalytics hub), and replacing it silently would be data
+    loss. Old code paths keep reading it; the variant list is additive.
+    """
+
+    path = build_file if os.path.isabs(build_file) else os.path.join(REPO_ROOT, build_file)
+    with open(path, "r", encoding="utf-8") as f:
+        build = json.load(f)
+
+    build["variants"] = variants
+
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(build, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+    return path
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("profile_id", help="Maxroll planner profile id, e.g. 'oohxnu0w'")
@@ -900,6 +974,16 @@ def main():
         "--build-file",
         default=None,
         help="If given, write the result into this builds/*.json file under 'verified_build'",
+    )
+    parser.add_argument(
+        "--all-variants",
+        action="store_true",
+        help=(
+            "Decode EVERY saved profile at this planner id and write them to "
+            "the build file's 'variants' list. A Maxroll guide's variants are "
+            "exactly its planner profiles - this never invents one, and a "
+            "planner with a single profile simply yields a single variant."
+        ),
     )
     parser.add_argument(
         "--list-profiles",
@@ -924,6 +1008,14 @@ def main():
         load_profile_raw(args.profile_id, force_refresh=True)
 
     data_dict = load_data_dict()
+
+    if args.all_variants:
+        variants = decode_all_variants(args.profile_id, data_dict)
+        print(json.dumps(variants, indent=2, ensure_ascii=False))
+        if args.build_file:
+            write_variants(args.build_file, variants)
+        return
+
     result = decode_profile(
         args.profile_id, args.profile_name, data_dict, paragon_step_name=args.paragon_step
     )

@@ -973,6 +973,7 @@ class MainWindow(FluentWindow):
 
         self.leveling_card.level_changed.connect(self.on_level_changed)
         self.leveling_card.build_changed.connect(self.on_build_changed)
+        self.leveling_card.variant_changed.connect(self.on_variant_changed)
         self.leveling_card.class_changed.connect(self.on_class_changed)
         self.leveling_card.mark_done.connect(self.on_mark_done)
         self.leveling_card.mark_board_done.connect(self.on_mark_board_done)
@@ -1509,6 +1510,7 @@ class MainWindow(FluentWindow):
         self.leveling_card.set_builds_for_class(
             self.leveling_manager.list_builds_for_class(default_class), default_build
         )
+        self._refresh_variants()
         self.leveling_card.set_level_value(default_level)
         self.leveling_card.set_favorite_state(self._is_build_favorite(default_build))
         # Don't re-persist what we just loaded back onto this same
@@ -1636,6 +1638,36 @@ class MainWindow(FluentWindow):
         self.leveling_card.set_favorite_state(
             self._is_build_favorite(self.leveling_manager.current_build_name)
         )
+
+        # set_current_build already dropped the old build's variant, so
+        # this shows the new build's own variants (or hides the row).
+        self._refresh_variants()
+
+    def _refresh_variants(self):
+        """Keep the variant selector in step with whatever build is
+        current. Hides itself for builds that have no variants."""
+
+        self.leveling_card.set_variants(
+            self.leveling_manager.get_variants(),
+            self.leveling_manager.current_variant_id,
+        )
+
+    def on_variant_changed(self, variant_id: str):
+        """A variant selection changes what ``get_verified_build``
+        returns, and every page reads its data from there - so the same
+        refresh sequence a build change uses is exactly what is needed
+        here too. Nothing from the previous variant survives it."""
+
+        if not self.leveling_manager.set_current_variant(variant_id or None):
+            return
+
+        level = self._current_level()
+
+        self._refresh_leveling(level)
+        self._refresh_skills()
+        self._refresh_paragon()
+        self._refresh_gear()
+        self._refresh_build_status()
 
     # ---------------------------------------------------------
     # FAVORITES / RECENT BUILDS (Phase 26)
@@ -3206,6 +3238,7 @@ class MainWindow(FluentWindow):
         first_build_name = builds[0]["build_name"]
 
         self.leveling_card.set_builds_for_class(builds, first_build_name)
+        self._refresh_variants()
         self.on_build_changed(first_build_name)
 
     # ---------------------------------------------------------
@@ -3236,6 +3269,7 @@ class MainWindow(FluentWindow):
 
         self.leveling_card.set_classes(self.leveling_manager.list_classes(), class_name)
         self.leveling_card.set_builds_for_class(builds, build_name)
+        self._refresh_variants()
         self.on_build_changed(build_name)
 
         self.switchTo(self.builds_interface)
