@@ -11,11 +11,17 @@ convention: DATA -> SERVICES -> UI).
   src/items_api.py; the address is configuration, see
   src/api_config.py). Nothing about an item is stored in this
   application any more.
-* The **Unique <-> Boss relationship** stays in src/unique_data.py,
-  because the API does not have it: the dataset describes *items*, not
-  which boss drops them. That file is therefore no longer an item
-  database - it is this project's own boss-mapping table, keyed by the
-  same stable snake_case ``id``.
+* The **drop sources** now come from the API too, as their own dataset
+  (``/drop-sources``): 177 records that at least two independent
+  Season 15 sources agreed on, each one a ``target_boss``, the shared
+  ``general_pool`` or the ``mythic_pool``. Items nobody could verify
+  are simply absent, and stay DATA UNAVAILABLE.
+* **src/unique_data.py is now a fallback**, used only where the server
+  has no verified record - it keeps the 11 items the dataset doesn't
+  list at all, and their bosses. Where the API and this older local
+  research disagree, **the API wins**: it is three current sources
+  against one earlier pass (see PROJECT_STATUS for the three items this
+  changed).
 
 So a record handed to the UI is the API's facts plus our own target
 bosses. Neither half invents the other's fields.
@@ -65,7 +71,31 @@ for _u in UNIQUES:
     _LOCAL_INDEX.setdefault(normalize_id(_u["name"]), _u)
 
 _api = ItemsAPI()
-_cache: dict = {"items": [], "by_id": {}, "fetched_at": 0.0, "error": None, "info": None}
+_cache: dict = {"items": [], "by_id": {}, "fetched_at": 0.0, "error": None, "info": None,
+                "drops": {}, "drops_meta": {}}
+
+
+def _boss_record(navn: str):
+    """The app's own boss record for a boss name from the server.
+
+    The two spell several bosses differently ("Duriel" vs "Duriel, King
+    of Maggots", "Varshan" vs "Echo of Varshan"), so the match is on the
+    normalized name with the app's "echo of" prefix and its ", title"
+    suffix allowed - an exact comparison of normalized strings, never a
+    fuzzy one. No match is not an error: the name is still shown, we
+    just have no zone/key details for it."""
+
+    if not navn:
+        return None
+    maal = normalize_id(navn)
+    for boss in BOSSES:
+        eget = normalize_id(boss["name"])
+        if eget == maal:
+            return boss
+        kort = eget.split("_")[0] if not eget.startswith("echo_of_") else eget[len("echo_of_"):]
+        if kort.split("_")[0] == maal.split("_")[0] and maal.split("_")[0] not in ("the",):
+            return boss
+    return None
 
 
 # ---------------------------------------------------------
@@ -93,7 +123,40 @@ def _split_type(api_type: str, category: str) -> tuple[str, str]:
     return kind, (slot or UNAVAILABLE)
 
 
-def _adapt(record: dict) -> dict:
+def _drop_felter(navn: str, item_id: str, drops: dict, local: dict) -> dict:
+    """Drop-kilden for én post: serverens verificerede data hvis den har
+    nogen, ellers projektets egen ældre mapping, ellers ingenting.
+
+    Rækkefølgen er ikke til forhandling: tre aktuelle Season 15-kilder
+    slår ét tidligere gennemløb. Men en manglende server-post giver
+    aldrig et gæt - så falder vi tilbage på den lokale mapping, og har
+    vi heller ikke den, står der DATA UNAVAILABLE."""
+
+    post = drops.get(item_id) or drops.get(normalize_id(navn))
+    if post:
+        kilder = post.get("drop_sources") or []
+        bosser, navne, typer, belaeg = [], [], [], set()
+        for k in kilder:
+            typer.append(k.get("type"))
+            belaeg.update(k.get("sources") or [])
+            if k.get("type") == "target_boss" and k.get("name"):
+                navne.append(k["name"])
+                rec = _boss_record(k["name"])
+                if rec:
+                    bosser.append(rec["id"])
+        return {"target_bosses": bosser, "drop_type": typer[0] if typer else None,
+                "drop_boss_names": navne, "drop_verified_by": sorted(belaeg),
+                "drop_from_api": True}
+
+    lokale_bosser = list(local.get("target_bosses", []))
+    return {"target_bosses": lokale_bosser,
+            "drop_type": "target_boss" if lokale_bosser else None,
+            "drop_boss_names": [_BOSSES_BY_ID[b]["name"] for b in lokale_bosser
+                                if b in _BOSSES_BY_ID],
+            "drop_verified_by": [], "drop_from_api": False}
+
+
+def _adapt(record: dict, drops: dict | None = None) -> dict:
     """One API record -> the shape the Unique Drop Locations UI already
     reads. Unknown API fields are carried along untouched in ``api``, so
     a new server field is never lost on the way through."""
@@ -107,6 +170,7 @@ def _adapt(record: dict) -> dict:
     kind, slot = _split_type(record.get("type", ""), record.get("category", ""))
 
     image_filename = str(record.get("local_image") or "").replace("\\", "/").rsplit("/", 1)[-1]
+    drop = _drop_felter(name, item_id, drops or {}, local)
 
     return {
         "id": item_id,
@@ -114,9 +178,7 @@ def _adapt(record: dict) -> dict:
         "type": kind,
         "class": str(record.get("class") or "").strip() or UNAVAILABLE,
         "slot": slot,
-        # The API has no boss data; this is ours, and an empty list
-        # legitimately means "no single target boss" (see unique_data).
-        "target_bosses": list(local.get("target_bosses", [])),
+        **drop,
         "description": (record.get("description") or "").strip() or None,
         # Only a path once the file is actually in the local cache - the
         # UI's background loader fetches it on demand and never blocks
@@ -152,6 +214,11 @@ def _local_only(unique: dict) -> dict:
 
     entry = dict(unique)
     entry.setdefault("image_filename", None)
+    entry["drop_type"] = "target_boss" if unique.get("target_bosses") else None
+    entry["drop_boss_names"] = [_BOSSES_BY_ID[b]["name"] for b in unique.get("target_bosses", [])
+                                if b in _BOSSES_BY_ID]
+    entry["drop_verified_by"] = []
+    entry["drop_from_api"] = False
     entry["from_api"] = False
     citation = (unique.get("source") or "").strip()
     entry["source"] = (
@@ -181,7 +248,15 @@ def _load(force: bool = False) -> dict:
                        "info": None})
         return _cache
 
-    adapted = [_adapt(r) for r in records
+    raa_drops = _api.drop_sources() or {}
+    drops = {}
+    for post in raa_drops.get("items", []):
+        nid = str(post.get("item_id", "")).strip().lower()
+        if nid:
+            drops[nid] = post
+        drops.setdefault(normalize_id(str(post.get("item_name", ""))), post)
+
+    adapted = [_adapt(r, drops) for r in records
                if str(r.get("category", "")).lower() in UNIQUE_CATEGORIES
                and str(r.get("name", "")).strip()]
 
@@ -201,7 +276,9 @@ def _load(force: bool = False) -> dict:
 
     items = sorted(by_id.values(), key=lambda e: e["name"].lower())
     _cache.update({"items": items, "by_id": by_id, "fetched_at": time.monotonic(),
-                   "error": None, "info": _api.version()})
+                   "error": None, "info": _api.version(),
+                   "drops": drops,
+                   "drops_meta": {k: v for k, v in raa_drops.items() if k != "items"}})
     return _cache
 
 
@@ -228,6 +305,13 @@ def dataset_info() -> dict | None:
     which dataset is actually being displayed."""
 
     return _load()["info"]
+
+
+def drop_source_info() -> dict:
+    """The server's drop-source dataset metadata - version, season and
+    which sources it was built from."""
+
+    return dict(_load()["drops_meta"])
 
 
 def api_base_url() -> str:

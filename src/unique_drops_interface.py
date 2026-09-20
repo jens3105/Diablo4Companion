@@ -75,11 +75,23 @@ def _boss_names_for(unique: dict) -> str:
     bosses = service.get_bosses_for_unique(unique["id"])
     if bosses:
         return ", ".join(b["name"] for b in bosses)
+
+    # A target boss the server named but this project has no record for:
+    # still show the name rather than nothing.
+    if unique.get("drop_boss_names"):
+        return ", ".join(unique["drop_boss_names"])
+
+    # The two shared pools are real, verified answers - not a gap.
+    if unique.get("drop_type") == "mythic_pool":
+        return "Mythic pool - any Uber boss can drop it (no boss to target)"
+    if unique.get("drop_type") == "general_pool":
+        return "General unique pool - not tied to a single boss"
+
     # An item we *do* have a record for explains itself (e.g. the
     # Season 15 Mythic crafting path) via its own notes.
     if unique.get("notes"):
         return unique["notes"]
-    return f"{_UNKNOWN} - no target boss recorded for this item"
+    return f"{_UNKNOWN} - no verified drop source for this item"
 
 
 def _resolve_asset_path(relative_path: str) -> str:
@@ -473,6 +485,7 @@ class UniqueDropsCard(BaseCard):
             f"Target boss(es):\n{boss_lines}\n"
             f"Confidence: {confidence_text}\n"
             f"Item data: {'Data API (verified dataset)' if entry.get('from_api') else 'local boss mapping - NOT in the verified dataset'}\n"
+            f"Drop source: {'verified Season 15 data (' + ', '.join(entry['drop_verified_by']) + ')' if entry.get('drop_verified_by') else ('this project' + chr(39) + 's own earlier research' if entry.get('target_bosses') else 'none recorded')}\n"
             f"Source: {entry['source']}"
         )
         if notes and bosses:

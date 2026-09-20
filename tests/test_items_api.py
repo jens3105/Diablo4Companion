@@ -255,40 +255,57 @@ class UniqueDropServiceTests(unittest.TestCase):
         by_id = {u["id"]: u for u in self.uniques}
         for local in UNIQUES:
             self.assertIn(local["id"], by_id, f"{local['name']} fell out of the catalogue")
-            self.assertEqual(
-                by_id[local["id"]]["target_bosses"],
-                local["target_bosses"],
-                f"{local['name']} lost its boss mapping",
-            )
+            entry = by_id[local["id"]]
+            if entry["drop_from_api"]:
+                # The server's verified Season 15 data wins over this
+                # project's earlier research - but it must still say
+                # *something* about where the item drops.
+                self.assertTrue(
+                    entry["drop_type"], f"{local['name']} lost its drop source entirely"
+                )
+            else:
+                self.assertEqual(
+                    entry["target_bosses"],
+                    local["target_bosses"],
+                    f"{local['name']} lost its boss mapping",
+                )
 
     def test_mapping_coverage_is_what_we_think_it_is(self):
-        # 30 mapped entries, 2 of which deliberately have no target boss
-        # (Season 15 Mythic crafting - see src/unique_data.py). Everything
-        # else has no boss data anywhere, and must say so rather than guess.
-        with_boss = [u for u in self.uniques if u["target_bosses"]]
-        self.assertEqual(len(with_boss), 28)
+        """Coverage after the Season 15 research: 151 target bosses and
+        26 shared-pool records from the server, 11 more from this
+        project's own mapping, and the rest honestly unknown."""
+
+        import collections
+
+        fordeling = collections.Counter(u.get("drop_type") for u in self.uniques)
+        self.assertEqual(fordeling["target_boss"], 162)   # 151 verified + 11 local
+        self.assertEqual(fordeling["mythic_pool"], 13)
+        self.assertEqual(fordeling["general_pool"], 15)
+        self.assertEqual(fordeling[None], 52, "Unverified items must stay unknown")
         for name in ("Harlequin Crest", "Fists of Fate"):
             entry = service.find_unique(name)
-            self.assertEqual(entry["target_bosses"], [])
-            self.assertTrue(entry["notes"], f"{name} has no boss and no explanation")
+            self.assertEqual(entry["target_bosses"], [], f"{name} must not name a boss")
 
-    def test_items_reported_as_data_unavailable_really_have_no_mapping(self):
-        """The items from the Windows end-to-end test. They are in the
-        dataset, they are not in the boss mapping, and no boss may be
-        invented for them."""
+    def test_items_from_the_windows_report_now_have_verified_sources(self):
+        """The seven items the Windows test showed as DATA UNAVAILABLE.
+        Six now have a verified Season 15 drop source; Nemesis Bracers
+        has none in any source and must stay unavailable."""
 
-        from src.unique_data import UNIQUES
-
-        mapped = {u["id"] for u in UNIQUES}
-        for name in ("Might of the Ursine", "Misericorde", "Mjölnic Ryng",
-                     "Mother's Embrace", "Nails of the Gore-Crowned",
-                     "Nemesis Bracers", "Nesekem, the Herald"):
+        forventet = {
+            "Might of the Ursine": "target_boss",
+            "Misericorde": "target_boss",
+            "Mjölnic Ryng": "target_boss",
+            "Mother's Embrace": "general_pool",
+            "Nails of the Gore-Crowned": "target_boss",
+            "Nesekem, the Herald": "mythic_pool",
+            "Nemesis Bracers": None,
+        }
+        for name, drop_type in forventet.items():
             entry = service.find_unique(name)
             self.assertIsNotNone(entry, f"{name} is missing from the catalogue")
             self.assertTrue(entry["from_api"], f"{name} did not come from the API")
             self.assertTrue(entry["description"], f"{name} has no description")
-            self.assertNotIn(entry["id"], mapped)
-            self.assertEqual(entry["target_bosses"], [])
+            self.assertEqual(entry["drop_type"], drop_type, name)
 
     def test_a_mapped_item_still_shows_its_boss(self):
         moloch = service.find_unique("Moloch's Beating Flame")
@@ -306,6 +323,81 @@ class UniqueDropServiceTests(unittest.TestCase):
                 normalize_id(unicodedata.normalize("NFD", name)),
                 "Two spellings of the same name produce different ids",
             )
+
+    # --- drop sources (server dataset, Season 15) -------------------
+
+    def test_drop_source_dataset_loads(self):
+        meta = service.drop_source_info()
+        self.assertEqual(meta["season"], 15)
+        self.assertEqual(meta["dataset_version"], "1.0.0")
+        self.assertGreaterEqual(len(meta["source_list"]), 2, "Needs independent sources")
+
+    def test_target_boss_data_displays(self):
+        for name, boss in (("Misericorde", "Bartuc"),
+                           ("Might of the Ursine", "Harbinger of Hatred"),
+                           ("Mjölnic Ryng", "Bartuc"),
+                           ("Nails of the Gore-Crowned", "The Butcher")):
+            entry = service.find_unique(name)
+            self.assertEqual(entry["drop_type"], "target_boss", name)
+            self.assertEqual(entry["drop_boss_names"], [boss], name)
+            self.assertTrue(entry["target_bosses"], f"{name} resolved to no boss record")
+            self.assertGreaterEqual(len(entry["drop_verified_by"]), 2, name)
+
+    def test_general_pool_data_displays(self):
+        for name in ("Mother's Embrace", "Fists of Fate"):
+            entry = service.find_unique(name)
+            self.assertEqual(entry["drop_type"], "general_pool", name)
+            self.assertEqual(entry["target_bosses"], [], f"{name} must not name a boss")
+
+    def test_mythic_pool_data_displays(self):
+        for name in ("Harlequin Crest", "Nesekem, the Herald"):
+            entry = service.find_unique(name)
+            self.assertEqual(entry["drop_type"], "mythic_pool", name)
+            self.assertEqual(entry["target_bosses"], [], f"{name} must not name a boss")
+
+    def test_unverified_item_stays_data_unavailable(self):
+        entry = service.find_unique("Nemesis Bracers")
+        self.assertIsNone(entry["drop_type"])
+        self.assertEqual(entry["target_bosses"], [])
+        self.assertEqual(entry["drop_boss_names"], [])
+        self.assertIsNone(ItemsAPI().drop_source("Nemesis Bracers"),
+                          "The server must not carry an unverified record")
+
+    def test_no_invented_sources(self):
+        """Every drop record on the server cites the sources that agreed
+        on it, and every one of them is marked verified."""
+
+        payload = ItemsAPI().drop_sources()
+        for record in payload["items"]:
+            for drop in record["drop_sources"]:
+                self.assertEqual(drop["status"], "verified", record["item_name"])
+                self.assertEqual(drop["season"], 15, record["item_name"])
+                self.assertGreaterEqual(len(drop["sources"]), 1, record["item_name"])
+                if drop["type"] == "target_boss":
+                    self.assertTrue(drop.get("name"), record["item_name"])
+
+    def test_special_items_keep_their_season_15_notes(self):
+        for name in ("Harlequin Crest", "Fists of Fate"):
+            entry = service.find_unique(name)
+            self.assertTrue(entry["notes"], f"{name} lost its special note")
+            self.assertIn("Horadric Cube", entry["notes"])
+
+    def test_local_mapping_still_covers_items_the_server_cannot(self):
+        # The 11 items not in the dataset keep their own bosses.
+        windforce = service.find_unique("Windforce")
+        self.assertFalse(windforce["drop_from_api"])
+        self.assertEqual(windforce["drop_boss_names"], ["Urivar"])
+
+    def test_item_dataset_sha256_did_not_change(self):
+        # Adding drop sources must not touch the canonical item dataset.
+        self.assertEqual(ItemsAPI().version()["sha256"], EXPECTED_SHA256)
+
+    def test_api_is_still_read_only(self):
+        import requests
+
+        for method in ("POST", "PUT", "PATCH", "DELETE"):
+            r = requests.request(method, f"{CONFIGURED_URL}/drop-sources", timeout=5)
+            self.assertEqual(r.status_code, 405, method)
 
     def test_no_duplicate_entries_after_merging(self):
         ids = [u["id"] for u in self.uniques]
@@ -358,17 +450,17 @@ class UniqueDropServiceTests(unittest.TestCase):
             # Kept only because they carry the mapping.
             self.assertTrue(unique["target_bosses"], f"{unique['name']} maps to no boss")
 
-    def test_removing_local_entries_would_empty_two_bosses(self):
-        """Why they are kept at all - stated as a test so a future
-        cleanup sees the consequence before deleting them."""
+    def test_local_only_items_still_carry_their_bosses(self):
+        """The 11 items the dataset doesn't list kept this project's own
+        mapping - the server has nothing to replace it with."""
 
-        local_ids = {u["id"] for u in self.uniques if not u["from_api"]}
-        emptied = []
-        for boss in service.all_bosses():
-            items = service.get_uniques_for_boss(boss["id"])
-            if items and all(u["id"] in local_ids for u in items):
-                emptied.append(boss["name"])
-        self.assertEqual(len(emptied), 2, f"Expected 2 bosses to depend on them, got {emptied}")
+        local = [u for u in self.uniques if not u["from_api"]]
+        self.assertEqual(len(local), 11)
+        med_boss = [u for u in local if u["target_bosses"]]
+        self.assertEqual(len(med_boss), 11, "A locally-mapped item lost its boss")
+        for unique in med_boss:
+            self.assertFalse(unique["drop_from_api"])
+            self.assertTrue(service.get_bosses_for_unique(unique["id"]))
 
     def test_no_hardcoded_item_catalogue_in_the_production_path(self):
         # src/unique_data.py is now only the boss-mapping table: far

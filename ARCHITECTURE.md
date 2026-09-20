@@ -110,6 +110,18 @@ UI (unique_drops_interface)
   farmable Uniques - but every record carries `from_api`, and those 11
   are labelled "not in dataset" on the card and in the detail panel, so
   local research can never pass for verified data.
+* **Drop sources are their own dataset on the server** (`/drop-sources`,
+  Season 15): 179 records - 151 `target_boss`, 15 `general_pool`,
+  13 `mythic_pool` - built from three independent sources and kept only
+  where at least two agreed. `src/unique_data.py` is now the *fallback*:
+  it still covers the 11 items the dataset does not list at all. Where
+  the server and this project's older research disagree, the server
+  wins (three current sources beat one earlier pass); that changed the
+  target boss for Galvanic Azurite, Yen's Blessing and Paingorger's
+  Gauntlets.
+* An item with no verified drop source is **absent** from that dataset,
+  and the page says DATA UNAVAILABLE. 52 items are in that state, and
+  none of them may be given a boss because one looks plausible.
 * `src/item_images.py` caches API images on disk, one at a time, only
   when a card actually needs to draw one. Deleting the cache is always
   safe; it is never a source of truth, and no images ship with the app.

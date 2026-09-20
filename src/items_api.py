@@ -165,6 +165,28 @@ class ItemsAPI:
         return self._items_of(self._get_json("search", {"q": query.strip()}))
 
     # -----------------------------
+    # Drop sources
+    # -----------------------------
+
+    def drop_sources(self) -> dict | None:
+        """The whole verified drop-source dataset, or ``None``.
+
+        A separate dataset from the item catalogue on purpose: an item's
+        metadata and who drops it come from different sources and are
+        versioned separately. The server only publishes records that at
+        least two independent Season 15 sources agreed on - an item that
+        isn't in here has no verified drop source, and the app must show
+        DATA UNAVAILABLE rather than fill the gap."""
+
+        return self._get_json("drop-sources")
+
+    def drop_source(self, name: str) -> dict | None:
+        if not name or not name.strip():
+            self.last_error = "Empty item name"
+            return None
+        return self._get_json(f"drop-sources/{urllib.parse.quote(name.strip())}")
+
+    # -----------------------------
     # Images
     # -----------------------------
 
