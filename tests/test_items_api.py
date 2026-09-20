@@ -43,7 +43,7 @@ from src.items_api import ItemsAPI  # noqa: E402
 EXPECTED_ITEMS = 453
 EXPECTED_CATEGORIES = {"charms": 222, "mythics": 16, "uniques": 215}
 EXPECTED_SHA256 = "79aacf51f387b491c69d073d82dbdf7417acffb88363ade6d1f645002aad0a4c"
-DROP_DATASET_VERSION = "1.2.0"
+DROP_DATASET_VERSION = "1.3.0"
 
 CONFIGURED_URL = items_api_base_url()
 
@@ -247,29 +247,20 @@ class UniqueDropServiceTests(unittest.TestCase):
         crest = service.find_unique("Harlequin Crest")
         self.assertEqual(crest["image_filename"], "Harlequin-Crest-1089568.png")
 
-    def test_every_local_mapping_reaches_the_catalogue(self):
-        """The whole boss mapping must survive the merge - this is the
-        test that would fail if name normalization ever regressed."""
+    def test_the_app_holds_no_item_or_drop_data_of_its_own(self):
+        """The whole point of this phase: every item on the page came
+        from the server, and src/unique_data.py no longer exists."""
 
-        from src.unique_data import UNIQUES
+        import importlib
+        from pathlib import Path
 
-        by_id = {u["id"]: u for u in self.uniques}
-        for local in UNIQUES:
-            self.assertIn(local["id"], by_id, f"{local['name']} fell out of the catalogue")
-            entry = by_id[local["id"]]
-            if entry["drop_from_api"]:
-                # The server's verified Season 15 data wins over this
-                # project's earlier research - but it must still say
-                # *something* about where the item drops.
-                self.assertTrue(
-                    entry["drop_type"], f"{local['name']} lost its drop source entirely"
-                )
-            else:
-                self.assertEqual(
-                    entry["target_bosses"],
-                    local["target_bosses"],
-                    f"{local['name']} lost its boss mapping",
-                )
+        with self.assertRaises(ImportError):
+            importlib.import_module("src.unique_data")
+        self.assertFalse(
+            (Path(__file__).resolve().parent.parent / "src" / "unique_data.py").exists()
+        )
+        for unique in self.uniques:
+            self.assertTrue(unique["from_api"], f"{unique['name']} did not come from the server")
 
     def test_mapping_coverage_is_what_we_think_it_is(self):
         """Coverage after the Season 15 research: 151 target bosses and
@@ -384,10 +375,11 @@ class UniqueDropServiceTests(unittest.TestCase):
             self.assertTrue(entry["notes"], f"{name} lost its special note")
             self.assertIn("Horadric Cube", entry["notes"])
 
-    def test_local_mapping_still_covers_items_the_server_cannot(self):
-        # The 11 items not in the dataset keep their own bosses.
+    def test_windforce_survived_the_move_to_the_server(self):
+        # It used to be local data. It is still on the page, now served.
         windforce = service.find_unique("Windforce")
-        self.assertFalse(windforce["drop_from_api"])
+        self.assertTrue(windforce["drop_from_api"])
+        self.assertEqual(windforce["category"], "supplement")
         self.assertEqual(windforce["drop_boss_names"], ["Urivar"])
 
     def test_item_dataset_sha256_did_not_change(self):
@@ -416,22 +408,35 @@ class UniqueDropServiceTests(unittest.TestCase):
             bosses = [b["name"] for b in service.get_bosses_for_unique(entry["id"])]
             self.assertEqual(bosses, [boss], name)
 
-    def test_no_item_with_server_data_uses_the_local_mapping(self):
-        from src.unique_data import UNIQUES
-
-        local_ids = {u["id"] for u in UNIQUES}
+    def test_no_drop_source_is_local_any_more(self):
         for unique in self.uniques:
-            if unique["drop_from_api"] and unique["id"] in local_ids:
-                self.assertNotEqual(
-                    unique["drop_verification"], "local_legacy",
-                    f"{unique['name']} showed stale local boss data",
-                )
+            self.assertNotEqual(unique.get("drop_verification"), "local_legacy",
+                                f"{unique['name']} still shows local drop data")
 
-    def test_local_mapping_is_fallback_only(self):
-        legacy = [u for u in self.uniques if u["drop_verification"] == "local_legacy"]
-        self.assertEqual(len(legacy), 11, "Legacy mapping is used beyond its fallback role")
-        for unique in legacy:
-            self.assertFalse(unique["drop_from_api"])
+    def test_the_11_missing_items_come_from_the_servers_supplement(self):
+        """They used to live in the app. Now the server publishes them,
+        with a verified boss and their metadata marked as older
+        research - and they are still on the page."""
+
+        supplement = [u for u in self.uniques if u["category"] == "supplement"]
+        self.assertEqual(len(supplement), 11)
+        for unique in supplement:
+            self.assertTrue(unique["from_api"])
+            self.assertEqual(unique["metadata_status"], "local_legacy")
+            self.assertEqual(unique["drop_verification"], "verified")
+            self.assertTrue(unique["target_bosses"], f"{unique['name']} lost its boss")
+            self.assertGreaterEqual(len(unique["drop_verified_by"]), 2, unique["name"])
+        self.assertIn("Windforce", [u["name"] for u in supplement])
+
+    def test_special_notes_come_from_the_server(self):
+        for name, fragment in (("Harlequin Crest", "Horadric Cube"),
+                               ("Fists of Fate", "Helltide")):
+            entry = service.find_unique(name)
+            self.assertTrue(entry["notes"], f"{name} lost its note")
+            self.assertIn(fragment, entry["notes"])
+            # And it really is the server's copy, not a local one.
+            record = ItemsAPI().drop_source(name)
+            self.assertEqual(record["note"], entry["notes"])
 
     # --- confidence levels ------------------------------------------
 
@@ -478,8 +483,12 @@ class UniqueDropServiceTests(unittest.TestCase):
             payload["count"] + payload["single_source_count"] + payload["unresolved_count"],
             payload["catalogue_size"],
         )
+        # Everything on the page comes from the server: the 231
+        # catalogue items plus the 11 the catalogue is missing.
         from_api = [u for u in self.uniques if u["from_api"]]
-        self.assertEqual(len(from_api), 231)
+        self.assertEqual(len(from_api), len(self.uniques))
+        self.assertEqual(len(self.uniques), payload["catalogue_size"]
+                         + payload["catalogue_supplement_count"])
 
     def test_drop_source_file_reload_and_version_reporting(self):
         version = ItemsAPI().version()
@@ -498,15 +507,16 @@ class UniqueDropServiceTests(unittest.TestCase):
         self.assertEqual(len(names), len(set(names)), "The same item appears twice")
 
     def test_item_known_under_an_older_local_id_is_not_duplicated(self):
-        # "The Eightfold Idol" sits in the local boss table under the id
-        # "eightfold_idol"; before the name-based match it appeared
-        # twice - once from the API without a boss, once from the table.
+        # This one used to exist twice: once from the API without a
+        # boss, once from the local table under the older id
+        # "eightfold_idol". With no local table there is one record, and
+        # its id is simply its normalized name.
         matches = [u for u in self.uniques if u["name"] == "The Eightfold Idol"]
         self.assertEqual(len(matches), 1)
         entry = matches[0]
-        self.assertEqual(entry["id"], "eightfold_idol")
-        self.assertEqual(entry["category"], "uniques")   # came from the API
-        self.assertTrue(entry["target_bosses"])          # kept its boss
+        self.assertEqual(entry["id"], "the_eightfold_idol")
+        self.assertEqual(entry["category"], "uniques")
+        self.assertTrue(entry["target_bosses"])
 
     def test_harlequin_crest_comes_from_the_api(self):
         crest = service.find_unique("Harlequin Crest")
@@ -520,47 +530,38 @@ class UniqueDropServiceTests(unittest.TestCase):
 
     def test_every_api_sourced_record_really_has_an_api_record(self):
         for unique in self.uniques:
-            if unique["from_api"]:
-                self.assertIsNotNone(unique["api"], unique["name"])
-                self.assertEqual(unique["api"]["name"], unique["name"])
+            self.assertIsNotNone(unique["api"], unique["name"])
+            raa = unique["api"]
+            # Catalogue records carry "name"; supplement records, which
+            # come from the drop-source dataset, carry "item_name".
+            self.assertEqual(raa.get("name") or raa.get("item_name"), unique["name"])
 
     def test_item_without_an_api_record_is_not_presented_as_api_data(self):
         """The 11 entries the dataset doesn't list are kept for their
         boss mapping only - they must never pass for verified data."""
 
-        local = [u for u in self.uniques if not u["from_api"]]
-        self.assertTrue(local, "Expected some local-only entries")
-        for unique in local:
-            self.assertIsNone(unique["api"])
-            self.assertEqual(unique["category"], "local")
-            self.assertIn("NOT in the verified dataset", unique["source"])
-            self.assertNotIn("Data API", unique["source"])
-            # No API fields may be faked in either: no description and
-            # no image filename, rather than an invented one.
-            self.assertIsNone(unique.get("description"))
+        supplement = [u for u in self.uniques if u["category"] == "supplement"]
+        self.assertTrue(supplement, "Expected the catalogue supplement")
+        for unique in supplement:
+            self.assertEqual(unique["metadata_status"], "local_legacy")
+            self.assertNotIn(unique["name"], {i["name"] for i in ItemsAPI().items()},
+                             "A supplement item must not also be in the catalogue")
+            # No catalogue metadata may be faked in: no image.
             self.assertIsNone(unique.get("image_filename"))
-            # Kept only because they carry the mapping.
-            self.assertTrue(unique["target_bosses"], f"{unique['name']} maps to no boss")
 
-    def test_local_only_items_still_carry_their_bosses(self):
-        """The 11 items the dataset doesn't list kept this project's own
-        mapping - the server has nothing to replace it with."""
-
-        local = [u for u in self.uniques if not u["from_api"]]
-        self.assertEqual(len(local), 11)
-        med_boss = [u for u in local if u["target_bosses"]]
-        self.assertEqual(len(med_boss), 11, "A locally-mapped item lost its boss")
-        for unique in med_boss:
-            self.assertFalse(unique["drop_from_api"])
-            self.assertTrue(service.get_bosses_for_unique(unique["id"]))
+    def test_every_supplement_item_resolves_to_a_real_boss(self):
+        for unique in [u for u in self.uniques if u["category"] == "supplement"]:
+            self.assertTrue(service.get_bosses_for_unique(unique["id"]), unique["name"])
 
     def test_no_hardcoded_item_catalogue_in_the_production_path(self):
-        # src/unique_data.py is now only the boss-mapping table: far
-        # smaller than the catalogue, and nothing may be served from it
-        # as an item list.
-        from src.unique_data import UNIQUES
+        import subprocess
+        from pathlib import Path
 
-        self.assertLess(len(UNIQUES), len(self.uniques))
+        rod = Path(__file__).resolve().parent.parent / "src"
+        fundet = subprocess.run(
+            ["grep", "-rlnE", r"(from|import)[^#]*unique_data", str(rod)],
+            capture_output=True, text=True).stdout.strip()
+        self.assertEqual(fundet, "", f"Production code still imports unique_data: {fundet}")
         self.assertGreater(len(self.uniques), 200)
 
 

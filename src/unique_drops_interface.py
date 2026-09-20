@@ -11,10 +11,10 @@ results for both directions instead of building two separate screens:
   the Boss filter; the list becomes exactly that boss's farmable
   Uniques, and a boss-detail panel shows its tier/zone/key/key source.
 
-See src/unique_data.py and src/boss_data.py's module docstrings for how
-this data is sourced/verified, and src/unique_drop_service.py for the
-data access layer this UI calls into - it never reads UNIQUES/BOSSES or
-hardcodes a loot table itself."""
+All item and drop data comes from the server (see
+src/unique_drop_service.py, the data access layer this UI calls into) -
+this page never reads a local table or hardcodes a loot table itself.
+src/boss_data.py supplies the boss details (tier, zone, key)."""
 
 import os
 import sys
@@ -73,8 +73,6 @@ def _drop_provenance(entry: dict) -> str:
         return f"verified Season 15 data - {entry.get('source_count') or len(entry.get('drop_verified_by') or [])} sources agree ({kilder})"
     if status == "single_source":
         return f"SINGLE SOURCE, low confidence - only {kilder} states this"
-    if status == "local_legacy":
-        return "this project's own earlier research (not in the server dataset)"
     return "none recorded"
 
 
@@ -92,8 +90,10 @@ def _boss_names_for(unique: dict) -> str:
     forbehold = ""
     if unique.get("drop_verification") == "single_source":
         forbehold = "  (single source - low confidence)"
-    elif unique.get("drop_verification") == "local_legacy":
-        forbehold = "  (this project's own earlier research)"
+    elif unique.get("metadata_status") == "local_legacy":
+        # The drop source is verified; it is the item's own details that
+        # are older research, because the item dataset does not list it.
+        forbehold = "  (item not in the verified dataset)"
 
     bosses = service.get_bosses_for_unique(unique["id"])
     if bosses:
@@ -253,9 +253,11 @@ class UniqueItemCard(QFrame):
         text_col.addWidget(name_label)
 
         meta_text = f"{unique['type']} · {unique['class']} · {unique['slot']}"
-        if not unique.get("from_api", False):
-            # This item isn't in the canonical dataset - say so on the
-            # card itself, so it can't be mistaken for verified data.
+        if unique.get("metadata_status") == "local_legacy":
+            # The item is real and its boss is verified, but the item
+            # dataset doesn't list it, so these details are older
+            # research. Say so on the card rather than let it pass for
+            # catalogue data.
             meta_text += " · not in dataset"
         meta_label = CaptionLabel(meta_text, self)
         meta_label.setTextColor(QColor(theme.TEXT_MUTED), QColor(theme.TEXT_MUTED))

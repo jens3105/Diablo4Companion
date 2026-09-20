@@ -7,7 +7,7 @@ why no legitimately licensed source of Diablo IV item icon art exists).
 Instead, the *user* may drop their own image files into
 ``assets/items/uniques/`` - this module only discovers and validates
 what's already there, matched to a Unique's existing stable ``id``
-(src/unique_data.py), never by display name alone (a name-only match
+(derived from its name), never by display name alone (a name-only match
 risks silently attaching the wrong item's icon).
 
 ``assets/items/uniques/`` is gitignored - these are the user's own
@@ -41,7 +41,7 @@ def icons_dir() -> str:
 def normalize_id(text: str) -> str:
     """Turns "Harlequin Crest" / "harlequin-crest" / "HARLEQUIN CREST"
     into "harlequin_crest" - the same normalized form a Unique's own
-    stable ``id`` already uses (src/unique_data.py), so a filename only
+    stable ``id`` already uses, so a filename only
     has to normalize-equal an existing id to match. No fuzzy/partial
     matching - an unrecognized name is left unmatched rather than
     guessed at (see scripts/import_item_icons.py).

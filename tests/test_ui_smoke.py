@@ -93,7 +93,8 @@ class UniqueDropsPageTests(unittest.TestCase):
         from PySide6.QtWidgets import QLabel
 
         card = UniqueDropsCard()
-        local = next(u for u in service.all_uniques() if not u["from_api"])
+        local = next(u for u in service.all_uniques()
+                     if u.get("metadata_status") == "local_legacy")
 
         texts = [w.text() for w in card.findChildren(QLabel) if hasattr(w, "text")]
         self.assertTrue(
@@ -106,7 +107,7 @@ class UniqueDropsPageTests(unittest.TestCase):
         )
 
         card._show_detail(local["id"])
-        self.assertIn("NOT in the verified dataset", card.detail_label.text())
+        self.assertIn("not in all-items-final.json", card.detail_label.text())
 
         # ...and a real API item is labelled as such.
         card._show_detail(service.find_unique("Harlequin Crest")["id"])
@@ -121,7 +122,7 @@ class UniqueDropsPageTests(unittest.TestCase):
             "Harlequin Crest": ("Mythic pool", "verified"),
             "Nemesis Bracers": ("DATA UNAVAILABLE", "none recorded"),
             "Bane of Ahjad-Den": ("single source - low confidence", "SINGLE SOURCE"),
-            "Windforce": ("earlier research", "earlier research"),
+            "Windforce": ("Urivar", "verified"),
         }
         for name, (i_linjen, i_panelet) in forventet.items():
             entry = service.find_unique(name)

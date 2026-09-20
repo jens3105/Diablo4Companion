@@ -11,17 +11,20 @@ convention: DATA -> SERVICES -> UI).
   src/items_api.py; the address is configuration, see
   src/api_config.py). Nothing about an item is stored in this
   application any more.
-* The **drop sources** now come from the API too, as their own dataset
-  (``/drop-sources``): 177 records that at least two independent
-  Season 15 sources agreed on, each one a ``target_boss``, the shared
-  ``general_pool`` or the ``mythic_pool``. Items nobody could verify
-  are simply absent, and stay DATA UNAVAILABLE.
-* **src/unique_data.py is now a fallback**, used only where the server
-  has no verified record - it keeps the 11 items the dataset doesn't
-  list at all, and their bosses. Where the API and this older local
-  research disagree, **the API wins**: it is three current sources
-  against one earlier pass (see PROJECT_STATUS for the three items this
-  changed).
+* The **drop sources** come from the API as their own dataset
+  (``/drop-sources``): records that at least two independent Season 15
+  sources agreed on, each one a ``target_boss``, the shared
+  ``general_pool`` or the ``mythic_pool``, plus any special acquisition
+  ``note``. Items nobody could verify are absent and stay DATA
+  UNAVAILABLE.
+* **This application holds no item or drop data of its own.**
+  src/unique_data.py is gone. The 11 items the item dataset does not
+  list arrive from the server's ``catalogue_supplement`` (their drop
+  source verified by three sources; their metadata carried over from
+  this project's earlier research and marked ``local_legacy`` there),
+  so there is exactly one place item knowledge lives: the server.
+  src/boss_data.py stays - it is boss reference data (tier, zone, key),
+  not item data.
 
 So a record handed to the UI is the API's facts plus our own target
 bosses. Neither half invents the other's fields.
@@ -45,7 +48,6 @@ from src.boss_data import BOSSES
 from src.item_icon_assets import normalize_id
 from src.item_images import cached_path
 from src.items_api import ItemsAPI
-from src.unique_data import UNIQUES
 
 # Categories on the server that belong on this page. "charms" is a
 # separate category in the same dataset and is not a Unique.
@@ -56,19 +58,6 @@ CACHE_TTL = 300  # seconds
 UNAVAILABLE = "DATA UNAVAILABLE"
 
 _BOSSES_BY_ID = {b["id"]: b for b in BOSSES}
-
-# The local boss-mapping table, reachable by both its own stable id and
-# by its normalized *name*. Both are needed: "The Eightfold Idol" is
-# stored here under the older id "eightfold_idol", so an id-only lookup
-# would fail to match the server's record and the item would appear
-# twice on the page - once from the API without its boss, and once from
-# this table. Matching on the name as well is an exact comparison of a
-# normalized string, not fuzzy matching (see src/item_icon_assets.py on
-# why nothing here guesses).
-_LOCAL_INDEX = {}
-for _u in UNIQUES:
-    _LOCAL_INDEX[_u["id"]] = _u
-    _LOCAL_INDEX.setdefault(normalize_id(_u["name"]), _u)
 
 _api = ItemsAPI()
 _cache: dict = {"items": [], "by_id": {}, "fetched_at": 0.0, "error": None, "info": None,
@@ -123,14 +112,13 @@ def _split_type(api_type: str, category: str) -> tuple[str, str]:
     return kind, (slot or UNAVAILABLE)
 
 
-def _drop_felter(navn: str, item_id: str, drops: dict, local: dict) -> dict:
-    """Drop-kilden for én post: serverens verificerede data hvis den har
-    nogen, ellers projektets egen ældre mapping, ellers ingenting.
+def _drop_felter(navn: str, item_id: str, drops: dict) -> dict:
+    """Drop-kilden for én post, udelukkende fra serveren.
 
-    Rækkefølgen er ikke til forhandling: tre aktuelle Season 15-kilder
-    slår ét tidligere gennemløb. Men en manglende server-post giver
-    aldrig et gæt - så falder vi tilbage på den lokale mapping, og har
-    vi heller ikke den, står der DATA UNAVAILABLE."""
+    Der er ingen lokal tabel at falde tilbage på længere: har serveren
+    ingen post, er svaret DATA UNAVAILABLE. Det er hele pointen - et
+    gæt ville være værre end ingenting, og en lokal kopi ville før eller
+    siden komme bagud uden at nogen opdagede det."""
 
     post = drops.get(item_id) or drops.get(normalize_id(navn))
     if post:
@@ -152,14 +140,9 @@ def _drop_felter(navn: str, item_id: str, drops: dict, local: dict) -> dict:
                 "drop_from_api": True, "drop_confidence": tillid,
                 "drop_verification": verifikation}
 
-    lokale_bosser = list(local.get("target_bosses", []))
-    return {"target_bosses": lokale_bosser,
-            "drop_type": "target_boss" if lokale_bosser else None,
-            "drop_boss_names": [_BOSSES_BY_ID[b]["name"] for b in lokale_bosser
-                                if b in _BOSSES_BY_ID],
+    return {"target_bosses": [], "drop_type": None, "drop_boss_names": [],
             "drop_verified_by": [], "drop_from_api": False,
-            "drop_confidence": "local" if lokale_bosser else None,
-            "drop_verification": "local_legacy" if lokale_bosser else None}
+            "drop_confidence": None, "drop_verification": None}
 
 
 def _adapt(record: dict, drops: dict | None = None) -> dict:
@@ -168,15 +151,13 @@ def _adapt(record: dict, drops: dict | None = None) -> dict:
     a new server field is never lost on the way through."""
 
     name = str(record.get("name", "")).strip()
-    local = _LOCAL_INDEX.get(normalize_id(name), {})
-    # A matched item keeps the id this project already uses, so existing
-    # references (and the user's own icon files, named after that id)
-    # don't silently stop matching.
-    item_id = local.get("id") or normalize_id(name)
+    item_id = normalize_id(name)
     kind, slot = _split_type(record.get("type", ""), record.get("category", ""))
 
     image_filename = str(record.get("local_image") or "").replace("\\", "/").rsplit("/", 1)[-1]
-    drop = _drop_felter(name, item_id, drops or {}, local)
+    drops = drops or {}
+    drop = _drop_felter(name, item_id, drops)
+    server_post = drops.get(item_id) or drops.get(normalize_id(name)) or {}
 
     return {
         "id": item_id,
@@ -195,47 +176,48 @@ def _adapt(record: dict, drops: dict | None = None) -> dict:
         # that isn't in the canonical dataset can pass for verified.
         "from_api": True,
         "source": "Diablo4Companion Data API (PureDiablo, verified)",
-        "confidence": local.get("confidence"),
-        "sources_count": local.get("sources_count"),
-        "notes": local.get("notes"),
+        "confidence": drop.get("drop_confidence"),
+        "sources_count": (drop["drop_verified_by"] and len(drop["drop_verified_by"])) or None,
+        # Special acquisition notes (Mythic crafting and the like) live
+        # on the server record now, not in this application.
+        "notes": server_post.get("note"),
         "category": record.get("category"),
         "api": record,
     }
 
 
-def _local_only(unique: dict) -> dict:
-    """A Unique this project has a target boss for, but which the
-    server's dataset does not list.
+def _fra_supplement(record: dict, drops: dict) -> dict:
+    """An item the game has but ``all-items-final.json`` does not.
 
-    These are kept **for the mapping**, not as an alternative item
-    database: dropping them would leave Grigoire and Echo of Varshan
-    with no farmable Uniques at all (measured, 2026-09-20), which is
-    the existing functionality this page is for.
+    The server publishes these in ``catalogue_supplement``: their drop
+    source is verified by three sources, their metadata is this
+    project's older research which was moved *to the server* and is
+    marked ``local_legacy`` there. So they still reach the page - the
+    application just no longer carries them itself."""
 
-    Their item fields (type/class/slot) are this project's own older
-    research, not the canonical dataset - so the record is explicitly
-    marked ``from_api: False`` and its ``source`` says so in words. The
-    UI shows that marker; nothing here may pass for verified data.
-    """
+    name = str(record.get("item_name", "")).strip()
+    item_id = str(record.get("item_id") or normalize_id(name))
+    drop = _drop_felter(name, item_id, drops)
 
-    entry = dict(unique)
-    entry.setdefault("image_filename", None)
-    entry["drop_type"] = "target_boss" if unique.get("target_bosses") else None
-    entry["drop_boss_names"] = [_BOSSES_BY_ID[b]["name"] for b in unique.get("target_bosses", [])
-                                if b in _BOSSES_BY_ID]
-    entry["drop_verified_by"] = []
-    entry["drop_from_api"] = False
-    entry["drop_confidence"] = "local" if unique.get("target_bosses") else None
-    entry["drop_verification"] = "local_legacy" if unique.get("target_bosses") else None
-    entry["from_api"] = False
-    citation = (unique.get("source") or "").strip()
-    entry["source"] = (
-        "Local boss mapping - NOT in the verified dataset"
-        + (f" (earlier research: {citation})" if citation else "")
-    )
-    entry["category"] = "local"
-    entry["api"] = None
-    return entry
+    return {
+        "id": item_id,
+        "name": name,
+        "type": record.get("type") or "Unique",
+        "class": str(record.get("class") or "").strip() or UNAVAILABLE,
+        "slot": str(record.get("slot") or "").strip() or UNAVAILABLE,
+        "description": record.get("description"),
+        "image": None,
+        "image_filename": None,
+        "source": record.get("metadata_source") or "Data API (catalogue supplement)",
+        "confidence": drop.get("drop_confidence"),
+        "sources_count": len(drop["drop_verified_by"]) or None,
+        "notes": record.get("note"),
+        "category": "supplement",
+        "api": record,
+        "from_api": True,
+        "metadata_status": record.get("metadata_status"),
+        **drop,
+    }
 
 
 # ---------------------------------------------------------
@@ -262,7 +244,7 @@ def _load(force: bool = False) -> dict:
     # bliver brugt for et item serveren har data om - uanset hvor godt
     # verificeret det er. Forskellen bæres af posten selv
     # (verification_status/confidence), ikke af hvor den kom fra.
-    for noegle in ("items", "single_source_items"):
+    for noegle in ("items", "single_source_items", "catalogue_supplement"):
         for post in raa_drops.get(noegle, []):
             nid = str(post.get("item_id", "")).strip().lower()
             if nid:
@@ -274,18 +256,14 @@ def _load(force: bool = False) -> dict:
                and str(r.get("name", "")).strip()]
 
     by_id = {}
-    matched_local = set()
     for entry in adapted:
         by_id.setdefault(entry["id"], entry)
-        local = _LOCAL_INDEX.get(normalize_id(entry["name"]))
-        if local is not None:
-            matched_local.add(local["id"])
 
-    # Uniques this project has boss data for that the dataset doesn't
-    # list at all - kept so the boss pages don't quietly lose entries.
-    for unique in UNIQUES:
-        if unique["id"] not in by_id and unique["id"] not in matched_local:
-            by_id[unique["id"]] = _local_only(unique)
+    # Items the catalogue is missing, published by the server so this
+    # application needs no item data of its own.
+    for post in raa_drops.get("catalogue_supplement", []):
+        entry = _fra_supplement(post, drops)
+        by_id.setdefault(entry["id"], entry)
 
     items = sorted(by_id.values(), key=lambda e: e["name"].lower())
     _cache.update({"items": items, "by_id": by_id, "fetched_at": time.monotonic(),
@@ -396,48 +374,45 @@ def search_bosses(query: str) -> list[dict]:
 # Data validation (see tests) - fails loudly on data-quality bugs
 # rather than letting the UI silently show something broken.
 #
-# This validates the *local boss-mapping table*, which is the only item
-# data this application still owns. The catalogue itself is verified
-# server-side (453 items, sha256 against the manifest) and re-checked
-# from the app in tests/test_items_api.py.
+# The catalogue and its drop sources are verified server-side (453
+# items, sha256 against the manifest) and re-checked from the app in
+# tests/test_items_api.py.
 # ---------------------------------------------------------
 
 
 def validate_data() -> list[str]:
     """Returns a list of problem descriptions - empty means the data is
     internally consistent. Never raises; callers (tests, a future
-    startup check) decide what to do with a non-empty result."""
+    startup check) decide what to do with a non-empty result.
+
+    There is no local item table left to check. What can still go wrong
+    is the boss reference data, and a catalogue whose drop records point
+    at a boss this application has never heard of - which would show as
+    a silently missing drop source rather than an error."""
 
     problems = []
-
-    unique_ids = [u["id"] for u in UNIQUES]
-    if len(unique_ids) != len(set(unique_ids)):
-        dupes = {uid for uid in unique_ids if unique_ids.count(uid) > 1}
-        problems.append(f"Duplicate Unique ids: {sorted(dupes)}")
 
     boss_ids = [b["id"] for b in BOSSES]
     if len(boss_ids) != len(set(boss_ids)):
         dupes = {bid for bid in boss_ids if boss_ids.count(bid) > 1}
         problems.append(f"Duplicate Boss ids: {sorted(dupes)}")
 
-    boss_id_set = set(boss_ids)
-    for unique in UNIQUES:
-        if not unique.get("name", "").strip():
-            problems.append(f"Unique '{unique.get('id')}' has an empty name")
-        if not unique.get("id", "").strip():
-            problems.append(f"A Unique entry has an empty id (name={unique.get('name')})")
-        for bid in unique.get("target_bosses", []):
-            if bid not in boss_id_set:
-                problems.append(
-                    f"Unique '{unique['name']}' references unknown boss id '{bid}'"
-                )
-        if unique.get("type") not in ("Unique", "Mythic Unique"):
-            problems.append(f"Unique '{unique['name']}' has invalid type '{unique.get('type')}'")
-
     for boss in BOSSES:
         if not boss.get("name", "").strip():
             problems.append(f"Boss '{boss.get('id')}' has an empty name")
         if not boss.get("id", "").strip():
             problems.append(f"A Boss entry has an empty id (name={boss.get('name')})")
+
+    ids = [u["id"] for u in _load()["items"]]
+    if len(ids) != len(set(ids)):
+        dupes = {i for i in ids if ids.count(i) > 1}
+        problems.append(f"Duplicate item ids in the catalogue: {sorted(dupes)}")
+
+    for unique in _load()["items"]:
+        for bid in unique.get("target_bosses", []):
+            if bid not in _BOSSES_BY_ID:
+                problems.append(
+                    f"'{unique['name']}' references unknown boss id '{bid}'"
+                )
 
     return problems

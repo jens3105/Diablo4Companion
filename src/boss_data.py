@@ -3,10 +3,10 @@
 No Qt imports here on purpose - kept independently testable, same
 separation principle as builds/*.json vs. the interfaces that read them.
 
-Each boss's ``id`` is the stable key that src/unique_data.py's
+Each boss's ``id`` is the stable key that the server's drop-source
 ``target_bosses`` lists reference - never duplicate a boss's loot list
 here AND on the unique side; src/unique_drop_service.py computes
-"Uniques for this boss" by filtering UNIQUES, so there is exactly one
+records name, so there is exactly one
 place that relationship is recorded (the Unique's own target_bosses).
 
 Verified against Icy-Veins' Season 15 Lair Boss guide and aoeah.com's
