@@ -112,6 +112,22 @@ class UniqueDropsPageTests(unittest.TestCase):
         card._show_detail(service.find_unique("Harlequin Crest")["id"])
         self.assertIn("Data API (verified dataset)", card.detail_label.text())
 
+    def test_ui_distinguishes_every_drop_source_kind(self):
+        from src.unique_drops_interface import _boss_names_for, _drop_provenance
+
+        forventet = {
+            "Misericorde": ("Bartuc", "verified"),
+            "Mother's Embrace": ("General unique pool", "verified"),
+            "Harlequin Crest": ("Mythic pool", "verified"),
+            "Nemesis Bracers": ("DATA UNAVAILABLE", "none recorded"),
+            "Bane of Ahjad-Den": ("single source - low confidence", "SINGLE SOURCE"),
+            "Windforce": ("earlier research", "earlier research"),
+        }
+        for name, (i_linjen, i_panelet) in forventet.items():
+            entry = service.find_unique(name)
+            self.assertIn(i_linjen, _boss_names_for(entry), name)
+            self.assertIn(i_panelet, _drop_provenance(entry), name)
+
     def test_search_narrows_the_list(self):
         card = UniqueDropsCard()
         card.search_input.setText("Harlequin")

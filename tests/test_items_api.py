@@ -43,6 +43,7 @@ from src.items_api import ItemsAPI  # noqa: E402
 EXPECTED_ITEMS = 453
 EXPECTED_CATEGORIES = {"charms": 222, "mythics": 16, "uniques": 215}
 EXPECTED_SHA256 = "79aacf51f387b491c69d073d82dbdf7417acffb88363ade6d1f645002aad0a4c"
+DROP_DATASET_VERSION = "1.2.0"
 
 CONFIGURED_URL = items_api_base_url()
 
@@ -278,10 +279,11 @@ class UniqueDropServiceTests(unittest.TestCase):
         import collections
 
         fordeling = collections.Counter(u.get("drop_type") for u in self.uniques)
-        self.assertEqual(fordeling["target_boss"], 162)   # 151 verified + 11 local
+        # 151 verified + 1 single-source + 11 legacy fallback
+        self.assertEqual(fordeling["target_boss"], 163)
         self.assertEqual(fordeling["mythic_pool"], 13)
         self.assertEqual(fordeling["general_pool"], 15)
-        self.assertEqual(fordeling[None], 52, "Unverified items must stay unknown")
+        self.assertEqual(fordeling[None], 51, "Unverified items must stay unknown")
         for name in ("Harlequin Crest", "Fists of Fate"):
             entry = service.find_unique(name)
             self.assertEqual(entry["target_bosses"], [], f"{name} must not name a boss")
@@ -329,7 +331,7 @@ class UniqueDropServiceTests(unittest.TestCase):
     def test_drop_source_dataset_loads(self):
         meta = service.drop_source_info()
         self.assertEqual(meta["season"], 15)
-        self.assertEqual(meta["dataset_version"], "1.0.0")
+        self.assertEqual(meta["dataset_version"], DROP_DATASET_VERSION)
         self.assertGreaterEqual(len(meta["source_list"]), 2, "Needs independent sources")
 
     def test_target_boss_data_displays(self):
@@ -398,6 +400,96 @@ class UniqueDropServiceTests(unittest.TestCase):
         for method in ("POST", "PUT", "PATCH", "DELETE"):
             r = requests.request(method, f"{CONFIGURED_URL}/drop-sources", timeout=5)
             self.assertEqual(r.status_code, 405, method)
+
+    # --- the server is authoritative -------------------------------
+
+    def test_server_data_overrides_the_local_mapping(self):
+        """The three items where this project's older research and the
+        Season 15 sources disagree. The server wins, every time."""
+
+        for name, boss in (("Galvanic Azurite", "Duriel, King of Maggots"),
+                           ("Yen's Blessing", "Urivar"),
+                           ("Paingorger's Gauntlets", "Grigoire, The Galvanic Saint")):
+            entry = service.find_unique(name)
+            self.assertTrue(entry["drop_from_api"], f"{name} fell back to local data")
+            self.assertEqual(entry["drop_verification"], "verified", name)
+            bosses = [b["name"] for b in service.get_bosses_for_unique(entry["id"])]
+            self.assertEqual(bosses, [boss], name)
+
+    def test_no_item_with_server_data_uses_the_local_mapping(self):
+        from src.unique_data import UNIQUES
+
+        local_ids = {u["id"] for u in UNIQUES}
+        for unique in self.uniques:
+            if unique["drop_from_api"] and unique["id"] in local_ids:
+                self.assertNotEqual(
+                    unique["drop_verification"], "local_legacy",
+                    f"{unique['name']} showed stale local boss data",
+                )
+
+    def test_local_mapping_is_fallback_only(self):
+        legacy = [u for u in self.uniques if u["drop_verification"] == "local_legacy"]
+        self.assertEqual(len(legacy), 11, "Legacy mapping is used beyond its fallback role")
+        for unique in legacy:
+            self.assertFalse(unique["drop_from_api"])
+
+    # --- confidence levels ------------------------------------------
+
+    def test_single_source_is_distinguishable_from_verified(self):
+        entry = service.find_unique("Bane of Ahjad-Den")
+        self.assertEqual(entry["drop_verification"], "single_source")
+        self.assertEqual(entry["drop_confidence"], "low")
+        self.assertEqual(entry["drop_verified_by"], ["slashingcreeps"])
+
+        payload = ItemsAPI().drop_sources()
+        verified_names = {i["item_name"] for i in payload["items"]}
+        self.assertNotIn("Bane of Ahjad-Den", verified_names,
+                         "A single-source record must not sit among the verified ones")
+        self.assertEqual([i["item_name"] for i in payload["single_source_items"]],
+                         ["Bane of Ahjad-Den"])
+        for record in payload["items"]:
+            for drop in record["drop_sources"]:
+                self.assertEqual(drop["verification_status"], "verified")
+                self.assertGreaterEqual(drop["source_count"], 2)
+
+    # --- the unresolved stay unresolved -----------------------------
+
+    def test_unresolved_items_stay_unresolved(self):
+        payload = ItemsAPI().drop_sources()
+        self.assertEqual(payload["unresolved_count"], 51)
+        for name in payload["unresolved_items"]:
+            entry = service.find_unique(name)
+            self.assertIsNotNone(entry, name)
+            self.assertIsNone(entry["drop_type"], f"{name} was given a drop source")
+            self.assertEqual(entry["target_bosses"], [], name)
+            self.assertIsNone(entry["drop_verification"], name)
+
+    def test_the_counts_reconcile(self):
+        """231 catalogue items = 179 verified + 1 single-source + 51
+        unresolved. The 30 legacy mappings are a separate layer and are
+        not counted here."""
+
+        payload = ItemsAPI().drop_sources()
+        self.assertEqual(payload["catalogue_size"], 231)
+        self.assertEqual(payload["count"], 179)
+        self.assertEqual(payload["single_source_count"], 1)
+        self.assertEqual(payload["unresolved_count"], 51)
+        self.assertEqual(
+            payload["count"] + payload["single_source_count"] + payload["unresolved_count"],
+            payload["catalogue_size"],
+        )
+        from_api = [u for u in self.uniques if u["from_api"]]
+        self.assertEqual(len(from_api), 231)
+
+    def test_drop_source_file_reload_and_version_reporting(self):
+        version = ItemsAPI().version()
+        drops = version["drop_sources"]
+        self.assertEqual(drops["version"], DROP_DATASET_VERSION)
+        self.assertEqual(drops["season"], 15)
+        self.assertEqual(drops["item_count"], 179)
+        self.assertEqual(len(drops["sha256"]), 64)
+        # The item dataset's own hash is untouched by any of this.
+        self.assertEqual(version["sha256"], EXPECTED_SHA256)
 
     def test_no_duplicate_entries_after_merging(self):
         ids = [u["id"] for u in self.uniques]

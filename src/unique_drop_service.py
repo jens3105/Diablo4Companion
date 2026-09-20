@@ -136,9 +136,12 @@ def _drop_felter(navn: str, item_id: str, drops: dict, local: dict) -> dict:
     if post:
         kilder = post.get("drop_sources") or []
         bosser, navne, typer, belaeg = [], [], [], set()
+        tillid, verifikation = "high", "verified"
         for k in kilder:
             typer.append(k.get("type"))
             belaeg.update(k.get("sources") or [])
+            tillid = k.get("confidence", tillid)
+            verifikation = k.get("verification_status", k.get("status", verifikation))
             if k.get("type") == "target_boss" and k.get("name"):
                 navne.append(k["name"])
                 rec = _boss_record(k["name"])
@@ -146,14 +149,17 @@ def _drop_felter(navn: str, item_id: str, drops: dict, local: dict) -> dict:
                     bosser.append(rec["id"])
         return {"target_bosses": bosser, "drop_type": typer[0] if typer else None,
                 "drop_boss_names": navne, "drop_verified_by": sorted(belaeg),
-                "drop_from_api": True}
+                "drop_from_api": True, "drop_confidence": tillid,
+                "drop_verification": verifikation}
 
     lokale_bosser = list(local.get("target_bosses", []))
     return {"target_bosses": lokale_bosser,
             "drop_type": "target_boss" if lokale_bosser else None,
             "drop_boss_names": [_BOSSES_BY_ID[b]["name"] for b in lokale_bosser
                                 if b in _BOSSES_BY_ID],
-            "drop_verified_by": [], "drop_from_api": False}
+            "drop_verified_by": [], "drop_from_api": False,
+            "drop_confidence": "local" if lokale_bosser else None,
+            "drop_verification": "local_legacy" if lokale_bosser else None}
 
 
 def _adapt(record: dict, drops: dict | None = None) -> dict:
@@ -219,6 +225,8 @@ def _local_only(unique: dict) -> dict:
                                 if b in _BOSSES_BY_ID]
     entry["drop_verified_by"] = []
     entry["drop_from_api"] = False
+    entry["drop_confidence"] = "local" if unique.get("target_bosses") else None
+    entry["drop_verification"] = "local_legacy" if unique.get("target_bosses") else None
     entry["from_api"] = False
     citation = (unique.get("source") or "").strip()
     entry["source"] = (
@@ -250,11 +258,16 @@ def _load(force: bool = False) -> dict:
 
     raa_drops = _api.drop_sources() or {}
     drops = {}
-    for post in raa_drops.get("items", []):
-        nid = str(post.get("item_id", "")).strip().lower()
-        if nid:
-            drops[nid] = post
-        drops.setdefault(normalize_id(str(post.get("item_name", ""))), post)
+    # Begge slags server-poster indekseres, så den lokale tabel aldrig
+    # bliver brugt for et item serveren har data om - uanset hvor godt
+    # verificeret det er. Forskellen bæres af posten selv
+    # (verification_status/confidence), ikke af hvor den kom fra.
+    for noegle in ("items", "single_source_items"):
+        for post in raa_drops.get(noegle, []):
+            nid = str(post.get("item_id", "")).strip().lower()
+            if nid:
+                drops[nid] = post
+            drops.setdefault(normalize_id(str(post.get("item_name", ""))), post)
 
     adapted = [_adapt(r, drops) for r in records
                if str(r.get("category", "")).lower() in UNIQUE_CATEGORIES

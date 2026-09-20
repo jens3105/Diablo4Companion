@@ -63,6 +63,21 @@ def _no_data_text() -> str:
     )
 
 
+def _drop_provenance(entry: dict) -> str:
+    """Where the drop source came from, in the detail panel - so a
+    single-source guess and a cross-checked fact never read alike."""
+
+    status = entry.get("drop_verification")
+    kilder = ", ".join(entry.get("drop_verified_by") or [])
+    if status == "verified":
+        return f"verified Season 15 data - {entry.get('source_count') or len(entry.get('drop_verified_by') or [])} sources agree ({kilder})"
+    if status == "single_source":
+        return f"SINGLE SOURCE, low confidence - only {kilder} states this"
+    if status == "local_legacy":
+        return "this project's own earlier research (not in the server dataset)"
+    return "none recorded"
+
+
 def _boss_names_for(unique: dict) -> str:
     """Boss names, or an honest reason there are none.
 
@@ -72,14 +87,22 @@ def _boss_names_for(unique: dict) -> str:
     like a failure - it is missing knowledge, and the text says which.
     A boss is never guessed to fill the gap."""
 
+    # One source is not two. A low-confidence answer is shown, but never
+    # in a way that lets it pass for a verified one.
+    forbehold = ""
+    if unique.get("drop_verification") == "single_source":
+        forbehold = "  (single source - low confidence)"
+    elif unique.get("drop_verification") == "local_legacy":
+        forbehold = "  (this project's own earlier research)"
+
     bosses = service.get_bosses_for_unique(unique["id"])
     if bosses:
-        return ", ".join(b["name"] for b in bosses)
+        return ", ".join(b["name"] for b in bosses) + forbehold
 
     # A target boss the server named but this project has no record for:
     # still show the name rather than nothing.
     if unique.get("drop_boss_names"):
-        return ", ".join(unique["drop_boss_names"])
+        return ", ".join(unique["drop_boss_names"]) + forbehold
 
     # The two shared pools are real, verified answers - not a gap.
     if unique.get("drop_type") == "mythic_pool":
@@ -485,7 +508,7 @@ class UniqueDropsCard(BaseCard):
             f"Target boss(es):\n{boss_lines}\n"
             f"Confidence: {confidence_text}\n"
             f"Item data: {'Data API (verified dataset)' if entry.get('from_api') else 'local boss mapping - NOT in the verified dataset'}\n"
-            f"Drop source: {'verified Season 15 data (' + ', '.join(entry['drop_verified_by']) + ')' if entry.get('drop_verified_by') else ('this project' + chr(39) + 's own earlier research' if entry.get('target_bosses') else 'none recorded')}\n"
+            f"Drop source: {_drop_provenance(entry)}\n"
             f"Source: {entry['source']}"
         )
         if notes and bosses:
